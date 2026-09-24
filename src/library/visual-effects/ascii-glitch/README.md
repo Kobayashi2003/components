@@ -22,11 +22,18 @@ function Example() {
 
 ## Props
 
-- `text` is required. Whitespace is preserved and never replaced during a burst.
-- `duration` defaults to 600 ms, with a minimum of 120 ms. `intensity` defaults to 0.7 and accepts 0–1.
-- `glyphs` defaults to `$#@/\\|=+*%▒░` and supplies replacement characters. `shift` (18 px) limits the displacement of two horizontal text bands.
-- `scanlines` and `flicker` default to true. `triggerOnHover` also defaults to true; `loopInterval` can repeat the effect at intervals no shorter than `duration + 100` ms.
-- `className` and `style` customize the root, including text color and font.
+| Prop                 | Default               | Purpose                                                     |
+| -------------------- | --------------------- | ----------------------------------------------------------- |
+| `text`               | required              | Source text; whitespace is preserved during a burst.        |
+| `duration`           | `600` ms              | Burst duration, with a minimum of 120 ms.                   |
+| `intensity`          | `0.7`                 | Character replacement and flicker strength, clamped to 0–1. |
+| `glyphs`             | built-in terminal set | Characters used to replace non-whitespace text.             |
+| `shift`              | `18` px               | Maximum displacement of two horizontal text bands.          |
+| `scanlines`          | `true`                | Adds a subtle scanline texture.                             |
+| `flicker`            | `true`                | Varies text opacity during a burst.                         |
+| `triggerOnHover`     | `true`                | Starts a burst when the pointer enters.                     |
+| `loopInterval`       | unset                 | Repeats bursts, no faster than `duration + 100` ms.         |
+| `className`, `style` | —                     | Customize the root, including font and text color.          |
 
 ## Notes
 
