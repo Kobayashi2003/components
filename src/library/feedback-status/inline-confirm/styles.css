@@ -1,0 +1,113 @@
+.atlas-control {
+  --control-surface: #2b2c2f;
+  --control-hover: #3b3c3f;
+  --control-ink: #f4f4f2;
+  --control-muted: #909193;
+  --control-ease: cubic-bezier(0.22, 1.25, 0.4, 1);
+  color: var(--control-ink);
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.atlas-control *,
+.atlas-control *::before,
+.atlas-control *::after {
+  box-sizing: border-box;
+}
+.atlas-control button,
+.atlas-control input {
+  font: inherit;
+  color: inherit;
+}
+.atlas-control button {
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.atlas-control button:disabled,
+.atlas-control input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:where(.atlas-control) :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.atlas-control svg {
+  display: block;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-control *,
+  .atlas-control *::before,
+  .atlas-control *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.inline-confirm__shell {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 174px;
+  min-height: 48px;
+  background: var(--control-surface);
+  border-radius: 26px;
+  overflow: hidden;
+  transition: width 360ms var(--control-ease);
+}
+.inline-confirm__shell[data-phase='asking'],
+.inline-confirm__shell[data-phase='done'] {
+  width: 228px;
+}
+.inline-confirm__shell > button,
+.inline-confirm__shell > span {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: transparent;
+  white-space: nowrap;
+  animation: inline-confirm-enter 220ms ease-out;
+}
+.inline-confirm__shell > button:hover {
+  background: var(--control-hover);
+}
+.inline-confirm__shell > .inline-confirm__danger {
+  color: #f26b72;
+  background: #f26b7212;
+  border-left: 1px solid #ffffff12;
+}
+.inline-confirm__undo {
+  position: relative;
+}
+.inline-confirm__undo i {
+  position: absolute;
+  bottom: 7px;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: #a1a2a4;
+  transform-origin: left;
+  animation: inline-confirm-fuse linear forwards;
+}
+.inline-confirm p {
+  color: #f2a6a6;
+  font-size: 12px;
+  max-width: 240px;
+}
+@keyframes inline-confirm-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+@keyframes inline-confirm-fuse {
+  to {
+    transform: scaleX(0);
+  }
+}

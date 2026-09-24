@@ -1,0 +1,39 @@
+.control-demo {
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 40px 24px;
+  background: #202123;
+  border-radius: 16px;
+  color: #f4f4f2;
+  font:
+    13px/1.5 Arial,
+    sans-serif;
+}
+.control-demo > p,
+.control-demo > output {
+  color: #959698;
+  margin: 0;
+  text-align: center;
+  max-width: 420px;
+  overflow-wrap: anywhere;
+}
+.control-demo > button {
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: transparent;
+  color: #ddd;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.control-demo > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.control-demo--roomy {
+  min-height: 480px;
+}

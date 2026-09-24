@@ -1,0 +1,85 @@
+.range-dial-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr);
+  overflow: hidden;
+  border: 1px solid #343638;
+  border-radius: 16px;
+  background: #202123;
+  color: #f4f4f3;
+  font-family: Arial, sans-serif;
+}
+.range-dial-demo__scene {
+  display: grid;
+  place-items: center;
+  min-height: 540px;
+  padding: 36px;
+  background: radial-gradient(ellipse at 90% 10%, #ffffff05, transparent 60%);
+}
+.range-dial-demo__controls {
+  padding: 32px;
+  border-left: 1px solid #343638;
+  align-self: center;
+}
+.range-dial-demo__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.range-dial-demo__heading h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+.range-dial-demo__heading span {
+  font: 10px monospace;
+  letter-spacing: 2px;
+  color: #9a9c9f;
+}
+.range-dial-demo__controls label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin: 24px 0;
+  font-size: 13px;
+}
+.range-dial-demo__controls output {
+  font-variant-numeric: tabular-nums;
+}
+.range-dial-demo__controls input[type='range'] {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 0;
+  accent-color: #35d583;
+}
+.range-dial-demo__controls input:focus-visible {
+  outline: 2px solid #8af2b9;
+  outline-offset: 4px;
+}
+.range-dial-demo__controls .range-dial-demo__disabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.range-dial-demo__disabled input {
+  accent-color: #35d583;
+}
+.range-dial-demo__controls p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a5a8a9;
+}
+@media (max-width: 760px) {
+  .range-dial-demo {
+    grid-template-columns: 1fr;
+  }
+  .range-dial-demo__scene {
+    min-height: 340px;
+    padding: 24px;
+  }
+  .range-dial-demo__controls {
+    border-left: 0;
+    border-top: 1px solid #343638;
+    padding: 24px;
+  }
+}

@@ -1,0 +1,158 @@
+.atlas-control {
+  --control-surface: #2b2c2f;
+  --control-hover: #3b3c3f;
+  --control-ink: #f4f4f2;
+  --control-muted: #909193;
+  --control-ease: cubic-bezier(0.22, 1.25, 0.4, 1);
+  color: var(--control-ink);
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.atlas-control *,
+.atlas-control *::before,
+.atlas-control *::after {
+  box-sizing: border-box;
+}
+.atlas-control button,
+.atlas-control input {
+  font: inherit;
+  color: inherit;
+}
+.atlas-control button {
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.atlas-control button:disabled,
+.atlas-control input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:where(.atlas-control) :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.atlas-control svg {
+  display: block;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-control *,
+  .atlas-control *::before,
+  .atlas-control *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.task-checklist {
+  width: 308px;
+  max-width: 100%;
+  background: var(--control-surface);
+  border-radius: 19px;
+  padding: 9px 15px;
+}
+.task-checklist__row {
+  position: relative;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  min-height: 41px;
+  cursor: pointer;
+}
+.task-checklist__row input {
+  position: absolute;
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.task-checklist__box,
+.task-checklist__empty {
+  display: grid;
+  place-items: center;
+  flex: 0 0 18px;
+  height: 18px;
+  border: 1.5px solid #646568;
+  border-radius: 6px;
+  transition:
+    background 200ms,
+    border-color 200ms;
+}
+.task-checklist__box svg {
+  opacity: 0;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition:
+    stroke-dashoffset 260ms,
+    opacity 120ms;
+}
+.task-checklist__text {
+  position: relative;
+  overflow-wrap: anywhere;
+  transition: color 220ms;
+}
+.task-checklist__text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52%;
+  height: 1.5px;
+  background: #9b9c9e;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms var(--control-ease);
+}
+.task-checklist__row input:checked ~ .task-checklist__text {
+  color: var(--control-muted);
+}
+.task-checklist__row input:checked ~ .task-checklist__text::after {
+  transform: scaleX(1);
+}
+.task-checklist__row input:checked + .task-checklist__box {
+  background: var(--control-ink);
+  border-color: var(--control-ink);
+  color: #292a2c;
+  animation: checklist-pop 320ms var(--control-ease);
+}
+.task-checklist__row input:checked + .task-checklist__box svg {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+.task-checklist__row input:focus-visible + .task-checklist__box {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.task-checklist__row:has(input:disabled) {
+  opacity: 0.45;
+  cursor: default;
+}
+.task-checklist__add {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 41px;
+  padding: 0;
+  background: none;
+  color: var(--control-muted) !important;
+}
+.task-checklist__add input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  min-width: 0;
+  width: 100%;
+  padding: 6px 0;
+}
+.task-checklist__empty {
+  opacity: 0.55;
+}
+@keyframes checklist-pop {
+  50% {
+    transform: scale(1.18, 0.92);
+  }
+}

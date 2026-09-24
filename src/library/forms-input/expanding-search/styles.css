@@ -1,0 +1,98 @@
+.atlas-control {
+  --control-surface: #2b2c2f;
+  --control-hover: #3b3c3f;
+  --control-ink: #f4f4f2;
+  --control-muted: #909193;
+  --control-ease: cubic-bezier(0.22, 1.25, 0.4, 1);
+  color: var(--control-ink);
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.atlas-control *,
+.atlas-control *::before,
+.atlas-control *::after {
+  box-sizing: border-box;
+}
+.atlas-control button,
+.atlas-control input {
+  font: inherit;
+  color: inherit;
+}
+.atlas-control button {
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.atlas-control button:disabled,
+.atlas-control input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:where(.atlas-control) :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.atlas-control svg {
+  display: block;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-control *,
+  .atlas-control *::before,
+  .atlas-control *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.expanding-search {
+  display: flex;
+  align-items: center;
+  width: 56px;
+  max-width: 100%;
+  height: 56px;
+  border-radius: 32px;
+  background: var(--control-surface);
+  transition:
+    width 500ms var(--control-ease),
+    transform 180ms;
+  overflow: hidden;
+}
+.expanding-search[data-open='true'] {
+  width: 320px;
+}
+.expanding-search button {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  background: transparent;
+  border-radius: 50%;
+  color: var(--control-muted);
+}
+.expanding-search:focus-within button {
+  color: var(--control-ink);
+}
+.expanding-search input {
+  min-width: 0;
+  flex: 1;
+  width: 0;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 180ms 80ms;
+}
+.expanding-search[data-open='true'] input {
+  opacity: 1;
+  margin-right: 20px;
+}
+.expanding-search input:focus-visible {
+  outline: none;
+}
+.expanding-search:focus-within {
+  box-shadow: inset 0 0 0 1px #55565a;
+}

@@ -1,0 +1,122 @@
+.atlas-control {
+  --control-surface: #2b2c2f;
+  --control-hover: #3b3c3f;
+  --control-ink: #f4f4f2;
+  --control-muted: #909193;
+  --control-ease: cubic-bezier(0.22, 1.25, 0.4, 1);
+  color: var(--control-ink);
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.atlas-control *,
+.atlas-control *::before,
+.atlas-control *::after {
+  box-sizing: border-box;
+}
+.atlas-control button,
+.atlas-control input {
+  font: inherit;
+  color: inherit;
+}
+.atlas-control button {
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.atlas-control button:disabled,
+.atlas-control input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:where(.atlas-control) :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.atlas-control svg {
+  display: block;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-control *,
+  .atlas-control *::before,
+  .atlas-control *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.create-menu {
+  position: relative;
+  width: 130px;
+  height: 48px;
+  border-radius: 28px;
+  background: var(--control-surface);
+  transition:
+    width 420ms var(--control-ease),
+    height 420ms var(--control-ease),
+    border-radius 350ms;
+}
+.create-menu[data-open='true'] {
+  width: 240px;
+  height: var(--create-height);
+}
+.create-menu__trigger {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 16px;
+  background: transparent;
+  border-radius: inherit;
+  transition:
+    opacity 120ms,
+    transform 200ms;
+}
+.create-menu__trigger svg {
+  width: 18px;
+  height: 18px;
+}
+.create-menu[data-open='true'] .create-menu__trigger {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.85);
+}
+.create-menu__menu {
+  position: absolute;
+  inset: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms;
+}
+.create-menu[data-open='true'] .create-menu__menu {
+  opacity: 1;
+  visibility: visible;
+}
+.create-menu__menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  border-radius: 22px;
+  text-align: left;
+  transform: translateY(9px);
+  transition:
+    background 150ms,
+    transform 360ms var(--control-ease);
+  transition-delay: calc(var(--item-index) * 25ms);
+}
+.create-menu[data-open='true'] .create-menu__menu button {
+  transform: translateY(0);
+}
+.create-menu__menu button:hover,
+.create-menu__menu button:focus-visible {
+  background: var(--control-hover);
+}

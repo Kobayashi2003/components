@@ -1,0 +1,117 @@
+.atlas-control {
+  --control-surface: #2b2c2f;
+  --control-hover: #3b3c3f;
+  --control-ink: #f4f4f2;
+  --control-muted: #909193;
+  --control-ease: cubic-bezier(0.22, 1.25, 0.4, 1);
+  color: var(--control-ink);
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+.atlas-control *,
+.atlas-control *::before,
+.atlas-control *::after {
+  box-sizing: border-box;
+}
+.atlas-control button,
+.atlas-control input {
+  font: inherit;
+  color: inherit;
+}
+.atlas-control button {
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.atlas-control button:disabled,
+.atlas-control input:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+:where(.atlas-control) :where(button, input, [tabindex]):focus-visible {
+  outline: 2px solid #bfc4ce;
+  outline-offset: 3px;
+}
+.atlas-control svg {
+  display: block;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-control *,
+  .atlas-control *::before,
+  .atlas-control *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.radial-action-menu {
+  position: relative;
+  width: 290px;
+  max-width: 100%;
+  height: 215px;
+}
+.radial-action-menu button {
+  position: absolute;
+  left: calc(50% - 26px);
+  bottom: 30px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--control-surface);
+}
+.radial-action-menu__trigger {
+  z-index: 2;
+}
+.radial-action-menu__trigger svg {
+  transition: transform 340ms var(--control-ease);
+}
+.radial-action-menu[data-open='true'] .radial-action-menu__trigger svg {
+  transform: rotate(45deg);
+}
+.radial-action-menu__items button {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.45);
+  transition:
+    transform 450ms var(--control-ease),
+    opacity 180ms;
+}
+.radial-action-menu[data-open='true'] .radial-action-menu__items button {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(var(--radial-x), var(--radial-y)) scale(1);
+  transition-delay: var(--radial-delay);
+}
+.radial-action-menu__items button:hover,
+.radial-action-menu__items button:focus-visible {
+  background: var(--control-hover);
+  z-index: 3;
+}
+.radial-action-menu__items span {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 9px monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+}
+.radial-action-menu__items button[data-label-above='true'] span {
+  top: -22px;
+  bottom: auto;
+}
+.radial-action-menu__items:has(button:hover) button:focus-visible:not(:hover) span {
+  opacity: 0;
+}
+.radial-action-menu__items button:hover span,
+.radial-action-menu__items button:focus-visible span {
+  opacity: 1;
+}
