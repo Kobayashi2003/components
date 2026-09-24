@@ -74,7 +74,6 @@ export function SlideToConfirm({
             const box = track.current?.getBoundingClientRect()
             if (!box || !track.current) return
             event.preventDefault()
-            event.currentTarget.focus()
             event.currentTarget.setPointerCapture(event.pointerId)
             const scale = box.width / track.current.offsetWidth
             gesture.current = {

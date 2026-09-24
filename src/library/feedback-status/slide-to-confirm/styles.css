@@ -103,6 +103,7 @@
   transition: width 300ms;
   cursor: grabbing;
   transform: scale(1.025, 0.975);
+  outline: none;
 }
 .slide-confirm[data-done='true'] .slide-confirm__thumb {
   left: 4px;
