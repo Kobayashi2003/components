@@ -51,6 +51,7 @@ export interface CatalogEntryMeta {
 export interface CatalogEntry extends Omit<CatalogEntryMeta, 'tags'> {
   tags: CatalogTag[]
   key: string
+  thumbnail?: string
   Demo: LazyExoticComponent<ComponentType>
   loadReadme: () => Promise<string>
 }

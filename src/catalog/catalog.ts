@@ -58,6 +58,12 @@ const entryReadmes = import.meta.glob('../library/*/*/README.md', {
   import: 'default',
 }) as Record<string, () => Promise<string>>
 
+const thumbnailModules = import.meta.glob('../assets/thumbnails/*/*.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
 const pathPattern = /^\.\.\/library\/([^/]+)\/([^/]+)\/meta\.ts$/
 
 export const entries: CatalogEntry[] = Object.entries(metadataModules)
@@ -91,6 +97,7 @@ export const entries: CatalogEntry[] = Object.entries(metadataModules)
       ),
       usage: metadata.usage ?? 'reusable',
       key: `${category}/${slug}`,
+      thumbnail: thumbnailModules[`../assets/thumbnails/${category}/${slug}.webp`],
       Demo: lazy(loadDemo),
       loadReadme,
     }

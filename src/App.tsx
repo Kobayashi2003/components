@@ -127,20 +127,26 @@ function CategoryCard({ category }: { category: CategoryDefinition }) {
 
 function EntryCard({ entry }: { entry: CatalogEntry }) {
   return (
-    <article className="entry-card">
+    <a
+      className={`entry-card${entry.thumbnail ? ' entry-card--has-thumbnail' : ''}`}
+      href={`#/entry/${entry.category}/${entry.slug}`}
+    >
       <div className="entry-card-body">
         <div className="entry-card-topline">
           <span>{entry.kind}</span>
           <span>{entry.status}</span>
         </div>
-        <h2>
-          <a href={`#/entry/${entry.category}/${entry.slug}`}>{entry.title}</a>
-        </h2>
+        <h2>{entry.title}</h2>
         <p>{entry.summary}</p>
         <TagList tags={entry.tags} />
         <CapabilityList entry={entry} />
       </div>
-    </article>
+      {entry.thumbnail && (
+        <div className="entry-card-thumbnail" aria-hidden="true">
+          <img src={entry.thumbnail} alt="" loading="lazy" decoding="async" />
+        </div>
+      )}
+    </a>
   )
 }
 
@@ -194,9 +200,7 @@ function HomePage() {
           <span />
         </div>
         <h1>
-          Component
-          {' '}
-          <em>Atlas.</em>
+          Component <em>Atlas.</em>
         </h1>
       </section>
 
