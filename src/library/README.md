@@ -11,6 +11,7 @@ Each entry lives at `category/slug`. Keep EPUB Reader's existing package structu
 - `demo/styles.css`: showcase-only layout and controls. Empty is fine when no additional styling is needed.
 - `meta.ts`: small catalog metadata, registered tag IDs, usage and verified capabilities.
 - `README.md`: short user documentation.
+- `thumbnail.webp` (optional): a transparent preview of a representative component state, shown on catalog cards.
 
 Do not add a nested `src/` by default. Add `components/`, `hooks/`, `assets/` or a meaningful domain directory only when there is a real responsibility to separate. Prefer named modules such as `geometry.ts` over a miscellaneous utils collection. Shared types belong in `types.ts` only when multiple files consume them. Demo assets and fixture data belong in `demo/`.
 
@@ -32,7 +33,7 @@ For `usage: showcase`, write one sentence and a minimal embedding example, with 
 
 Use registered IDs from `src/catalog/tags.ts`; do not write arbitrary label/group objects in new entries. Input, feature, technology and style are the tag groups. Keyboard, touch and reduced-motion support belong to `capabilities`, and missing means unknown. Only claim capabilities that have been checked. `usage` describes reusable vs showcase, independently of kind/status.
 
-The catalog eagerly loads metadata only. Demos and documentation remain lazy. Run lint, build and relevant interaction checks after changes; verify public imports work without demo CSS.
+The catalog discovers `thumbnail.webp` beside each entry's `meta.ts` by filename; no metadata field or central image registry is needed. Keep the preview tightly cropped and free of a screenshot backdrop so it works in both themes. The catalog eagerly loads metadata and thumbnail URLs only. Demos and documentation remain lazy. Run lint, build and relevant interaction checks after changes; verify public imports work without demo CSS.
 
 ## Checks
 

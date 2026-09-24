@@ -136,13 +136,15 @@ function EntryCard({ entry }: { entry: CatalogEntry }) {
           <span>{entry.kind}</span>
           <span>{entry.status}</span>
         </div>
-        <h2>{entry.title}</h2>
-        <p>{entry.summary}</p>
-        <TagList tags={entry.tags} />
-        <CapabilityList entry={entry} />
+        <div className="entry-card-copy">
+          <h2>{entry.title}</h2>
+          <p>{entry.summary}</p>
+          <TagList tags={entry.tags} />
+          <CapabilityList entry={entry} />
+        </div>
       </div>
       {entry.thumbnail && (
-        <div className="entry-card-thumbnail" aria-hidden="true">
+        <div className="entry-card-thumbnail" data-slug={entry.slug} aria-hidden="true">
           <img src={entry.thumbnail} alt="" loading="lazy" decoding="async" />
         </div>
       )}

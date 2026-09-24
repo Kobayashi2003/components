@@ -389,7 +389,9 @@ main {
   gap: 28px;
 }
 .entry-card {
-  display: grid;
+  position: relative;
+  display: block;
+  overflow: hidden;
   border: 1px solid var(--line);
   background: var(--entry-card);
   color: inherit;
@@ -397,9 +399,6 @@ main {
   transition:
     transform 220ms ease,
     border-color 220ms ease;
-}
-.entry-card--has-thumbnail {
-  grid-template-columns: minmax(0, 1fr) minmax(160px, 38%);
 }
 .entry-card:hover,
 .entry-card:focus-visible {
@@ -412,17 +411,29 @@ main {
 }
 .entry-card-body {
   display: flex;
-  min-height: 210px;
+  position: relative;
+  z-index: 1;
+  min-height: 240px;
   padding: 24px;
   flex-direction: column;
   min-width: 0;
 }
-.entry-card-thumbnail {
-  position: relative;
+.entry-card-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   min-width: 0;
-  overflow: hidden;
-  border-left: 1px solid var(--line);
-  background: #202123;
+}
+.entry-card--has-thumbnail .entry-card-copy {
+  width: 66%;
+}
+.entry-card-thumbnail {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  bottom: 12px;
+  width: 35%;
+  pointer-events: none;
 }
 .entry-card-thumbnail img {
   display: block;
@@ -431,6 +442,9 @@ main {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+:root:not([data-theme='light']) .entry-card-thumbnail[data-slug='cursor-distortion'] img {
+  filter: invert(1);
 }
 .entry-card h2 {
   margin: 22px 0 8px;
@@ -982,11 +996,17 @@ footer {
   .entry-grid {
     grid-template-columns: 1fr;
   }
-  .entry-card--has-thumbnail {
-    grid-template-columns: minmax(0, 1fr) 38%;
-  }
   .entry-card-body {
     padding: 18px;
+  }
+  .entry-card--has-thumbnail .entry-card-copy {
+    width: 65%;
+  }
+  .entry-card-thumbnail {
+    top: 44px;
+    right: 0;
+    bottom: 4px;
+    width: 36%;
   }
   .entry-card h2 {
     font-size: 23px;
