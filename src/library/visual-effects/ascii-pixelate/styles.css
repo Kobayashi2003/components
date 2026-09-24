@@ -1,0 +1,44 @@
+.ascii-pixelate {
+  --ascii-x: 50%;
+  --ascii-y: 50%;
+  --ascii-radius: 180px;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ascii-pixelate__layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ascii-pixelate__base {
+  filter: blur(0.3px);
+  transition: filter 500ms ease;
+}
+
+.ascii-pixelate__detail {
+  opacity: 0;
+  mask-image: radial-gradient(
+    circle var(--ascii-radius) at var(--ascii-x) var(--ascii-y),
+    #000 18%,
+    transparent 100%
+  );
+  transition: opacity 500ms ease;
+}
+
+.ascii-pixelate__outgoing {
+  opacity: 0;
+  transition: opacity 520ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ascii-pixelate__layer {
+    transition: none;
+  }
+}

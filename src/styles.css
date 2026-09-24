@@ -562,14 +562,17 @@ main {
    top layer instead of outbidding the page on z-index. While closed it still has
    to lay out as an ordinary section, so the popover UA defaults are reset here. */
 .demo-stage {
-  display: block;
+  display: flex;
   position: static;
   inset: auto;
   width: auto;
   height: auto;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: clamp(20px, 3vw, 42px) var(--page-x) 0;
   padding: 0;
-  overflow: visible;
+  flex-direction: column;
+  overflow: hidden;
   border: 1px solid var(--line);
   color: inherit;
   background: var(--demo-surface);
@@ -624,6 +627,8 @@ main {
 }
 .demo-stage-content {
   min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 .demo-stage:is(:fullscreen, :popover-open) {
   display: flex;

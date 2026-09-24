@@ -81,6 +81,11 @@ export const tagRegistry = {
     label: 'Canvas 2D',
     group: 'technology',
   },
+  'ascii-art': {
+    id: 'ascii-art',
+    label: 'ASCII art',
+    group: 'style',
+  },
   'refraction-lens': {
     id: 'refraction-lens',
     label: 'Refraction lens',
