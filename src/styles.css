@@ -25,6 +25,9 @@
   --document-ink: #a9acb1;
   --soft-fill: rgba(255, 255, 255, 0.025);
   --soft-hover: rgba(255, 255, 255, 0.018);
+  --scrollbar-thumb: #4a5054;
+  --scrollbar-thumb-hover: #a5c55a;
+  --scrollbar-thumb-active: var(--acid);
 }
 
 :root[data-theme='light'] {
@@ -48,10 +51,58 @@
   --document-ink: #51564f;
   --soft-fill: rgba(24, 28, 22, 0.035);
   --soft-hover: rgba(24, 28, 22, 0.028);
+  --scrollbar-thumb: #a7aca3;
+  --scrollbar-thumb-hover: #728a36;
+  --scrollbar-thumb-active: var(--acid);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html::-webkit-scrollbar,
+.app-shell :where(*)::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+.app-shell :where(*)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb,
+.app-shell :where(*)::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--scrollbar-thumb) padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+.app-shell :where(*)::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+html::-webkit-scrollbar-thumb:active,
+.app-shell :where(*)::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+}
+
+html::-webkit-scrollbar-button,
+html::-webkit-scrollbar-corner,
+.app-shell :where(*)::-webkit-scrollbar-button,
+.app-shell :where(*)::-webkit-scrollbar-corner {
+  display: none;
+  background: transparent;
+}
+
+@supports (-moz-appearance: none) {
+  html,
+  .app-shell :where(*) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
 }
 
 html {
@@ -820,7 +871,6 @@ body:has(.demo-stage:popover-open) {
   border: 1px solid var(--line);
   border-radius: 4px;
   background: rgba(213, 255, 79, 0.04);
-  scrollbar-color: var(--faint) transparent;
 }
 .markdown-document pre code {
   display: block;
@@ -858,7 +908,6 @@ body:has(.demo-stage:popover-open) {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 4px;
-  scrollbar-color: var(--faint) transparent;
 }
 .markdown-table:focus-visible {
   outline: 2px solid var(--acid);

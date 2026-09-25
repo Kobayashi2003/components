@@ -187,6 +187,14 @@
   height: 6px;
   border-radius: 9px;
   background: #595a5d;
+  transition:
+    height 180ms ease,
+    margin 180ms ease;
+}
+
+.morph-audio__rail--seeking {
+  height: 10px;
+  margin-block: -2px;
 }
 
 .morph-audio__run {
@@ -388,7 +396,8 @@
 @media (prefers-reduced-motion: reduce) {
   .morph-audio,
   .morph-audio__heading,
-  .morph-audio__artwork {
+  .morph-audio__artwork,
+  .morph-audio__rail {
     transition: none;
   }
 

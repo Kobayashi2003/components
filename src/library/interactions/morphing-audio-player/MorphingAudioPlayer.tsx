@@ -33,6 +33,7 @@ export function MorphingAudioPlayer({
   const [expanded, setExpanded] = useState(initialExpanded)
   const [playing, setPlaying] = useState(false)
   const [liked, setLiked] = useState(false)
+  const [seeking, setSeeking] = useState(false)
   const [elapsed, setElapsed] = useState(() => Math.min(total, Math.max(0, initialTime)))
   const elapsedRef = useRef(elapsed)
   const seekingRef = useRef(false)
@@ -68,6 +69,11 @@ export function MorphingAudioPlayer({
     elapsedRef.current = next
     setElapsed(next)
     if (next >= total) setPlaying(false)
+  }
+
+  function updateSeeking(value: boolean) {
+    seekingRef.current = value
+    setSeeking(value)
   }
 
   function togglePlay() {
@@ -132,7 +138,7 @@ export function MorphingAudioPlayer({
         </div>
 
         <div className="morph-audio__timeline" aria-label="Playback progress">
-          <div className="morph-audio__rail">
+          <div className={`morph-audio__rail${seeking ? ' morph-audio__rail--seeking' : ''}`}>
             <span className="morph-audio__run" style={{ width: `${progress}%` }} />
             <input
               className="morph-audio__seek"
@@ -144,18 +150,10 @@ export function MorphingAudioPlayer({
               aria-label="Seek playback"
               aria-valuetext={formatTime(elapsed)}
               onChange={(event) => seek(Number(event.currentTarget.value))}
-              onPointerDown={() => {
-                seekingRef.current = true
-              }}
-              onPointerUp={() => {
-                seekingRef.current = false
-              }}
-              onPointerCancel={() => {
-                seekingRef.current = false
-              }}
-              onLostPointerCapture={() => {
-                seekingRef.current = false
-              }}
+              onPointerDown={() => updateSeeking(true)}
+              onPointerUp={() => updateSeeking(false)}
+              onPointerCancel={() => updateSeeking(false)}
+              onLostPointerCapture={() => updateSeeking(false)}
             />
           </div>
           {expanded && (
