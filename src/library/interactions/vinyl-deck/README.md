@@ -7,31 +7,42 @@ An SVG audio deck with track selection, platter dragging, playback controls, loc
 ```tsx
 import { VinylDeck } from './vinyl-deck'
 
-;<VinylDeck
-  items={[
-    {
-      id: '01',
-      title: 'Blue Static',
-      genre: 'Breakcore',
-      release: '2026',
-      author: 'Afterimage',
-      caption: 'Noise becomes rhythm.',
-      cover: '/cover.jpg',
-      audio: '/track.mp3',
-    },
-  ]}
-  backgroundControls
-/>
+export function Example() {
+  return (
+    <VinylDeck
+      items={[
+        {
+          id: '01',
+          title: 'Blue Static',
+          genre: 'Breakcore',
+          release: '2026',
+          author: 'Afterimage',
+          caption: 'Noise becomes rhythm.',
+          cover: '/cover.jpg',
+          audio: '/track.mp3',
+        },
+      ]}
+      backgroundControls
+    />
+  )
+}
 ```
 
 ## Props
 
-- `items` is required. An item contains track metadata plus optional `cover`, `audio`, color, BPM, and format fields.
-- `source` accepts a URL string, `URL`, `Blob`, `File`, or `MediaStream` and overrides the active item audio.
-- `initialIndex` defaults to 0. `autoPlay`, `loop`, and `muted` default to false.
-- `volume` / `defaultVolume` (64, 0–100), `shuffle` / `defaultShuffle` (false), `autoAdvance` / `defaultAutoAdvance` (false), and `shadowAngle` / `defaultShadowAngle` (90°) support controlled values with matching change callbacks.
-- `showBackground` defaults to true; `backgroundControls` defaults to false. `audioRef` exposes the underlying audio element.
-- `onChange`, `onTimeUpdate`, `onAudioFilesChange`, and `onError` expose navigation and media state.
+| Prop                                                           | Default          | Description                                                            |
+| -------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------- |
+| `items`                                                        | Required         | Tracks with metadata and optional cover, audio, color, BPM, or format. |
+| `source`                                                       | —                | Overrides active audio with a URL, Blob, File, or MediaStream.         |
+| `initialIndex`                                                 | `0`              | Initially selected track.                                              |
+| `autoPlay` / `loop` / `muted`                                  | `false`          | Initial playback behavior.                                             |
+| `volume` / `defaultVolume`                                     | - / `64`         | Controlled or initial volume, from 0 to 100.                           |
+| `shuffle` / `defaultShuffle`                                   | - / `false`      | Controlled or initial shuffle state.                                   |
+| `autoAdvance` / `defaultAutoAdvance`                           | - / `false`      | Controlled or initial automatic advance.                               |
+| `shadowAngle` / `defaultShadowAngle`                           | - / `90`         | Controlled or initial shadow angle in degrees.                         |
+| `showBackground` / `backgroundControls`                        | `true` / `false` | Backdrop and backdrop controls.                                        |
+| `audioRef`                                                     | —                | Underlying audio element ref.                                          |
+| `onChange` / `onTimeUpdate` / `onAudioFilesChange` / `onError` | —                | Navigation, progress, local-file, and error callbacks.                 |
 
 ## Notes
 

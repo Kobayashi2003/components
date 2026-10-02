@@ -6,19 +6,33 @@ A rotary numeric input with adjustable drag resistance and detents, in graphite,
 
 ```tsx
 import { RotaryKnob } from './rotary-knob'
-;<RotaryKnob label="Gain" defaultValue={50} damping={0.35} detentStep={10} detentStrength={0.6} />
+
+export function Example() {
+  return (
+    <RotaryKnob
+      label="Gain"
+      defaultValue={50}
+      damping={0.35}
+      detentStep={10}
+      detentStrength={0.6}
+    />
+  )
+}
 ```
 
-## API
+## Props
 
-- `label` is the accessible name; `unit` defaults to `%`.
-- `value` / `onChange` support controlled input; `defaultValue` defaults to 50 for uncontrolled input.
-- `min`, `max`, `step` default to 0, 100, 1. Values clamp to the range and round to steps anchored at min; max remains reachable. Use detent spacing divisible by step for exact notches.
-- `damping`: 0–1, default 0.35. Maximum damping requires four times the drag travel.
-- `detentStep`: notch spacing in value units, default 10; 0 disables notches.
-- `detentStrength`: 0–1, default 0.6; 0 is smooth, 1 fully indexed.
-- `appearance`: `graphite`, `ivory`, or `signal`.
-- `disabled`: prevents input; zero-width ranges also disable input.
+| Prop                            | Default           | Description                                                  |
+| ------------------------------- | ----------------- | ------------------------------------------------------------ |
+| `label`                         | Required          | Accessible input name.                                       |
+| `value` / `onChange`            | —                 | Controlled value and change callback.                        |
+| `defaultValue`                  | `50`              | Initial uncontrolled value.                                  |
+| `min` / `max` / `step`          | `0` / `100` / `1` | Bounds and step size.                                        |
+| `unit`                          | `%`               | Displayed unit.                                              |
+| `damping`                       | `0.35`            | Drag resistance, from 0 to 1.                                |
+| `detentStep` / `detentStrength` | `10` / `0.6`      | Notch spacing and resistance; zero spacing disables notches. |
+| `appearance`                    | `graphite`        | `graphite`, `ivory`, or `signal`.                            |
+| `disabled`                      | `false`           | Prevents input.                                              |
 
 ## Notes
 

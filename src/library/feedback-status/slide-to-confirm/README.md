@@ -2,13 +2,26 @@
 
 A compact drag-to-confirm control with a filling track, elastic return and success state. Inspired by [Bencho](https://bencho.dev/blocks/slide-confirm).
 
+## Usage
+
 ```tsx
 import { SlideToConfirm } from './slide-to-confirm'
 
-;<SlideToConfirm onConfirm={() => console.log('Confirmed')} />
+export function Example() {
+  return <SlideToConfirm onConfirm={() => console.log('Confirmed')} />
+}
 ```
 
-- `onConfirm` runs once on a completed gesture. Releasing early or cancelling returns the handle.
-- `label`: `Slide to confirm`; `confirmedLabel`: `Confirmed`; `resetAfter`: `1800` ms, `0` holds success.
+## Props
+
+| Prop                       | Default                          | Description                     |
+| -------------------------- | -------------------------------- | ------------------------------- |
+| `onConfirm`                | —                                | Runs after a completed gesture. |
+| `label` / `confirmedLabel` | `Slide to confirm` / `Confirmed` | Prompt and success text.        |
+| `resetAfter`               | `1800` ms                        | `0` keeps the success state.    |
+| `disabled`                 | `false`                          | Prevents activation.            |
+
+## Notes
+
 - `disabled`: `false`. Keyboard users can confirm with Enter or Space. The callback owns the actual action.
-- Supports `className` and `style`; reduced motion disables decorative animation. Demo data and controls are separate from public exports.
+- Supports `className` and `style`; reduced motion disables decorative animation.

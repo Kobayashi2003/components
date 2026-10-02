@@ -1,5 +1,5 @@
 import './styles.css'
-export { GeometryLightLab } from './components/GeometryLightLab'
+export { GeometryLightLab } from './GeometryLightLab'
 export type {
   GeometryLightControls,
   GeometryType,

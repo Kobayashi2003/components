@@ -2,12 +2,16 @@
 
 A visual task-board demonstration with local filtering and completion state.
 
-## Embed
+## Usage
 
 ```tsx
 import { NeubrutalistTaskBoard } from './neubrutalist-task-board'
 
-;<NeubrutalistTaskBoard />
+export function Example() {
+  return <NeubrutalistTaskBoard />
+}
 ```
+
+## Notes
 
 Tasks are sample data held in local state; this is not a persistent task manager or a data-bound board API.

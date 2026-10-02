@@ -1,8 +1,8 @@
 import { useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import { BookArtwork } from './BookArtwork'
-import { BookBookmark } from './BookBookmark'
-import { initialView, orbit, viewMatrix, views } from './camera'
+import { BookArtwork } from './components/BookArtwork'
+import { BookBookmark } from './components/BookBookmark'
+import { initialView, orbit, viewMatrix, views } from './rendering/camera'
 import './styles.css'
 
 export interface TypographicBookProps {

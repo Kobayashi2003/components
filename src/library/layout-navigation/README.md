@@ -1,5 +1,5 @@
 # Layout & Navigation
 
-This category covers spatial organization and movement through an interface: layout systems, menus, page transitions, responsive composition, and navigation models.
+Spatial organization and movement through an interface: layouts, menus, docks, and navigation models. Examples include [Create Menu](create-menu/README.md), [Magnifying Dock](magnifying-dock/README.md), and [Neubrutalist Task Board](neubrutalist-task-board/README.md).
 
-Use it when the experiment's main contribution is **where content lives or how a person moves between places**.
+Choose this category when placement or navigation is the main idea. Data editing belongs in **Forms & Input**; a control's direct manipulation can belong in **Interactions**.

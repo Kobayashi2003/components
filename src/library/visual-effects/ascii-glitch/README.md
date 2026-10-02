@@ -22,9 +22,9 @@ function Example() {
 
 ## Props
 
-| Prop                 | Default               | Purpose                                                     |
+| Prop                 | Default               | Description                                                 |
 | -------------------- | --------------------- | ----------------------------------------------------------- |
-| `text`               | required              | Source text; whitespace is preserved during a burst.        |
+| `text`               | Required              | Source text; whitespace is preserved during a burst.        |
 | `duration`           | `600` ms              | Burst duration, with a minimum of 120 ms.                   |
 | `intensity`          | `0.7`                 | Character replacement and flicker strength, clamped to 0–1. |
 | `glyphs`             | built-in terminal set | Characters used to replace non-whitespace text.             |

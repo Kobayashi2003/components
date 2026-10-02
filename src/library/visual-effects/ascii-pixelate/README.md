@@ -14,9 +14,9 @@ export function Example() {
 
 ## Props
 
-| Prop                 | Default           | Purpose                                                                    |
+| Prop                 | Default           | Description                                                                |
 | -------------------- | ----------------- | -------------------------------------------------------------------------- |
-| `src`                | required          | Image URL, `HTMLImageElement`, `HTMLCanvasElement`, or `HTMLVideoElement`. |
+| `src`                | Required          | Image URL, `HTMLImageElement`, `HTMLCanvasElement`, or `HTMLVideoElement`. |
 | `alt`                | `ASCII rendering` | Accessible image label.                                                    |
 | `resolution`         | `72`              | Base column count, clamped to 8–1024.                                      |
 | `fontSize`           | `14` px           | Maximum character size.                                                    |
@@ -45,4 +45,4 @@ export function Example() {
 
 - Use a ref of type `AsciiPixelateHandle`: `getText()` returns the current base frame, and `getCanvas()` returns a detached Canvas snapshot with background and visible pointer detail. Clipboard access and file download belong to the caller.
 - Uploads and camera streams are handled by the demo, outside the reusable component. Callers should stop their own media tracks. Cross-origin images need CORS permission for pixel sampling.
-- At 1024 columns, copied text retains 1024 characters per row. A narrow preview cannot show each glyph separately; lower the column count when character legibility matters. Live high-resolution sources are frame rate limited.
+- Lower `resolution` when individual characters need to remain legible; live high-resolution sources are frame rate limited.

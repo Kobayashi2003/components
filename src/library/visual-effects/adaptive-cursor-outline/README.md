@@ -7,17 +7,21 @@ A decorative pointer outline that fits interactive targets and follows keyboard 
 ```tsx
 import { AdaptiveCursorOutline } from './adaptive-cursor-outline'
 
-;<AdaptiveCursorOutline style={{ padding: 60 }}>
-  <button>Automatic target</button>
-  <article data-cursor-focus>Extra target</article>
-</AdaptiveCursorOutline>
+export function Example() {
+  return (
+    <AdaptiveCursorOutline style={{ padding: 60 }}>
+      <button>Automatic target</button>
+      <article data-cursor-focus>Extra target</article>
+    </AdaptiveCursorOutline>
+  )
+}
 ```
 
-## Parameters
+## Props
 
-| Parameter                   | Default                                      | Purpose                                                           |
+| Prop                        | Default                                      | Description                                                       |
 | --------------------------- | -------------------------------------------- | ----------------------------------------------------------------- |
-| `children`                  | required                                     | Content within the tracking area.                                 |
+| `children`                  | Required                                     | Content within the tracking area.                                 |
 | `selector`                  | interactive elements + `[data-cursor-focus]` | Matches buttons, links, inputs, selects and textareas by default. |
 | `color`                     | `#e6ff69`                                    | CSS outline color.                                                |
 | `padding`                   | `8` px                                       | Space around the target.                                          |

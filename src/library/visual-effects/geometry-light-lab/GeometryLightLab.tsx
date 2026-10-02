@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { GeometryLightControls } from './GeometryLightControls'
-import { LightGizmo } from './LightGizmo'
+import { GeometryLightControls } from './components/GeometryLightControls'
+import { LightGizmo } from './components/LightGizmo'
 import {
   DEFAULT_CONTROLS,
   MAX_LIGHTS,
@@ -11,10 +11,10 @@ import {
   type LightPosition,
   type LightSource,
   type RenderMode,
-} from '../model'
-import { useGeometryLightRenderer } from '../hooks/useGeometryLightRenderer'
-import { useObjectRotation } from '../hooks/useObjectRotation'
-import { orientationFromControls, rotateInViewSpace, type Quaternion } from '../rotation'
+} from './model'
+import { useGeometryLightRenderer } from './hooks/useGeometryLightRenderer'
+import { useObjectRotation } from './hooks/useObjectRotation'
+import { orientationFromControls, rotateInViewSpace, type Quaternion } from './rotation'
 
 const NEW_LIGHT_COLORS = ['#71e6a4', '#f3c969', '#c889ff', '#4dd7e8', '#ff7d9c']
 

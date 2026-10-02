@@ -1,0 +1,97 @@
+.video-player-demo {
+  position: relative;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 48px);
+}
+.video-player-demo__drop {
+  position: absolute;
+  inset: 12px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  border: 2px dashed #e2edce;
+  border-radius: 20px;
+  color: #e2edce;
+  background: #111e;
+  pointer-events: none;
+  font:
+    15px/1.5 system-ui,
+    sans-serif;
+}
+.video-player-demo__tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.video-player-demo__filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+  opacity: 0.65;
+  min-width: 0;
+}
+.video-player-demo__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.video-player-demo__error {
+  margin: 0 0 12px;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+  color: #e78c80;
+}
+.video-player-demo__actions > label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #828b8845;
+  background: #828b8810;
+  border-radius: 10px;
+  color: inherit;
+  font:
+    12px/1.4 system-ui,
+    sans-serif;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.video-player-demo__actions > label:hover {
+  background: #828b8825;
+}
+.video-player-demo__actions > label:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.video-player-demo__actions > label > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.video-player-demo .video-player-demo__subtitle {
+  font-weight: 600;
+}
+@media (max-width: 420px) {
+  .video-player-demo__tools {
+    gap: 8px;
+  }
+  .video-player-demo__actions > label {
+    padding-inline: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .video-player-demo__actions > label {
+    transition: none;
+  }
+}

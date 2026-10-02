@@ -7,20 +7,29 @@ A vintage audio player with station tuning, volume control, local-file playback,
 ```tsx
 import { RetroRadio } from './retro-radio'
 
-;<RetroRadio
-  stations={[
-    { id: '01', name: 'Warm', frequency: '88.6', glyph: 'W', angle: -46 },
-    { id: '02', name: 'Direct', frequency: '101.3', glyph: 'D', angle: 0 },
-  ]}
-  onStationChange={(station) => console.log(station)}
-/>
+export function Example() {
+  return (
+    <RetroRadio
+      stations={[
+        { id: '01', name: 'Warm', frequency: '88.6', glyph: 'W', angle: -46 },
+        { id: '02', name: 'Direct', frequency: '101.3', glyph: 'D', angle: 0 },
+      ]}
+      onStationChange={(station) => console.log(station)}
+    />
+  )
+}
 ```
 
 ## Props
 
-- `stations` is required. Each station needs `id`, `name`, `frequency`, and `glyph`; `angle` is optional and overrides the computed dial position.
-- `initialIndex` (0), `defaultVolume` (62, range 0–100), and `showBackground` (true) set the initial presentation.
-- `onStationChange`, `onVolumeChange`, `onPlaybackChange`, and `onMusicChange` expose user changes.
+| Prop                                 | Default  | Description                                                             |
+| ------------------------------------ | -------- | ----------------------------------------------------------------------- |
+| `stations`                           | Required | Stations with `id`, `name`, `frequency`, `glyph`, and optional `angle`. |
+| `initialIndex`                       | `0`      | Initially tuned station.                                                |
+| `defaultVolume`                      | `62`     | Initial volume, from 0 to 100.                                          |
+| `showBackground`                     | `true`   | Shows the cabinet backdrop.                                             |
+| `onStationChange` / `onVolumeChange` | —        | Reports tuning and volume changes.                                      |
+| `onPlaybackChange` / `onMusicChange` | —        | Reports playback and music changes.                                     |
 
 ## Notes
 

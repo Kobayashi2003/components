@@ -1,9 +1,9 @@
 import type { CatalogEntryMeta } from '../../../catalog/types'
 
 export default {
-  slug: 'morphing-audio-player',
-  title: 'Morphing Audio Player',
-  category: 'interactions',
+  slug: 'audio-player',
+  title: 'Audio Player',
+  category: 'data-display',
   kind: 'component',
   status: 'experimental',
   summary: 'A compact now-playing card that expands into a larger playback view.',

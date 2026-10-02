@@ -1,4 +1,4 @@
-type IconName = 'play' | 'pause' | 'previous' | 'next' | 'heart'
+type IconName = 'play' | 'pause' | 'previous' | 'next' | 'heart' | 'volume' | 'muted'
 
 export function PlayerIcon({ name, size = 24 }: { name: IconName; size?: number }) {
   const common = {
@@ -9,6 +9,25 @@ export function PlayerIcon({ name, size = 24 }: { name: IconName; size?: number 
   }
 
   switch (name) {
+    case 'volume':
+    case 'muted':
+      return (
+        <svg
+          {...common}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m11 4-6 5H2v6h3l6 5Z" />
+          {name === 'volume' ? (
+            <path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" />
+          ) : (
+            <path d="m16 9 6 6m0-6-6 6" />
+          )}
+        </svg>
+      )
     case 'play':
       return (
         <svg {...common} fill="currentColor">

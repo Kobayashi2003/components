@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import type { VinylDeckAudioSource } from './hooks/useVinylDeckAudio'
-import { usePlatterInertia } from './hooks/usePlatterInertia'
+import type { VinylDeckAudioSource } from '../hooks/useVinylDeckAudio'
+import { usePlatterInertia } from '../hooks/usePlatterInertia'
 
 // Shared track model -----------------------------------------------------------
 export interface VinylDeckItem {

@@ -1,5 +1,5 @@
 # Data Display
 
-This category contains expressive ways to inspect, compare, and understand information: tables, charts, timelines, metrics, diagrams, and dense data surfaces.
+Components for inspecting information and media. [Audio Player](audio-player/README.md) and [Video Player](video-player/README.md) expose playback state and controls; EPUB Reader has its own package documentation and layout.
 
-Entries should optimize comprehension rather than decoration alone and should document empty, loading, overflow, and reduced-data cases when relevant.
+Choose this category when presenting content is the main purpose. Document applicable empty, loading, overflow, and reduced-data states; a purely decorative effect belongs in **Visual Effects**.

@@ -1,9 +1,0 @@
-.morph-audio-demo {
-  display: grid;
-  width: 100%;
-  min-height: min(700px, calc(100dvh - 64px));
-  padding: 24px;
-  place-items: center;
-  overflow: hidden;
-  background: #232426;
-}

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import { useTickWave } from './useTickWave'
+import { useTickWave } from './hooks/useTickWave'
 
 export interface RangeDialProps {
   label?: string

@@ -7,16 +7,20 @@ A pointer-following light over DOM content. Mark objects explicitly to give them
 ```tsx
 import { CursorSpotlight } from './cursor-spotlight'
 
-;<CursorSpotlight style={{ padding: 60, background: '#30383e' }}>
-  <button data-spotlight-shadow>Lit surface</button>
-</CursorSpotlight>
+export function Example() {
+  return (
+    <CursorSpotlight style={{ padding: 60, background: '#30383e' }}>
+      <button data-spotlight-shadow>Lit surface</button>
+    </CursorSpotlight>
+  )
+}
 ```
 
-## Parameters
+## Props
 
-| Parameter               | Default    | Purpose                                                 |
+| Prop                    | Default    | Description                                             |
 | ----------------------- | ---------- | ------------------------------------------------------- |
-| `children`              | required   | Content beneath the light overlay.                      |
+| `children`              | Required   | Content beneath the light overlay.                      |
 | `color`                 | `#d8efff`  | CSS light color.                                        |
 | `radius`                | `300` px   | Light radius.                                           |
 | `intensity`, `softness` | `32`, `68` | Percentages, 0–100.                                     |

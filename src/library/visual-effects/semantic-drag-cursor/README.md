@@ -7,19 +7,23 @@ Changes a decorative cursor according to the hovered element’s action. It does
 ```tsx
 import { SemanticDragCursor } from './semantic-drag-cursor'
 
-;<SemanticDragCursor style={{ padding: 60 }}>
-  <a href="/work" data-cursor="link">
-    Open work
-  </a>
-  <div data-cursor="drag">Your draggable content</div>
-</SemanticDragCursor>
+export function Example() {
+  return (
+    <SemanticDragCursor style={{ padding: 60 }}>
+      <a href="/work" data-cursor="link">
+        Open work
+      </a>
+      <div data-cursor="drag">Your draggable content</div>
+    </SemanticDragCursor>
+  )
+}
 ```
 
-## Parameters
+## Props
 
-| Parameter            | Default         | Purpose                                                 |
+| Prop                 | Default         | Description                                             |
 | -------------------- | --------------- | ------------------------------------------------------- |
-| `children`           | required        | Content within the tracking area.                       |
+| `children`           | Required        | Content within the tracking area.                       |
 | `selector`           | `[data-cursor]` | Finds semantic targets.                                 |
 | `color`              | `#dfff42`       | CSS cursor color.                                       |
 | `smoothing`          | `0.24`          | Follow factor, 0.01–1; larger is faster.                |

@@ -1,0 +1,301 @@
+.morph-audio-demo {
+  position: relative;
+  color: #d2d3d5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  min-height: min(700px, calc(100dvh - 64px));
+  padding: 48px 24px;
+  background: #232426;
+}
+.morph-audio-demo__library {
+  width: min(488px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.morph-audio-demo__upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid #ffffff26;
+  border-radius: 24px;
+  color: #d2d3d5;
+  font:
+    13px/1.4 system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+.morph-audio-demo__upload:hover {
+  background: #ffffff0a;
+}
+.morph-audio-demo__upload:focus-within {
+  outline: 2px solid #c8efaa;
+  outline-offset: 4px;
+}
+.morph-audio-demo__upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.morph-audio-demo__queue {
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  width: 100%;
+  background: #ffffff05;
+  border: 1px solid #ffffff0e;
+  border-radius: 16px;
+}
+.morph-audio-demo__queue button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  border: 0;
+  border-radius: 10px;
+  color: #b5b7ba;
+  background: transparent;
+  cursor: pointer;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+}
+.morph-audio-demo__queue button > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.morph-audio-demo__queue strong,
+.morph-audio-demo__queue small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.morph-audio-demo__queue strong {
+  font-weight: 500;
+  color: #f2f3f4;
+}
+.morph-audio-demo__queue button:hover {
+  background: #ffffff08;
+}
+.morph-audio-demo__queue button[aria-current='true'] {
+  background: #ffffff0d;
+  color: #e2edce;
+}
+.morph-audio-demo__queue button:focus-visible {
+  outline: 2px solid #e2edce;
+  outline-offset: -2px;
+}
+.morph-audio-demo__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.morph-audio-demo__options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+}
+.morph-audio-demo__options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.morph-audio-demo__options select,
+.morph-audio-demo__options button,
+.morph-audio-demo__queue-heading button {
+  min-height: 36px;
+  border: 1px solid #ffffff20;
+  border-radius: 8px;
+  color: #d2d3d5;
+  background: #2d2e31;
+  padding: 6px 9px;
+  font: inherit;
+  cursor: pointer;
+}
+.morph-audio-demo__options button[aria-pressed='true'] {
+  color: #e2edce;
+  border-color: #e2edce80;
+  background: #e2edce15;
+}
+.morph-audio-demo__options :focus-visible,
+.morph-audio-demo__queue-heading button:focus-visible {
+  outline: 2px solid #e2edce;
+  outline-offset: 2px;
+}
+.morph-audio-demo__queue-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+}
+.morph-audio-demo__queue-heading button {
+  border: 0;
+  background: transparent;
+}
+.morph-audio-demo__queue li {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.morph-audio-demo__queue .morph-audio-demo__track {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.morph-audio-demo__track-actions {
+  display: flex;
+  flex: none;
+}
+.morph-audio-demo__track-actions button {
+  width: 32px;
+  min-height: 40px;
+  padding: 0;
+  justify-content: center;
+  font-size: 16px;
+}
+.morph-audio-demo__track-actions button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.morph-audio-demo__status {
+  margin: 0;
+  font:
+    12px/1.5 system-ui,
+    sans-serif;
+  text-align: center;
+}
+.morph-audio-demo__drop {
+  position: absolute;
+  inset: 12px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  border: 2px dashed #e2edce;
+  border-radius: 24px;
+  background: #232426ed;
+  pointer-events: none;
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+}
+.morph-audio-demo__empty {
+  width: min(488px, 100%);
+  padding: 48px 24px;
+  border: 1px dashed #ffffff30;
+  border-radius: 24px;
+  display: grid;
+  gap: 12px;
+  text-align: center;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+}
+@media (max-width: 440px) {
+  .morph-audio-demo {
+    padding: 28px 16px;
+    gap: 24px;
+  }
+  .morph-audio-demo__queue {
+    padding: 3px;
+  }
+  .morph-audio-demo__queue button {
+    gap: 8px;
+  }
+}
+:root[data-theme='light'] .morph-audio-demo {
+  background: #eeefec;
+  color: #252923;
+  --audio-player-background: #fff;
+  --audio-player-foreground: #252923;
+  --audio-player-muted: #697165;
+  --audio-player-track: #d6dcd3;
+  --audio-player-progress: #46523c;
+  --audio-player-control: #56634c;
+  --audio-player-play-background: #263323;
+  --audio-player-play-color: #fff;
+  --audio-player-accent: #4c682a;
+}
+:root[data-theme='light'] .morph-audio-demo__upload,
+:root[data-theme='light'] .morph-audio-demo__options select,
+:root[data-theme='light'] .morph-audio-demo__options button,
+:root[data-theme='light'] .morph-audio-demo__queue-heading button {
+  color: #3d4936;
+  border-color: #1a251f30;
+  background: #ffffff80;
+}
+:root[data-theme='light'] .morph-audio-demo__queue {
+  background: #fff8;
+  border-color: #1a251f15;
+}
+:root[data-theme='light'] .morph-audio-demo__queue button {
+  color: #66715f;
+}
+:root[data-theme='light'] .morph-audio-demo__queue strong {
+  color: #252923;
+}
+:root[data-theme='light'] .morph-audio-demo__queue button[aria-current='true'],
+:root[data-theme='light'] .morph-audio-demo__options button[aria-pressed='true'] {
+  background: #5b76491a;
+  color: #415b2e;
+}
+:root[data-theme='light'] .morph-audio-demo__empty {
+  border-color: #1a251f30;
+}
+:root[data-theme='light'] .morph-audio-demo .morph-audio__like[aria-pressed='true'] {
+  color: #4c682a;
+}
+:root[data-theme='light'] .morph-audio-demo .morph-audio__like[aria-pressed='true'] svg {
+  fill: currentColor;
+}
+:root[data-theme='light'] .morph-audio-demo :focus-visible {
+  outline-color: #4c682a;
+}
+
+.morph-audio-demo__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.morph-audio-demo__options label {
+  justify-content: space-between;
+  min-width: 0;
+}
+.morph-audio-demo__options select {
+  min-width: 0;
+  max-width: 110px;
+}
+.morph-audio-demo__options button {
+  min-height: 40px;
+}
+.morph-audio-demo__track-actions {
+  flex: 0 0 auto;
+}
+.morph-audio-demo__queue .morph-audio-demo__track-actions button {
+  width: 28px;
+  padding: 0;
+}

@@ -7,17 +7,21 @@ Moves selected DOM elements toward the pointer. Wrapping content defines the tra
 ```tsx
 import { CursorGravityField } from './cursor-gravity-field'
 
-;<CursorGravityField style={{ padding: 80 }}>
-  <button data-cursor-gravity>Move me</button>
-  <span>I stay still</span>
-</CursorGravityField>
+export function Example() {
+  return (
+    <CursorGravityField style={{ padding: 80 }}>
+      <button data-cursor-gravity>Move me</button>
+      <span>I stay still</span>
+    </CursorGravityField>
+  )
+}
 ```
 
-## Parameters
+## Props
 
-| Parameter            | Default                 | Purpose                                                              |
+| Prop                 | Default                 | Description                                                          |
 | -------------------- | ----------------------- | -------------------------------------------------------------------- |
-| `children`           | required                | Content within the tracking area.                                    |
+| `children`           | Required                | Content within the tracking area.                                    |
 | `selector`           | `[data-cursor-gravity]` | CSS selector for moving targets; custom selectors need no extra CSS. |
 | `radius`             | `210` px                | Attraction radius, minimum 40 px.                                    |
 | `strength`           | `0.32`                  | −1–1; negative repels.                                               |

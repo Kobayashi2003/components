@@ -1,5 +1,5 @@
 # Forms & Input
 
-This category is for entering and editing information: fields, pickers, validation patterns, multi-step flows, and composition tools.
+Controls for entering, choosing, and editing values. Examples include [Assignee Picker](assignee-picker/README.md), [Message Composer](message-composer/README.md), and [Rotary Knob](rotary-knob/README.md).
 
-Entries should document keyboard operation, focus behavior, validation timing, disabled states, and the intended data shape.
+Choose this category when the result is user-entered data. Document the value shape, controlled and uncontrolled modes, keyboard and focus behavior, and disabled or validation states where applicable.

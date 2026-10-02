@@ -1,5 +1,5 @@
 # Shared
 
-This directory is reserved for primitives used by two or more real catalog entries.
+Only project infrastructure unrelated to a specific catalog component belongs here.
 
-Do not place entry-specific code here in anticipation of reuse. Start locally inside an entry, then extract only when repeated use reveals a stable API. Shared code must remain independent of the showcase shell.
+Each catalog entry must remain self-contained. Keep its runtime helpers, styles, assets, and demo utilities inside its own folder, even when another entry uses a similar implementation. Avoid adding root dependencies for individual entries.

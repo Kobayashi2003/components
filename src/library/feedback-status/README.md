@@ -1,5 +1,5 @@
 # Feedback & Status
 
-This category covers communication from the system back to the person: progress, loading, notifications, errors, confirmations, empty states, and availability.
+Controls and surfaces that communicate state or the result of an action: progress, notifications, errors, and confirmations. See [Slide to Confirm](slide-to-confirm/README.md), [Inline Confirm](inline-confirm/README.md), and [Notify Button](notify-button/README.md).
 
-The primary purpose should be to make state or change understandable. Document timing, interruption behavior, and assistive-technology announcements when relevant.
+Choose this category when communicating a state change is the main idea. Document timing, cancellation, repeated activation, and assistive-technology announcements where relevant.

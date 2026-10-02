@@ -8,7 +8,7 @@ import type {
 } from 'react'
 import darkTexture from './assets/bg-dark-denim.png'
 import woodTexture from './assets/wood-cabinet.jpg'
-import { RetroRadioBackground } from './RetroRadioBackground'
+import { RetroRadioBackground } from './components/RetroRadioBackground'
 
 export interface RetroRadioStation {
   id: string

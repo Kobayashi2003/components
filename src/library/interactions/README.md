@@ -1,5 +1,5 @@
 # Interactions
 
-This category is for direct manipulation and input-response patterns: pointer tracking, dragging, gestures, keyboard mechanics, selection, and novel controls.
+Direct manipulation and input-response patterns, including dragging, gestures, keyboard mechanics, and novel controls. [Vinyl Deck](vinyl-deck/README.md) and [Retro Radio](retro-radio/README.md) use physical controls as their central interaction.
 
-The defining value should be how the interface **responds to a person**. Decorative treatments that happen to follow the pointer still belong in **Visual Effects** when their interaction model is otherwise conventional.
+Choose this category when the behavior of the control is the reusable idea. A decorative treatment that follows the pointer belongs in **Visual Effects** when its interaction is otherwise conventional.

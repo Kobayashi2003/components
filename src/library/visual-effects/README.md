@@ -1,5 +1,5 @@
 # Visual Effects
 
-This category contains primarily decorative treatments: lighting, texture, distortion, particles, masking, depth, and shader-like motion.
+Visual treatments that change the appearance of content: lighting, texture, distortion, typography, depth, and shader-like motion. Current entries include [Cursor Spotlight](cursor-spotlight/README.md), [ASCII Pixelate](ascii-pixelate/README.md), and [Geometry Light Lab](geometry-light-lab/README.md).
 
-Choose this category when the main idea changes how an interface **looks or feels** without defining a new input pattern. If pointer or keyboard behavior is the core idea, prefer **Interactions**. If the work mainly communicates system state, prefer **Feedback & Status**.
+Pointer movement can drive an effect, but the visual treatment remains the main idea. Place a new input pattern in **Interactions** and a system-state message in **Feedback & Status**.

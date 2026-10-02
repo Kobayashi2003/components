@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { CSSProperties, Ref } from 'react'
-import { captureAsciiCanvas } from './captureCanvas'
+import { captureAsciiCanvas } from './rendering/captureCanvas'
 import {
   DEFAULT_CHARSET,
   DEFAULT_PALETTE,
@@ -8,8 +8,8 @@ import {
   MAX_COLUMNS,
   MAX_DETAIL_COLUMNS,
   renderAsciiLayer,
-} from './renderAscii'
-import type { AsciiColorMode, AsciiDensityMode, AsciiMediaSource } from './renderAscii'
+} from './rendering/renderAscii'
+import type { AsciiColorMode, AsciiDensityMode, AsciiMediaSource } from './rendering/renderAscii'
 
 export type AsciiPixelateSource =
   string | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | null
