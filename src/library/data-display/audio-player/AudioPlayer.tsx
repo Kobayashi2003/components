@@ -192,10 +192,12 @@ function AudioPlayerSession({
   }, [playing, simulated])
 
   // Cached media can load before React commits the element's listeners; catch up once mounted.
-  useEffect(() => {
+  const catchUpMetadata = useEffectEvent(() => {
     const audio = audioRef.current
     if (audio && audio.readyState >= HTMLMediaElement.HAVE_METADATA) applyMetadata(audio)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once for the mounted element
+  })
+  useEffect(() => {
+    catchUpMetadata()
   }, [])
 
   function applyMetadata(audio: HTMLAudioElement) {

@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { categories, getCategory, getCategoryEntries, getEntry } from './catalog/catalog'
-import type { CatalogEntry, CategoryDefinition } from './catalog/types'
-import type { CatalogTag, TagGroup } from './catalog/types'
+import type { CatalogEntry, CatalogTag, CategoryDefinition, TagGroup } from './catalog/types'
+import { applyTheme, type Theme } from './shared/theme'
 
 const MarkdownDocument = lazy(() => import('./components/MarkdownDocument'))
 
@@ -10,8 +10,6 @@ type Route =
   | { page: 'home' }
   | { page: 'category'; category: string }
   | { page: 'entry'; category: string; slug: string }
-
-type Theme = 'light' | 'dark'
 
 function SunIcon() {
   return (
@@ -74,11 +72,7 @@ function Shell({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
   )
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document.documentElement.style.colorScheme = theme
-    localStorage.setItem('component-atlas-theme', theme)
-  }, [theme])
+  useEffect(() => applyTheme(theme), [theme])
 
   const nextTheme = theme === 'dark' ? 'light' : 'dark'
 
@@ -410,7 +404,11 @@ export default function App() {
   else if (route.page === 'category') content = <CategoryPage categoryId={route.category} />
   else {
     const entry = getEntry(route.category, route.slug)
-    content = entry ? <EntryPage entry={entry} /> : <NotFound />
+    content = entry ? (
+      <EntryPage key={`${entry.category}/${entry.slug}`} entry={entry} />
+    ) : (
+      <NotFound />
+    )
   }
 
   return <Shell>{content}</Shell>

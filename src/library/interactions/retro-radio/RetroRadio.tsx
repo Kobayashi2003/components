@@ -9,6 +9,7 @@ import type {
 import darkTexture from './assets/bg-dark-denim.png'
 import woodTexture from './assets/wood-cabinet.jpg'
 import { RetroRadioBackground } from './components/RetroRadioBackground'
+import { useRadioAudio } from './hooks/useRadioAudio'
 
 export interface RetroRadioStation {
   id: string
@@ -111,9 +112,6 @@ export function RetroRadio({
   const [tuneDetent, setTuneDetent] = useState(false)
   const [volume, setVolume] = useState(initialVolume)
   const [volumeAngle, setVolumeAngle] = useState(volumeToAngle(initialVolume))
-  const [playing, setPlaying] = useState(false)
-  const [hasMusic, setHasMusic] = useState(false)
-  const [musicName, setMusicName] = useState('')
   const [screenView, setScreenViewState] = useState<ScreenView>('mode')
   const [switching, setSwitching] = useState(false)
   const [antenna, setAntenna] = useState<AntennaState>({
@@ -124,18 +122,8 @@ export function RetroRadio({
 
   const radioSvgRef = useRef<SVGSVGElement>(null)
   const spectrumCanvasRef = useRef<HTMLCanvasElement>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const audioUrlRef = useRef<string | null>(null)
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const analyserRef = useRef<AnalyserNode | null>(null)
-  const gainRef = useRef<GainNode | null>(null)
-  const spectrumFrameRef = useRef(0)
-  const spectrumDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
   const stationIndexRef = useRef(safeInitialIndex)
   const tuneAngleRef = useRef(initialTuneAngle)
-  const volumeRef = useRef(initialVolume)
-  const playingRef = useRef(false)
-  const playbackCallbackRef = useRef(onPlaybackChange)
   const antennaPointer = useRef<number | null>(null)
   const antennaCleanup = useRef<(() => void) | null>(null)
   const screenTimer = useRef<number | null>(null)
@@ -161,6 +149,13 @@ export function RetroRadio({
   const id = useId().replace(/:/g, '')
 
   const displayStation = stations[previewIndex] ?? stations[stationIndex]
+  const radioAudio = useRadioAudio({
+    volume,
+    spectrumCanvasRef,
+    onPlaybackChange,
+    onEnded: () => setScreenView('play', 1100),
+  })
+  const { playing, musicName, isPlaying } = radioAudio
 
   // Preview the closest mode while dragging; commit it only on pointerup.
   const nearestStation = useCallback(
@@ -181,135 +176,32 @@ export function RetroRadio({
     [stations],
   )
 
-  const setScreenView = useCallback((view: ScreenView, revertAfter?: number) => {
-    if (screenTimer.current !== null) {
-      window.clearTimeout(screenTimer.current)
-      screenTimer.current = null
-    }
-
-    setScreenViewState(view)
-    if (revertAfter === undefined) return
-
-    // Match the source receiver's view priority: interaction feedback is
-    // temporary, while live audio analysis remains the resting screen.
-    screenTimer.current = window.setTimeout(() => {
-      setScreenViewState(playingRef.current ? 'viz' : 'mode')
-      screenTimer.current = null
-    }, revertAfter)
-  }, [])
-
-  // The source project paints analyser data directly to the CRT canvas. Keeping
-  // the canvas outside React avoids a render for every animation frame.
-  const drawSpectrum = useCallback(function drawSpectrumFrame() {
-    const analyser = analyserRef.current
-    const canvas = spectrumCanvasRef.current
-    const context = canvas?.getContext('2d')
-
-    // Stop instead of idling: a paused analyser only returns zeros, and the
-    // loop would otherwise stay resident for the page's lifetime.
-    if (!playingRef.current || !analyser || !canvas || !context) {
-      if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height)
-      spectrumFrameRef.current = 0
-      return
-    }
-
-    spectrumDataRef.current ??= new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount))
-    const frequencyData = spectrumDataRef.current
-    analyser.getByteFrequencyData(frequencyData)
-    context.clearRect(0, 0, canvas.width, canvas.height)
-
-    const barWidth = canvas.width / frequencyData.length
-    context.fillStyle = '#9dffb0'
-    frequencyData.forEach((level, index) => {
-      const barHeight = (level / 255) * canvas.height
-      context.fillRect(
-        index * barWidth + 1,
-        canvas.height - barHeight,
-        Math.max(1, barWidth - 2),
-        barHeight,
-      )
-    })
-
-    spectrumFrameRef.current = window.requestAnimationFrame(drawSpectrumFrame)
-  }, [])
-
-  const setPlaybackState = useCallback(
-    (nextPlaying: boolean) => {
-      playingRef.current = nextPlaying
-      setPlaying(nextPlaying)
-      playbackCallbackRef.current?.(nextPlaying)
-      if (nextPlaying && !spectrumFrameRef.current) drawSpectrum()
-    },
-    [drawSpectrum],
-  )
-
-  const ensureAudioGraph = useCallback(() => {
-    let audio = audioRef.current
-    if (!audio) {
-      audio = new Audio()
-      audio.preload = 'metadata'
-      audio.addEventListener('ended', () => {
-        setPlaybackState(false)
-        setScreenView('play', 1100)
-      })
-      // Pauses from outside the radio (system media keys, other players) update the screen too.
-      const element = audio
-      audio.addEventListener('pause', () => {
-        if (playingRef.current && !element.ended) setPlaybackState(false)
-      })
-      audioRef.current = audio
-    }
-
-    let audioContext = audioContextRef.current
-    if (!audioContext) {
-      audioContext = new AudioContext()
-      const analyser = audioContext.createAnalyser()
-      const gain = audioContext.createGain()
-      const source = audioContext.createMediaElementSource(audio)
-
-      analyser.fftSize = 64
-      gain.gain.value = volumeRef.current / 100
-      source.connect(analyser)
-      analyser.connect(gain)
-      gain.connect(audioContext.destination)
-
-      audioContextRef.current = audioContext
-      analyserRef.current = analyser
-      gainRef.current = gain
-    }
-
-    return { audio, audioContext }
-  }, [setPlaybackState, setScreenView])
-
-  const loadMusic = useCallback(
-    async (file: File) => {
-      const { audio, audioContext } = ensureAudioGraph()
-
-      audio.pause()
-      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current)
-
-      const nextUrl = URL.createObjectURL(file)
-      audioUrlRef.current = nextUrl
-      audio.src = nextUrl
-      audio.load()
-
-      const nextName = file.name.replace(/\.[^.]+$/, '') || file.name
-      setMusicName(nextName)
-      setHasMusic(true)
-      onMusicChange?.(file)
-
-      try {
-        await audioContext.resume()
-        await audio.play()
-        setPlaybackState(true)
-        setScreenView('viz')
-      } catch {
-        setPlaybackState(false)
-        setScreenView('play', 1100)
+  const setScreenView = useCallback(
+    (view: ScreenView, revertAfter?: number) => {
+      if (screenTimer.current !== null) {
+        window.clearTimeout(screenTimer.current)
+        screenTimer.current = null
       }
+
+      setScreenViewState(view)
+      if (revertAfter === undefined) return
+
+      // Match the source receiver's view priority: interaction feedback is
+      // temporary, while live audio analysis remains the resting screen.
+      screenTimer.current = window.setTimeout(() => {
+        setScreenViewState(isPlaying() ? 'viz' : 'mode')
+        screenTimer.current = null
+      }, revertAfter)
     },
-    [ensureAudioGraph, onMusicChange, setPlaybackState, setScreenView],
+    [isPlaying],
   )
+
+  const loadMusic = async (file: File) => {
+    onMusicChange?.(file)
+    const started = await radioAudio.load(file)
+    if (started) setScreenView('viz')
+    else setScreenView('play', 1100)
+  }
 
   const handleMusicChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
@@ -357,10 +249,8 @@ export function RetroRadio({
       const normalizedAngle = clamp(nextAngle, VOLUME_MIN, VOLUME_MAX)
       const normalizedVolume = angleToVolume(normalizedAngle)
 
-      volumeRef.current = normalizedVolume
       setVolumeAngle(normalizedAngle)
       setVolume(normalizedVolume)
-      if (gainRef.current) gainRef.current.gain.value = normalizedVolume / 100
       setScreenView('vol', 1000)
       onVolumeChange?.(normalizedVolume)
     },
@@ -510,28 +400,7 @@ export function RetroRadio({
   }
 
   const togglePlayback = async () => {
-    const audio = audioRef.current
-    const audioContext = audioContextRef.current
-
-    if (!audio || !hasMusic) {
-      setScreenView('play', 1100)
-      return
-    }
-
-    if (playingRef.current) {
-      audio.pause()
-      setPlaybackState(false)
-      setScreenView('play', 1100)
-      return
-    }
-
-    try {
-      await audioContext?.resume()
-      await audio.play()
-      setPlaybackState(true)
-    } catch {
-      setPlaybackState(false)
-    }
+    if (musicName !== null) await radioAudio.toggle()
     setScreenView('play', 1100)
   }
 
@@ -617,10 +486,6 @@ export function RetroRadio({
   }
 
   useEffect(() => {
-    playbackCallbackRef.current = onPlaybackChange
-  }, [onPlaybackChange])
-
-  useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     let clearTimer: number | null = null
@@ -677,13 +542,6 @@ export function RetroRadio({
       antennaCleanup.current?.()
       if (screenTimer.current !== null) window.clearTimeout(screenTimer.current)
       if (switchTimer.current !== null) window.clearTimeout(switchTimer.current)
-
-      window.cancelAnimationFrame(spectrumFrameRef.current)
-      audioRef.current?.pause()
-      audioRef.current?.removeAttribute('src')
-      audioRef.current?.load()
-      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current)
-      void audioContextRef.current?.close()
     },
     [],
   )
@@ -740,7 +598,7 @@ export function RetroRadio({
       {showBackground && <RetroRadioBackground />}
 
       <label className="retro-radio__music-control">
-        <span>{hasMusic ? musicName : 'Load audio'}</span>
+        <span>{musicName ?? 'Load audio'}</span>
         <input type="file" accept="audio/*" onChange={handleMusicChange} />
       </label>
 
@@ -1023,8 +881,10 @@ export function RetroRadio({
                 <strong>{volume}</strong>
               </div>
               <div className="retro-radio__crt-view retro-radio__crt-play">
-                <span>{hasMusic ? (playing ? '▶' : '❚❚') : '♪'}</span>
-                <strong>{hasMusic ? (playing ? 'PLAYING' : 'PAUSED') : 'LOAD AUDIO'}</strong>
+                <span>{musicName !== null ? (playing ? '▶' : '❚❚') : '♪'}</span>
+                <strong>
+                  {musicName !== null ? (playing ? 'PLAYING' : 'PAUSED') : 'LOAD AUDIO'}
+                </strong>
               </div>
               <div className="retro-radio__crt-view retro-radio__crt-viz">
                 <span>{displayStation.glyph}</span>

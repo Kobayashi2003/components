@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent, Ref } from 'react'
 import { VideoIcon } from './components/icons'
 import type { VideoIconName } from './components/icons'
@@ -310,10 +310,12 @@ function VideoPlayerSession({
   }, [activeCaption, subtitles, pip])
 
   // Cached media can load before React commits the element's listeners; catch up once mounted.
-  useEffect(() => {
+  const catchUpMetadata = useEffectEvent(() => {
     const video = videoRef.current
     if (video && video.readyState >= HTMLMediaElement.HAVE_METADATA) applyMetadata(video)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once for the mounted element
+  })
+  useEffect(() => {
+    catchUpMetadata()
   }, [])
 
   function applyMetadata(video: HTMLVideoElement) {
