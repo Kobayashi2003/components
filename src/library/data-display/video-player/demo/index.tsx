@@ -1,12 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
 import { VideoPlayer } from '..'
-import type { VideoSubtitle } from '..'
+import type { VideoChapter, VideoSubtitle } from '..'
 import { VideoIcon } from '../components/icons'
 import './styles.css'
 import { useMediaPreferences, readPreference, writePreference } from './preferences'
 import { usePlaybackPosition } from './usePlaybackPosition'
 
 const sample = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
+const sampleChapters: VideoChapter[] = [
+  { time: 0, title: 'Closed bud' },
+  { time: 2.4, title: 'Opening' },
+]
+const sampleSubtitles: VideoSubtitle[] = [
+  {
+    src: `data:text/vtt;charset=utf-8,${encodeURIComponent(
+      [
+        'WEBVTT',
+        '',
+        '00:00.300 --> 00:02.300',
+        'A purslane bud in the morning light',
+        '',
+        '00:02.500 --> 00:05.000',
+        'Its petals begin to unfold',
+      ].join('\n'),
+    )}`,
+    label: 'English (sample)',
+    language: 'en',
+  },
+]
 function savedTime(key: string) {
   try {
     const value = Number(localStorage.getItem(key))
@@ -22,8 +43,9 @@ export default function VideoPlayerShowcase() {
     name: 'Flowers',
     key: 'video-player:sample',
     resume: savedTime('video-player:sample'),
+    sample: true,
   }))
-  const [subtitles, setSubtitles] = useState<VideoSubtitle[]>([])
+  const [subtitles, setSubtitles] = useState<VideoSubtitle[]>(sampleSubtitles)
   const [subtitleError, setSubtitleError] = useState('')
   const [dragging, setDragging] = useState(false)
   const [preferences, setPreferences] = useMediaPreferences('atlas:video:preferences')
@@ -47,7 +69,9 @@ export default function VideoPlayerShowcase() {
   )
   useEffect(
     () => () => {
-      subtitles.forEach((track) => URL.revokeObjectURL(track.src))
+      subtitles.forEach((track) => {
+        if (track.src.startsWith('blob:')) URL.revokeObjectURL(track.src)
+      })
     },
     [subtitles],
   )
@@ -62,7 +86,13 @@ export default function VideoPlayerShowcase() {
     subtitleRequest.current += 1
     setSubtitleError('')
     const key = `video-player:${file.name}:${file.size}:${file.lastModified}`
-    setSource({ url: URL.createObjectURL(file), name: file.name, key, resume: savedTime(key) })
+    setSource({
+      url: URL.createObjectURL(file),
+      name: file.name,
+      key,
+      resume: savedTime(key),
+      sample: false,
+    })
     setSubtitles([])
   }
   return (
@@ -144,6 +174,7 @@ export default function VideoPlayerShowcase() {
         src={source.url}
         title={source.name}
         subtitles={subtitles}
+        chapters={source.sample ? sampleChapters : undefined}
         resumeTime={source.resume}
         {...position}
         defaultVolume={preferences.volume}

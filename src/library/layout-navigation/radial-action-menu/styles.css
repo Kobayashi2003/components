@@ -78,14 +78,20 @@
   visibility: hidden;
   transform: scale(0.45);
   transition:
-    transform 450ms var(--control-ease),
-    opacity 180ms;
+    background 150ms,
+    transform 320ms var(--control-ease),
+    opacity 180ms,
+    visibility 0s linear 320ms;
 }
 .radial-action-menu[data-open='true'] .radial-action-menu__items button {
   opacity: 1;
   visibility: visible;
   transform: translate(var(--radial-x), var(--radial-y)) scale(1);
-  transition-delay: var(--radial-delay);
+  transition:
+    background 150ms,
+    transform 450ms var(--control-ease) var(--radial-delay),
+    opacity 180ms var(--radial-delay),
+    visibility 0s var(--radial-delay);
 }
 .radial-action-menu__items button:hover,
 .radial-action-menu__items button:focus-visible {
@@ -114,4 +120,9 @@
 .radial-action-menu__items button:hover span,
 .radial-action-menu__items button:focus-visible span {
   opacity: 1;
+}
+@media (hover: none) {
+  .radial-action-menu[data-open='true'] .radial-action-menu__items span {
+    opacity: 1;
+  }
 }

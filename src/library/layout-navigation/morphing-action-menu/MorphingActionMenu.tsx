@@ -4,14 +4,14 @@ import { ControlIcon } from './internal/ControlIcon'
 import { useDismiss } from './internal/useDismiss'
 import { moveControlFocus } from './internal/moveControlFocus'
 
-export interface CreateMenuItem {
+export interface MorphingActionMenuItem {
   id: string
   label: string
   icon?: ReactNode
   disabled?: boolean
 }
-export interface CreateMenuProps {
-  items: CreateMenuItem[]
+export interface MorphingActionMenuProps {
+  items: MorphingActionMenuItem[]
   onSelect?: (id: string) => void
   label?: string
   disabled?: boolean
@@ -19,14 +19,14 @@ export interface CreateMenuProps {
   style?: CSSProperties
 }
 
-export function CreateMenu({
+export function MorphingActionMenu({
   items,
   onSelect,
   label = 'Create',
   disabled = false,
   className = '',
   style,
-}: CreateMenuProps) {
+}: MorphingActionMenuProps) {
   const [expanded, setExpanded] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -50,7 +50,7 @@ export function CreateMenu({
   return (
     <div
       ref={root}
-      className={`atlas-control create-menu ${className}`}
+      className={`atlas-control morphing-action-menu ${className}`}
       data-open={open}
       style={{ '--create-height': `${items.length * 44 + 24}px`, ...style } as CSSProperties}
       onKeyDown={(event) => {
@@ -66,7 +66,7 @@ export function CreateMenu({
     >
       <button
         ref={trigger}
-        className="create-menu__trigger"
+        className="morphing-action-menu__trigger"
         type="button"
         disabled={disabled}
         aria-haspopup="menu"
@@ -88,7 +88,7 @@ export function CreateMenu({
       <div
         id={id}
         ref={menu}
-        className="create-menu__menu"
+        className="morphing-action-menu__menu"
         role="menu"
         aria-label={label}
         inert={!open}

@@ -127,8 +127,17 @@ export function GeometryLightLab() {
             key={light.id}
             light={light}
             index={index}
+            onNudge={(x, y) =>
+              updateLight(light.id, {
+                position: {
+                  x: clamp(light.position.x + x, 0.025, 0.975),
+                  y: clamp(light.position.y + y, 0.025, 0.975),
+                },
+              })
+            }
             onPointerDown={(event) => {
               event.stopPropagation()
+              if (event.button !== 0) return
               draggingRef.current = light.id
               event.currentTarget.setPointerCapture(event.pointerId)
               updateDraggedLight(event.clientX, event.clientY)

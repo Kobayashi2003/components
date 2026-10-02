@@ -24,5 +24,5 @@ export function Example() {
 
 ## Notes
 
-- Enter or blur saves a new task; Escape cancels. Space toggles a focused checkbox.
+- Enter saves a task and keeps the field open for the next one; an empty Enter or blur finishes, and Escape cancels. Space toggles a focused checkbox.
 - Supports `className` and `style`; reduced motion disables decorative animation.

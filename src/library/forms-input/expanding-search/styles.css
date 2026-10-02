@@ -90,6 +90,25 @@
   opacity: 1;
   margin-right: 20px;
 }
+.expanding-search[data-open='true'] input:has(+ .expanding-search__clear) {
+  margin-right: 4px;
+}
+.expanding-search .expanding-search__clear {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  margin-right: 10px;
+  animation: expanding-search-pop 200ms var(--control-ease);
+}
+.expanding-search .expanding-search__clear:hover {
+  background: var(--control-hover);
+}
+@keyframes expanding-search-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
 .expanding-search input:focus-visible {
   outline: none;
 }

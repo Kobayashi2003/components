@@ -33,6 +33,7 @@ export function VinylDeckBackground({
               multiple
               onChange={(event) => {
                 const files = Array.from(event.currentTarget.files ?? [])
+                event.currentTarget.value = ''
                 if (!files.length) return
                 onAudioFilesChange?.(files)
                 onAudioFileChange?.(files[0])
@@ -46,7 +47,7 @@ export function VinylDeckBackground({
               min="0"
               max="359"
               value={shadowAngle}
-              onInput={(event) => onShadowAngleChange?.(Number(event.currentTarget.value))}
+              onChange={(event) => onShadowAngleChange?.(Number(event.currentTarget.value))}
             />
           </label>
         </div>

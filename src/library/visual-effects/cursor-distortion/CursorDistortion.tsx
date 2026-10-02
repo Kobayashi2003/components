@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import type { CSSProperties, PointerEvent, ReactNode } from 'react'
-import './styles.css'
 
 export interface CursorDistortionSource {
   context: CanvasRenderingContext2D
@@ -246,11 +245,21 @@ export function CursorDistortion({
       render()
     }
 
+    // A lost context (GPU reset, too many contexts) falls back to the children.
+    const lose = () => {
+      container.dataset.webgl = 'unsupported'
+      if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current)
+      animationFrame.current = null
+      renderFrame.current = null
+    }
+    surface.addEventListener('webglcontextlost', lose)
+
     reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const observer = new ResizeObserver(resize)
     observer.observe(container)
     resize()
     return () => {
+      surface.removeEventListener('webglcontextlost', lose)
       observer.disconnect()
       if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current)
       renderFrame.current = null

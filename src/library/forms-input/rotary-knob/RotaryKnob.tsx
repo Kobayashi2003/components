@@ -1,6 +1,5 @@
 import { useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
-import './styles.css'
 
 export interface RotaryKnobProps {
   label: string
@@ -19,6 +18,8 @@ export interface RotaryKnobProps {
   disabled?: boolean
   appearance?: 'graphite' | 'ivory' | 'signal'
   unit?: string
+  className?: string
+  style?: CSSProperties
 }
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -37,6 +38,8 @@ export function RotaryKnob({
   disabled = false,
   appearance = 'graphite',
   unit = '%',
+  className = '',
+  style,
 }: RotaryKnobProps) {
   const [internal, setInternal] = useState(defaultValue)
   const [dragging, setDragging] = useState(false)
@@ -86,13 +89,16 @@ export function RotaryKnob({
     event.preventDefault()
     commit(values[event.key])
   }
-  const style = {
+  const knobStyle = {
     '--knob-angle': `${-135 + progress * 270}deg`,
     '--knob-progress': `${progress * 270}deg`,
     '--knob-settle': `${40 + resistance * 160}ms`,
   } as CSSProperties
   return (
-    <div className={`rotary-knob rotary-knob--${appearance}`} style={style}>
+    <div
+      className={['rotary-knob', `rotary-knob--${appearance}`, className].filter(Boolean).join(' ')}
+      style={{ ...knobStyle, ...style }}
+    >
       <span id={labelId} className="rotary-knob__label">
         {label}
       </span>
@@ -107,6 +113,9 @@ export function RotaryKnob({
         aria-valuetext={`${current}${unit}`}
         aria-disabled={inactive}
         onKeyDown={keyboard}
+        onDoubleClick={() => {
+          if (!inactive) commit(clamp(defaultValue, min, upper))
+        }}
         onPointerDown={(event) => {
           if (inactive || !event.isPrimary || event.button !== 0 || gesture.current) return
           const angle = angleAt(event)

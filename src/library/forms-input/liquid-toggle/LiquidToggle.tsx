@@ -38,7 +38,8 @@ export function LiquidToggle({
     if (!drag || drag.id !== event.pointerId) return
     gesture.current = null
     setPosition(null)
-    if (!cancelled && !disabled) update(drag.moved ? drag.position >= 0.5 : !on)
+    const next = drag.moved ? drag.position >= 0.5 : !on
+    if (!cancelled && !disabled && next !== on) update(next)
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId)
   }

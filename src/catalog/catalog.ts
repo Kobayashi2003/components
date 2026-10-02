@@ -112,6 +112,13 @@ export function getCategoryEntries(id: string) {
   return entries.filter((entry) => entry.category === id)
 }
 
+// Former slugs keep old links working after an entry is renamed.
+const renamedEntries: Record<string, string> = {
+  'layout-navigation/create-menu': 'morphing-action-menu',
+  'visual-effects/semantic-drag-cursor': 'semantic-cursor',
+}
+
 export function getEntry(category: string, slug: string) {
-  return entries.find((entry) => entry.category === category && entry.slug === slug)
+  const current = renamedEntries[`${category}/${slug}`] ?? slug
+  return entries.find((entry) => entry.category === category && entry.slug === current)
 }

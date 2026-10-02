@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import './styles.css'
 
 type Filter = 'all' | 'open' | 'done'
 
@@ -54,6 +53,13 @@ export function NeubrutalistTaskBoard() {
             onClick={() => setFilter(item)}
           >
             {item === 'all' ? 'All tasks' : item === 'open' ? 'Open' : 'Completed'}
+            <small>
+              {item === 'all'
+                ? tasks.length
+                : item === 'done'
+                  ? completed
+                  : tasks.length - completed}
+            </small>
           </button>
         ))}
       </div>
@@ -61,7 +67,7 @@ export function NeubrutalistTaskBoard() {
       <div className="task-grid">
         {visibleTasks.map((task) => (
           <article
-            className={`task-card ${task.color} ${task.done ? 'is-done' : ''}`}
+            className={['task-card', task.color, task.done && 'is-done'].filter(Boolean).join(' ')}
             key={task.id}
           >
             <div className="task-meta">

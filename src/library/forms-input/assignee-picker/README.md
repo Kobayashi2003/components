@@ -30,5 +30,5 @@ export function Example() {
 
 ## Notes
 
-- `label`: `Assignees`; `disabled`: `false`. Native checkboxes support Tab and Space; Escape closes and restores trigger focus.
+- Native checkboxes support Tab and Space; Escape closes and restores trigger focus.
 - Supports `className` and `style`; reduced motion disables decorative animation.

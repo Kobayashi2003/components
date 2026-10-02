@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FocusEvent, PointerEvent, ReactNode } from 'react'
-import './styles.css'
 
 export interface AdaptiveCursorOutlineProps {
   children: ReactNode
@@ -207,6 +206,20 @@ export function AdaptiveCursorOutline({
       clearPending()
     }
   }, [clearPending])
+
+  // Scrolling or resizing moves the target under a stationary pointer; re-measure it.
+  useEffect(() => {
+    const remeasure = () => {
+      const target = activeTarget.current
+      if (target && targetedRef.current && target.isConnected) setGeometry(geometryFor(target))
+    }
+    window.addEventListener('scroll', remeasure, { capture: true, passive: true })
+    window.addEventListener('resize', remeasure)
+    return () => {
+      window.removeEventListener('scroll', remeasure, { capture: true })
+      window.removeEventListener('resize', remeasure)
+    }
+  }, [geometryFor])
 
   const vars = {
     '--cursor-color': color,

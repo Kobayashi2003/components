@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent, ReactNode } from 'react'
-import './styles.css'
 
 export interface CursorSpotlightProps {
   children: ReactNode

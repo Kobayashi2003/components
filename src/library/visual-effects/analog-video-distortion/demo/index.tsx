@@ -1,10 +1,10 @@
 import './styles.css'
-import { AnalogVideoEffect } from '..'
+import { AnalogVideoDistortion } from '..'
 
 export default function AnalogVideoDistortionShowcase() {
   return (
     <div className="vhs-demo">
-      <AnalogVideoEffect
+      <AnalogVideoDistortion
         noise={0.18}
         tearing={0.82}
         smear={0.74}
@@ -16,7 +16,7 @@ export default function AnalogVideoDistortionShowcase() {
           <h2>LOST SIGNAL</h2>
           <time className="vhs-demo__timecode">00:14:27:08</time>
         </article>
-      </AnalogVideoEffect>
+      </AnalogVideoDistortion>
     </div>
   )
 }

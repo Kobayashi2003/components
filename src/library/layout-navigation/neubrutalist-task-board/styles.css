@@ -7,7 +7,7 @@
   background: var(--paper);
   font-family: Arial, Helvetica, sans-serif;
 }
-.board-header {
+.neubrutalist-board .board-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -15,7 +15,7 @@
   padding-bottom: 28px;
   border-bottom: 3px solid var(--black);
 }
-.board-kicker {
+.neubrutalist-board .board-kicker {
   display: block;
   margin-bottom: 12px;
   font:
@@ -24,19 +24,19 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.board-header h2 {
+.neubrutalist-board .board-header h2 {
   max-width: 560px;
   margin: 0;
   font-size: clamp(38px, 7vw, 82px);
   line-height: 0.86;
   letter-spacing: -0.07em;
 }
-.board-header p {
+.neubrutalist-board .board-header p {
   margin: 18px 0 0;
   font-size: 14px;
   font-weight: 700;
 }
-.board-progress {
+.neubrutalist-board .board-progress {
   display: flex;
   min-width: 112px;
   padding: 14px;
@@ -45,25 +45,25 @@
   box-shadow: 6px 6px 0 var(--black);
   background: #ff6b5e;
 }
-.board-progress strong {
+.neubrutalist-board .board-progress strong {
   font-size: 42px;
   line-height: 0.9;
 }
-.board-progress span {
+.neubrutalist-board .board-progress span {
   margin-top: 9px;
   font:
     700 10px/1.1 'DM Mono',
     monospace;
   text-transform: uppercase;
 }
-.board-toolbar {
+.neubrutalist-board .board-toolbar {
   display: flex;
   gap: 10px;
   padding: 22px 0;
   flex-wrap: wrap;
 }
-.board-toolbar button,
-.task-toggle {
+.neubrutalist-board .board-toolbar button,
+.neubrutalist-board .task-toggle {
   min-height: 44px;
   border: 2px solid var(--black);
   border-radius: 0;
@@ -75,22 +75,22 @@
   text-transform: uppercase;
   cursor: pointer;
 }
-.board-toolbar button {
+.neubrutalist-board .board-toolbar button {
   padding: 0 14px;
   box-shadow: 3px 3px 0 var(--black);
 }
-.board-toolbar button.is-active,
-.board-toolbar button:active {
+.neubrutalist-board .board-toolbar button.is-active,
+.neubrutalist-board .board-toolbar button:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 var(--black);
   background: #ffcf4a;
 }
-.task-grid {
+.neubrutalist-board .task-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
-.task-card {
+.neubrutalist-board .task-card {
   display: flex;
   min-height: 180px;
   padding: 20px;
@@ -98,26 +98,26 @@
   border: 3px solid var(--black);
   box-shadow: 7px 7px 0 var(--black);
 }
-.task-card.yellow {
+.neubrutalist-board .task-card.yellow {
   background: #ffcf4a;
 }
-.task-card.pink {
+.neubrutalist-board .task-card.pink {
   background: #ff92bd;
 }
-.task-card.blue {
+.neubrutalist-board .task-card.blue {
   background: #77b9ff;
 }
-.task-card.green {
+.neubrutalist-board .task-card.green {
   background: #a8df8e;
 }
-.task-card.is-done {
+.neubrutalist-board .task-card.is-done {
   opacity: 0.72;
 }
-.task-card.is-done h3 {
+.neubrutalist-board .task-card.is-done h3 {
   text-decoration: line-through;
   text-decoration-thickness: 3px;
 }
-.task-meta {
+.neubrutalist-board .task-meta {
   display: flex;
   justify-content: space-between;
   font:
@@ -125,14 +125,14 @@
     monospace;
   text-transform: uppercase;
 }
-.task-card h3 {
+.neubrutalist-board .task-card h3 {
   max-width: 380px;
   margin: 28px 0 22px;
   font-size: clamp(22px, 3vw, 34px);
   line-height: 0.95;
   letter-spacing: -0.05em;
 }
-.task-toggle {
+.neubrutalist-board .task-toggle {
   display: inline-flex;
   width: fit-content;
   margin-top: auto;
@@ -141,7 +141,7 @@
   gap: 8px;
   background: var(--paper);
 }
-.task-toggle span {
+.neubrutalist-board .task-toggle span {
   display: grid;
   width: 20px;
   height: 20px;
@@ -149,16 +149,16 @@
   border: 2px solid var(--black);
   font-size: 14px;
 }
-.task-toggle:hover,
-.task-toggle:focus-visible {
+.neubrutalist-board .task-toggle:hover,
+.neubrutalist-board .task-toggle:focus-visible {
   background: white;
 }
-.task-toggle:focus-visible,
-.board-toolbar button:focus-visible {
+.neubrutalist-board .task-toggle:focus-visible,
+.neubrutalist-board .board-toolbar button:focus-visible {
   outline: 3px solid #6b35ff;
   outline-offset: 3px;
 }
-.board-empty {
+.neubrutalist-board .board-empty {
   margin: 0;
   padding: 40px;
   border: 3px dashed var(--black);
@@ -166,14 +166,36 @@
   text-align: center;
 }
 @media (max-width: 620px) {
-  .board-header {
+  .neubrutalist-board .board-header {
     align-items: flex-start;
     flex-direction: column;
   }
-  .board-progress {
+  .neubrutalist-board .board-progress {
     align-self: stretch;
   }
-  .task-grid {
+  .neubrutalist-board .task-grid {
     grid-template-columns: 1fr;
+  }
+}
+.neubrutalist-board .board-toolbar button:not(.is-active):hover {
+  background: #fff;
+}
+.neubrutalist-board .board-toolbar button small {
+  margin-left: 6px;
+  opacity: 0.6;
+}
+.neubrutalist-board .task-toggle {
+  box-shadow: 3px 3px 0 var(--black);
+  transition:
+    transform 80ms,
+    box-shadow 80ms;
+}
+.neubrutalist-board .task-toggle:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--black);
+}
+@media (prefers-reduced-motion: reduce) {
+  .neubrutalist-board .task-toggle {
+    transition: none;
   }
 }

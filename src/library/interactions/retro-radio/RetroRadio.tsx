@@ -252,6 +252,11 @@ export function RetroRadio({
         setPlaybackState(false)
         setScreenView('play', 1100)
       })
+      // Pauses from outside the radio (system media keys, other players) update the screen too.
+      const element = audio
+      audio.addEventListener('pause', () => {
+        if (playingRef.current && !element.ended) setPlaybackState(false)
+      })
       audioRef.current = audio
     }
 
@@ -1050,6 +1055,7 @@ export function RetroRadio({
               onPointerMove={moveTune}
               onPointerUp={finishTune}
               onPointerCancel={(event) => cancelDial(event, tuneGesture)}
+              onLostPointerCapture={(event) => cancelDial(event, tuneGesture)}
               onClick={handleTuneClick}
               onKeyDown={handleTuneKey}
             >
@@ -1068,6 +1074,7 @@ export function RetroRadio({
               onPointerMove={moveVolume}
               onPointerUp={finishVolume}
               onPointerCancel={(event) => cancelDial(event, volumeGesture)}
+              onLostPointerCapture={(event) => cancelDial(event, volumeGesture)}
               onClick={handleVolumeClick}
               onKeyDown={handleVolumeKey}
             >

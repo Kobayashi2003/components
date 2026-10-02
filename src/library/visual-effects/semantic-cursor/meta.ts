@@ -1,8 +1,8 @@
 import type { CatalogEntryMeta } from '../../../catalog/types'
 
 export default {
-  slug: 'semantic-drag-cursor',
-  title: 'Semantic Drag Cursor',
+  slug: 'semantic-cursor',
+  title: 'Semantic Cursor',
   category: 'visual-effects',
   kind: 'effect',
   status: 'experimental',

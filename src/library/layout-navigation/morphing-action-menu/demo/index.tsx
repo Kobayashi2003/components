@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CreateMenu } from '..'
+import { MorphingActionMenu } from '..'
 import { ControlIcon } from '../internal/ControlIcon'
 import './styles.css'
 
@@ -10,11 +10,11 @@ const items = [
   { id: 'folder', label: 'Folder', icon: <ControlIcon name="folder" /> },
 ]
 
-export default function CreateMenuShowcase() {
+export default function MorphingActionMenuShowcase() {
   const [selected, setSelected] = useState('')
   return (
     <section className="control-demo">
-      <CreateMenu items={items} onSelect={setSelected} />
+      <MorphingActionMenu items={items} onSelect={setSelected} />
       <output aria-live="polite">
         {selected ? `Selected: ${selected}` : 'Create something new.'}
       </output>

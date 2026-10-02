@@ -33,6 +33,7 @@ function Example() {
 | `flicker`            | `true`                | Varies text opacity during a burst.                         |
 | `triggerOnHover`     | `true`                | Starts a burst when the pointer enters.                     |
 | `loopInterval`       | unset                 | Repeats bursts, no faster than `duration + 100` ms.         |
+| `disabled`           | `false`               | Shows plain text and ignores triggers.                      |
 | `className`, `style` | —                     | Customize the root, including font and text color.          |
 
 ## Notes

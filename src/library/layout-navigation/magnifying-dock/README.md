@@ -30,5 +30,5 @@ export function Example() {
 
 ## Notes
 
-- `label`: `Dock`; `disabled`: `false`. Hover or focus magnifies, click selects; touch can scrub and release. Arrow keys move focus, Enter / Space select.
+- Hover or focus magnifies, click selects; touch can scrub and release. Arrow keys move focus, Enter / Space select.
 - Supports `className` and `style`; reduced motion disables decorative animation.

@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent, ReactNode } from 'react'
-import './styles.css'
 
 export type SemanticCursorState = 'default' | 'link' | 'drag' | 'view' | 'play'
 
-export interface SemanticDragCursorProps {
+export interface SemanticCursorProps {
   children: ReactNode
   className?: string
   style?: CSSProperties
@@ -35,7 +34,7 @@ function isCursorState(value: string | undefined): value is SemanticCursorState 
   )
 }
 
-export function SemanticDragCursor({
+export function SemanticCursor({
   children,
   className = '',
   style: rootStyle,
@@ -43,7 +42,7 @@ export function SemanticDragCursor({
   color = '#dfff42',
   smoothing = 0.24,
   selector = DEFAULT_SELECTOR,
-}: SemanticDragCursorProps) {
+}: SemanticCursorProps) {
   const root = useRef<HTMLDivElement>(null)
   const cursor = useRef<HTMLDivElement>(null)
   const frame = useRef<number | null>(null)
@@ -114,13 +113,15 @@ export function SemanticDragCursor({
     target.current = { x, y }
     if (immediate || reducedMotion.current) current.current = { ...target.current }
 
+    setVisible(true)
+    if (frame.current === null) frame.current = requestAnimationFrame(() => paintRef.current())
+    // A held drag keeps its cursor even when the pointer outruns the target.
+    if (grabbing) return
     const semanticTarget = resolveTarget(event.target)
     const nextState = semanticTarget?.dataset.cursor
     const resolvedState = isCursorState(nextState) ? nextState : 'default'
     setState(resolvedState)
     setLabel(semanticTarget?.dataset.cursorLabel ?? defaultLabels[resolvedState])
-    setVisible(true)
-    if (frame.current === null) frame.current = requestAnimationFrame(() => paintRef.current())
   }
 
   const style = {
@@ -147,7 +148,7 @@ export function SemanticDragCursor({
       {children}
       <div
         ref={cursor}
-        className={`semantic-cursor semantic-cursor--${state}${visible ? ' is-visible' : ''}${grabbing && state === 'drag' ? ' is-grabbing' : ''}`}
+        className={`semantic-cursor semantic-cursor--${state}${visible && !disabled ? ' is-visible' : ''}${grabbing && state === 'drag' ? ' is-grabbing' : ''}`}
         aria-hidden="true"
       >
         <span className="semantic-cursor__content">

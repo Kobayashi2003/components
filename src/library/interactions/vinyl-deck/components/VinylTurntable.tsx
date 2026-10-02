@@ -106,6 +106,7 @@ export function VinylTurntable({
 
   // Platter swipe / track selection --------------------------------------------
   const handlePointerDown = (event: PointerEvent<SVGGElement>) => {
+    if (!event.isPrimary || event.button !== 0) return
     dragStartRef.current = event.clientX
     suppressClickRef.current = false
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -122,7 +123,8 @@ export function VinylTurntable({
     if (dragStartRef.current === null) return
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId)
-    if (Math.abs(dragOffset) > 48) onSelect(dragOffset < 0 ? 1 : -1)
+    if (event.type !== 'pointercancel' && Math.abs(dragOffset) > 48)
+      onSelect(dragOffset < 0 ? 1 : -1)
     dragStartRef.current = null
     setDragOffset(0)
   }

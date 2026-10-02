@@ -1,38 +1,123 @@
 .morph-audio {
+  --_background: var(--audio-player-background, #222326);
+  --_foreground: var(--audio-player-foreground, #f7f6f3);
+  --_muted: var(--audio-player-muted, #a3a4a8);
+  --_track: var(--audio-player-track, #ffffff26);
+  --_progress: var(--audio-player-progress, #f8f8f6);
+  --_control: var(--audio-player-control, #b9babe);
+  --_play-background: var(--audio-player-play-background, #fbfaf8);
+  --_play-color: var(--audio-player-play-color, #171819);
+  --_accent: var(--audio-player-accent, #e2edce);
+  --_ambient: var(--audio-player-ambient, 0.34);
+  --_ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --_morph: 380ms var(--_ease);
+
   container-type: inline-size;
   box-sizing: border-box;
   position: relative;
+  isolation: isolate;
   width: min(488px, 100%);
-  height: 146px;
-  padding: 18px;
-  border-radius: 36px;
-  background: var(--audio-player-background, #2d2e31);
-  color: var(--audio-player-foreground, #f7f6f3);
-  font-family: Arial, Helvetica, sans-serif;
-  transition: height 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding: 16px;
+  border-radius: 32px;
+  background: var(--_background);
+  color: var(--_foreground);
+  box-shadow:
+    0 1px 0 #ffffff0d inset,
+    0 18px 50px -18px #0007;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    padding var(--_morph),
+    border-radius var(--_morph);
+}
+
+.morph-audio *,
+.morph-audio *::before,
+.morph-audio *::after {
+  box-sizing: border-box;
 }
 
 .morph-audio--expanded {
-  height: 354px;
+  padding: 22px 22px 20px;
+  border-radius: 38px;
 }
 
 .morph-audio button {
   color: inherit;
+  font: inherit;
   cursor: pointer;
 }
+
+.morph-audio button:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.morph-audio :focus-visible {
+  outline: 2px solid var(--_accent);
+  outline-offset: 3px;
+}
+
+/* Ambient artwork glow */
+
+.morph-audio__backdrop {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.morph-audio__backdrop img {
+  position: absolute;
+  inset: -40%;
+  width: 180%;
+  height: 180%;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(42px) saturate(1.5);
+  transition: opacity 600ms ease;
+}
+
+.morph-audio__backdrop[data-loaded='true'] img {
+  opacity: calc(var(--_ambient) * 0.55);
+}
+
+.morph-audio--expanded .morph-audio__backdrop[data-loaded='true'] img {
+  opacity: var(--_ambient);
+}
+
+.morph-audio__backdrop::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--_background) 70%, transparent)
+  );
+  content: '';
+}
+
+/* Whole-card expand target */
 
 .morph-audio__surface-toggle {
   position: absolute;
   z-index: 1;
   inset: 0;
   width: 100%;
+  padding: 0;
   border: 0;
   border-radius: inherit;
   background: transparent;
 }
 
-.morph-audio__surface-toggle:focus-visible {
-  outline: 2px solid #fff;
+.morph-audio .morph-audio__surface-toggle:focus-visible {
   outline-offset: 4px;
 }
 
@@ -42,78 +127,164 @@
   pointer-events: none;
 }
 
+.morph-audio__content :is(button, input, select, a, label),
+.morph-audio__expanded-content {
+  pointer-events: auto;
+}
+
+/* Heading */
+
 .morph-audio__heading {
   display: grid;
-  height: 74px;
-  grid-template-columns: 74px minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
-  transition: height 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    grid-template-columns var(--_morph),
+    gap var(--_morph);
 }
 
 .morph-audio--expanded .morph-audio__heading {
-  height: 132px;
-  padding: 8px;
-  grid-template-columns: 118px minmax(0, 1fr) 40px;
-  gap: 20px;
+  grid-template-columns: 116px minmax(0, 1fr) 40px;
+  gap: 18px;
 }
 
 .morph-audio__artwork {
-  display: block;
-  width: 74px;
-  height: 74px;
-  border-radius: 21px;
-  object-fit: cover;
-  transition:
-    width 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    height 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-radius 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  background: radial-gradient(circle at 20% 10%, #717780, #363b43 75%);
+  color: #d7dce4;
+  box-shadow:
+    inset 0 0 0 1px #ffffff14,
+    0 10px 24px -12px #000a;
+  transition: border-radius var(--_morph);
 }
 
 .morph-audio--expanded .morph-audio__artwork {
-  width: 118px;
-  height: 118px;
-  border-radius: 31px;
+  border-radius: 28px;
+}
+
+.morph-audio__artwork img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.morph-audio__artwork[data-loaded='true'] img {
+  opacity: 1;
+}
+
+.morph-audio__artwork[data-loaded='true'] svg {
+  visibility: hidden;
+}
+
+.morph-audio__artwork[data-reading='true'] svg {
+  animation: morph-audio-pulse 1.4s ease-in-out infinite;
 }
 
 .morph-audio__metadata {
   display: grid;
   min-width: 0;
-  gap: 4px;
+  gap: 3px;
 }
 
-.morph-audio__metadata strong,
-.morph-audio__metadata span {
+.morph-audio__metadata > strong,
+.morph-audio__metadata > span {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.morph-audio__metadata strong {
-  font-size: 23px;
-  font-weight: 600;
-  letter-spacing: -0.035em;
+.morph-audio__metadata > strong {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  transition: font-size var(--_morph);
 }
 
-.morph-audio__metadata span {
-  color: var(--audio-player-muted, #a4a4a4);
-  font-size: 18px;
+.morph-audio__metadata > span {
+  color: var(--_muted);
+  font-size: 15px;
+  transition: font-size var(--_morph);
 }
 
-.morph-audio--expanded .morph-audio__metadata strong {
-  font-size: 29px;
+.morph-audio--expanded .morph-audio__metadata > strong {
+  display: -webkit-box;
+  font-size: 24px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.morph-audio--expanded .morph-audio__metadata span {
-  font-size: 23px;
+.morph-audio--expanded .morph-audio__metadata > span {
+  font-size: 17px;
 }
+
+/* Playing indicator */
+
+.morph-audio__eq {
+  display: inline-flex;
+  width: 0;
+  height: 11px;
+  margin-right: 0;
+  align-items: flex-end;
+  gap: 2px;
+  overflow: hidden;
+  vertical-align: baseline;
+  transition:
+    width 200ms ease,
+    margin 200ms ease;
+}
+
+.morph-audio[data-state='playing'] .morph-audio__eq,
+.morph-audio[data-state='buffering'] .morph-audio__eq {
+  width: 13px;
+  margin-right: 7px;
+}
+
+.morph-audio__eq i {
+  width: 3px;
+  height: 100%;
+  flex: none;
+  border-radius: 1px;
+  background: var(--_accent);
+  transform-origin: bottom;
+  animation: morph-audio-eq 900ms ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.morph-audio__eq i:nth-child(2) {
+  animation-duration: 700ms;
+  animation-delay: -300ms;
+}
+
+.morph-audio__eq i:nth-child(3) {
+  animation-duration: 1100ms;
+  animation-delay: -600ms;
+}
+
+.morph-audio[data-state='playing'] .morph-audio__eq i {
+  animation-play-state: running;
+}
+
+/* Buttons */
 
 .morph-audio__transport {
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: auto;
 }
 
 .morph-audio__transport button,
@@ -123,87 +294,163 @@
   place-items: center;
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  color: var(--audio-player-control, #aaa);
+  color: var(--_control);
+  transition:
+    color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
 }
 
-.morph-audio__transport button:hover,
+.morph-audio__transport button:not(:disabled):hover,
 .morph-audio__like:hover {
-  color: #fff;
+  color: var(--_foreground);
+  background: color-mix(in srgb, var(--_foreground) 8%, transparent);
 }
 
-.morph-audio__transport button:focus-visible,
-.morph-audio__like:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
+.morph-audio__transport button:not(:disabled):active {
+  transform: scale(0.92);
 }
 
 .morph-audio__transport--compact {
-  gap: 10px;
+  gap: 4px;
 }
 
-.morph-audio__transport--compact button:not(.morph-audio__play) {
-  width: 28px;
-  height: 42px;
+.morph-audio__transport--compact button {
+  width: 36px;
+  height: 44px;
+  animation: morph-audio-fade 240ms ease both;
 }
 
-.morph-audio__transport .morph-audio__play {
-  width: 56px;
-  height: 56px;
+.morph-audio .morph-audio__play {
+  position: relative;
+  background: var(--_play-background);
+  color: var(--_play-color);
+  box-shadow: 0 6px 18px -8px #000c;
+}
+
+.morph-audio .morph-audio__play:not(:disabled):hover {
+  background: color-mix(in srgb, var(--_play-background) 88%, var(--_foreground));
+  color: var(--_play-color);
+}
+
+.morph-audio__transport--compact .morph-audio__play {
+  width: 50px;
+  height: 50px;
+}
+
+.morph-audio__play::after {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid transparent;
+  border-top-color: var(--_accent);
   border-radius: 50%;
-  background: var(--audio-player-play-background, #fbfaf8);
-  color: var(--audio-player-play-color, #171819);
+  opacity: 0;
+  content: '';
+  transition: opacity 200ms ease;
 }
 
-.morph-audio__transport .morph-audio__play:hover {
-  background: #e4e4e4;
-  color: #171819;
+.morph-audio__play[data-busy='true']::after {
+  opacity: 1;
+  animation: morph-audio-spin 800ms linear infinite;
 }
 
 .morph-audio__like {
   width: 40px;
   height: 40px;
   align-self: start;
-  margin-top: 15px;
-  pointer-events: auto;
+  margin-top: 6px;
+  animation: morph-audio-fade 240ms ease both;
 }
 
 .morph-audio__like[aria-pressed='true'] {
-  color: #fff;
+  color: var(--_accent);
 }
 
 .morph-audio__like[aria-pressed='true'] svg {
-  fill: #fff;
+  fill: currentColor;
+  animation: morph-audio-pop 360ms var(--_ease);
 }
+
+/* Timeline */
 
 .morph-audio__timeline {
-  margin-top: 26px;
+  margin-top: 18px;
+  transition: margin var(--_morph);
 }
 
-.morph-audio:not(.morph-audio--expanded) .morph-audio__timeline {
-  margin-top: 25px;
+.morph-audio--expanded .morph-audio__timeline {
+  margin-top: 24px;
 }
 
 .morph-audio__rail {
   position: relative;
-  height: 6px;
+  height: 5px;
   border-radius: 9px;
-  background: var(--audio-player-track, #595a5d);
-  transition:
-    height 180ms ease,
-    margin 180ms ease;
+  background: var(--_track);
+  transition: height 160ms ease;
 }
 
-.morph-audio__rail--seeking {
-  height: 10px;
-  margin-block: -2px;
+.morph-audio__rail:hover,
+.morph-audio__rail:has(input:focus-visible),
+.morph-audio__rail[data-seeking='true'] {
+  height: 8px;
+}
+
+.morph-audio__buffer,
+.morph-audio__run {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+}
+
+.morph-audio__buffer {
+  background: color-mix(in srgb, var(--_progress) 18%, transparent);
 }
 
 .morph-audio__run {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--audio-player-progress, #f8f8f8);
+  left: 0;
+  background: var(--_progress);
+}
+
+.morph-audio__thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--_progress);
+  box-shadow: 0 1px 6px #0006;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 160ms ease;
+}
+
+.morph-audio__rail:hover .morph-audio__thumb,
+.morph-audio__rail:has(input:focus-visible) .morph-audio__thumb,
+.morph-audio__rail[data-seeking='true'] .morph-audio__thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.morph-audio__rail:has(input:focus-visible) .morph-audio__thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--_accent) 45%, transparent);
+}
+
+.morph-audio__bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  padding: 3px 7px;
+  border-radius: 7px;
+  background: var(--_foreground);
+  color: var(--_background);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .morph-audio__seek {
@@ -211,337 +458,379 @@
   top: 50%;
   left: 0;
   width: 100%;
-  height: 20px;
+  height: 24px;
   margin: 0;
   padding: 0;
   border: 0;
   appearance: none;
   background: transparent;
   cursor: pointer;
-  pointer-events: auto;
+  opacity: 0;
+  touch-action: none;
   transform: translateY(-50%);
 }
 
+.morph-audio__seek:disabled {
+  cursor: default;
+}
+
 .morph-audio__seek::-webkit-slider-thumb {
-  width: 12px;
-  height: 12px;
-  border: 0;
-  border-radius: 50%;
+  width: 14px;
+  height: 14px;
   appearance: none;
-  background: #fff;
-  opacity: 0;
 }
 
 .morph-audio__seek::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: 0;
-  border-radius: 50%;
-  background: #fff;
+}
+
+/* Expanded panel */
+
+.morph-audio__panel {
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--_morph),
+    opacity 180ms ease,
+    visibility 0s linear 380ms;
 }
 
-.morph-audio__seek:hover::-webkit-slider-thumb,
-.morph-audio__seek:focus-visible::-webkit-slider-thumb,
-.morph-audio__seek:active::-webkit-slider-thumb,
-.morph-audio__seek:hover::-moz-range-thumb,
-.morph-audio__seek:focus-visible::-moz-range-thumb,
-.morph-audio__seek:active::-moz-range-thumb {
+.morph-audio--expanded .morph-audio__panel {
+  grid-template-rows: 1fr;
   opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--_morph),
+    opacity 280ms ease 90ms,
+    visibility 0s;
 }
 
-.morph-audio__seek:focus-visible {
-  outline: none;
-}
-.morph-audio__rail:has(input:focus-visible),
-.morph-audio__rail:hover {
-  height: 8px;
-  margin-block: -1px;
-}
-.morph-audio__rail--seeking {
-  box-shadow: 0 0 0 3px #ffffff0d;
+.morph-audio__panel-inner {
+  min-height: 0;
+  margin: 0 -6px -6px;
+  padding: 0 6px 6px;
+  overflow: hidden;
 }
 
 .morph-audio__time {
   display: flex;
-  margin-top: 12px;
+  margin-top: 10px;
   justify-content: space-between;
-  color: var(--audio-player-muted, #a3a3a3);
-  font-size: 20px;
+  color: var(--_muted);
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .morph-audio__transport--expanded {
-  gap: 34px;
-  margin-top: 25px;
-  animation: morph-audio-rise 320ms both;
+  gap: clamp(6px, 4cqw, 22px);
+  margin-top: 10px;
 }
 
-.morph-audio__transport--expanded button:not(.morph-audio__play) {
-  width: 38px;
-  height: 52px;
+.morph-audio__transport--expanded button {
+  width: 48px;
+  height: 48px;
 }
 
 .morph-audio__transport--expanded .morph-audio__play {
-  width: 84px;
-  height: 84px;
+  width: 74px;
+  height: 74px;
+  margin-inline: 4px;
 }
 
-@keyframes morph-audio-rise {
-  from {
-    opacity: 0;
-    transform: translateY(-7px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.morph-audio__options {
+  display: flex;
+  min-height: 40px;
+  margin-top: 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
+
+.morph-audio__volume {
+  display: flex;
+  flex: 0 1 200px;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.morph-audio__volume button,
+.morph-audio__rate {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--_control);
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+
+.morph-audio__volume button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.morph-audio__volume button:hover,
+.morph-audio__rate:hover {
+  color: var(--_foreground);
+  background: color-mix(in srgb, var(--_foreground) 8%, transparent);
+}
+
+.morph-audio__volume input {
+  --fill: 100%;
+  width: 100%;
+  min-width: 60px;
+  height: 24px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.morph-audio__volume input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--_control) var(--fill), var(--_track) var(--fill));
+}
+
+.morph-audio__volume input::-moz-range-track {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--_control) var(--fill), var(--_track) var(--fill));
+}
+
+.morph-audio__volume input::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  appearance: none;
+  background: var(--_foreground);
+}
+
+.morph-audio__volume input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--_foreground);
+}
+
+.morph-audio .morph-audio__volume input:focus-visible {
+  outline: none;
+}
+
+.morph-audio__volume input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--_accent) 50%, transparent);
+}
+
+.morph-audio__volume input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--_accent) 50%, transparent);
+}
+
+.morph-audio__rate {
+  min-width: 52px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--_foreground) 16%, transparent);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.morph-audio__expanded-content {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* Status */
+
+.morph-audio__error {
+  display: flex;
+  margin: 12px 0 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 14px;
+  background: #f3b8ac1a;
+  color: #f3b8ac;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.morph-audio__error button {
+  flex: none;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #ffffff18;
+}
+
+.morph-audio__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Narrow containers */
 
 @container (max-width: 430px) {
   .morph-audio {
-    height: 130px;
-    padding: 14px;
-    border-radius: 31px;
+    padding: 13px;
+    border-radius: 28px;
   }
 
   .morph-audio--expanded {
-    height: 317px;
+    padding: 18px 16px 16px;
+    border-radius: 32px;
   }
 
   .morph-audio__heading {
-    height: 66px;
-    grid-template-columns: 66px minmax(0, 1fr) auto;
-    gap: 10px;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    gap: 11px;
   }
 
   .morph-audio__artwork {
-    width: 66px;
-    height: 66px;
-    border-radius: 18px;
+    border-radius: 17px;
   }
 
-  .morph-audio__metadata strong {
-    font-size: 17px;
+  .morph-audio--expanded .morph-audio__heading {
+    grid-template-columns: 92px minmax(0, 1fr) 36px;
+    gap: 13px;
   }
 
-  .morph-audio__metadata span {
+  .morph-audio--expanded .morph-audio__artwork {
+    border-radius: 23px;
+  }
+
+  .morph-audio__metadata > strong {
+    font-size: 16px;
+  }
+
+  .morph-audio__metadata > span {
+    font-size: 13px;
+  }
+
+  .morph-audio--expanded .morph-audio__metadata > strong {
+    font-size: 19px;
+  }
+
+  .morph-audio--expanded .morph-audio__metadata > span {
     font-size: 14px;
   }
 
   .morph-audio__transport--compact {
-    gap: 5px;
+    gap: 0;
   }
 
-  .morph-audio__transport--compact button:not(.morph-audio__play) {
-    width: 24px;
+  .morph-audio__transport--compact button {
+    width: 32px;
   }
 
   .morph-audio__transport--compact .morph-audio__play {
+    width: 44px;
+    height: 44px;
+  }
+
+  .morph-audio__like {
+    width: 36px;
+    height: 36px;
+    margin-top: 2px;
+  }
+
+  .morph-audio__transport--expanded button {
     width: 42px;
     height: 42px;
   }
 
-  .morph-audio--expanded .morph-audio__heading {
-    height: 111px;
-    grid-template-columns: 95px minmax(0, 1fr) 28px;
-    gap: 12px;
-  }
-
-  .morph-audio--expanded .morph-audio__artwork {
-    width: 95px;
-    height: 95px;
-    border-radius: 23px;
-  }
-
-  .morph-audio--expanded .morph-audio__metadata strong {
-    font-size: 21px;
-  }
-
-  .morph-audio--expanded .morph-audio__metadata span {
-    font-size: 17px;
-  }
-
-  .morph-audio__like {
-    width: 28px;
-    margin-top: 7px;
-  }
-
-  .morph-audio__time {
-    font-size: 15px;
-  }
-
-  .morph-audio__transport--expanded {
-    margin-top: 17px;
-  }
-
   .morph-audio__transport--expanded .morph-audio__play {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
   }
 }
 
-@container (max-width: 320px) {
+@container (max-width: 340px) {
+  .morph-audio__transport--compact button:not(.morph-audio__play) {
+    display: none;
+  }
+
   .morph-audio--expanded .morph-audio__heading {
-    grid-template-columns: 82px minmax(0, 1fr) 24px;
-    gap: 8px;
+    grid-template-columns: 76px minmax(0, 1fr) 32px;
+    gap: 10px;
   }
 
-  .morph-audio--expanded .morph-audio__artwork {
-    width: 82px;
-    height: 82px;
+  .morph-audio--expanded .morph-audio__metadata > strong {
+    font-size: 17px;
   }
 
-  .morph-audio--expanded .morph-audio__metadata strong {
-    font-size: 18px;
+  .morph-audio__transport--expanded .morph-audio__skip {
+    display: none;
   }
+}
 
-  .morph-audio__like {
-    width: 24px;
+/* Motion */
+
+@keyframes morph-audio-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes morph-audio-pop {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes morph-audio-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes morph-audio-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes morph-audio-eq {
+  from {
+    transform: scaleY(0.25);
+  }
+  to {
+    transform: scaleY(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .morph-audio,
-  .morph-audio__heading,
-  .morph-audio__artwork,
-  .morph-audio__rail {
-    transition: none;
+  .morph-audio *,
+  .morph-audio *::before,
+  .morph-audio *::after {
+    animation: none !important;
+    transition: none !important;
   }
 
-  .morph-audio__transport--expanded {
-    animation: none;
+  .morph-audio__eq i {
+    transform: scaleY(0.6);
   }
-}
-
-.morph-audio__error {
-  position: relative;
-  margin: 12px 0 0;
-  color: #f3b8ac;
-  font:
-    12px/1.5 system-ui,
-    sans-serif;
-}
-
-.morph-audio__artwork--empty {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at 20% 10%, #717780, #363b43 75%);
-  color: #d7dce4;
-  box-shadow: inset 0 0 0 1px #ffffff12;
-}
-.morph-audio__artwork--empty img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-.morph-audio__artwork--empty[data-loaded='true'] img {
-  opacity: 1;
-}
-.morph-audio__artwork--empty[data-loaded='true'] svg {
-  visibility: hidden;
-}
-.morph-audio--expanded .morph-audio__metadata strong {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  white-space: normal;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-.morph-audio__seek {
-  touch-action: none;
-}
-@container (max-width: 350px) {
-  .morph-audio__transport--compact button:not(.morph-audio__play) {
-    display: none;
-  }
-  .morph-audio__transport--compact .morph-audio__play {
-    width: 44px;
-    height: 44px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .morph-audio__artwork--empty img {
-    transition: none;
-  }
-}
-
-.morph-audio:has(.morph-audio__volume) {
-  height: 404px;
-}
-.morph-audio:has(.morph-audio__error) {
-  height: auto;
-  min-height: 180px;
-}
-.morph-audio--expanded:has(.morph-audio__error) {
-  min-height: 420px;
-}
-.morph-audio button:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-.morph-audio__volume {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 16px;
-  pointer-events: auto;
-}
-.morph-audio__volume button {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-}
-.morph-audio__volume button:hover {
-  background: #ffffff10;
-}
-.morph-audio__volume input {
-  width: 100px;
-  accent-color: var(--audio-player-accent, #e2edce);
-  height: 24px;
-  cursor: pointer;
-}
-.morph-audio__volume :focus-visible {
-  outline: 2px solid #e2edce;
-  outline-offset: 3px;
-}
-.morph-audio__loading {
-  position: absolute;
-  right: 0;
-  bottom: -16px;
-  font-size: 11px;
-  color: #a4a4a4;
-}
-.morph-audio__error button {
-  pointer-events: auto;
-  border: 0;
-  border-radius: 6px;
-  padding: 6px 10px;
-  background: #ffffff15;
-}
-
-.morph-audio.morph-audio--expanded:has(.morph-audio__expanded-content) {
-  height: auto;
-}
-.morph-audio__expanded-content {
-  pointer-events: auto;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  display: grid;
-  gap: 16px;
 }

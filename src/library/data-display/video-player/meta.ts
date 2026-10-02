@@ -7,7 +7,8 @@ export default {
   kind: 'component',
   status: 'experimental',
   summary:
-    'A reusable video player with native playback, buffered progress, speed, and fullscreen controls.',
+    'A reusable video player with chapters, subtitles, gestures, speed, and fullscreen controls.',
   usage: 'reusable',
+  capabilities: { touch: 'supported', keyboard: true, reducedMotion: true },
   tags: ['responsive-layout', 'status-feedback', 'semantic-states'],
 } satisfies CatalogEntryMeta

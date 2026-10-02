@@ -23,5 +23,5 @@ export function Example() {
 
 ## Notes
 
-- `disabled`: `false`. Keyboard users can confirm with Enter or Space. The callback owns the actual action.
+- Keyboard users can confirm with Enter or Space. The callback owns the actual action.
 - Supports `className` and `style`; reduced motion disables decorative animation.

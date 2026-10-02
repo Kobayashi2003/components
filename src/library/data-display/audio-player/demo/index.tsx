@@ -9,6 +9,8 @@ import { useMediaPreferences, readPreference, writePreference } from './preferen
 import cover from './cover.jpg'
 import './styles.css'
 
+const repeatModes: RepeatMode[] = ['off', 'all', 'one']
+
 export default function AudioPlayerShowcase() {
   const library = useAudioLibrary()
   const { files } = library
@@ -120,36 +122,17 @@ export default function AudioPlayerShowcase() {
         >
           Shuffle
         </button>
+        <button
+          type="button"
+          aria-pressed={repeat !== 'off'}
+          aria-label={`Repeat ${repeat}`}
+          title="Change repeat mode"
+          onClick={() => setRepeat(repeatModes[(repeatModes.indexOf(repeat) + 1) % 3])}
+        >
+          Repeat{repeat !== 'off' && <small>{repeat}</small>}
+        </button>
         <label>
-          Repeat
-          <select
-            aria-label="Repeat mode"
-            value={repeat}
-            onChange={(event) => setRepeat(event.target.value as RepeatMode)}
-          >
-            <option value="off">Off</option>
-            <option value="all">All</option>
-            <option value="one">One</option>
-          </select>
-        </label>
-        <label>
-          Speed
-          <select
-            aria-label="Audio speed"
-            value={preferences.rate}
-            onChange={(event) =>
-              setPreferences((current) => ({ ...current, rate: Number(event.target.value) }))
-            }
-          >
-            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-              <option key={rate} value={rate}>
-                {rate}×
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Sleep
+          <span>Sleep</span>
           <select
             aria-label="Sleep timer"
             value={sleepUntil ? 'active' : 'off'}
@@ -180,7 +163,9 @@ export default function AudioPlayerShowcase() {
         </label>
       </div>
       <div className="morph-audio-demo__queue-heading">
-        <span>{files.length} tracks</span>
+        <span>
+          {files.length} {files.length === 1 ? 'track' : 'tracks'}
+        </span>
         <button
           type="button"
           onClick={() => {
@@ -282,6 +267,7 @@ export default function AudioPlayerShowcase() {
           volume={preferences.volume}
           muted={preferences.muted}
           playbackRate={preferences.rate}
+          onPlaybackRateChange={(rate) => setPreferences((current) => ({ ...current, rate }))}
           playbackGroup="atlas-media"
           mediaSession
           liked={likes.includes(file?.fingerprint ?? 'demo')}

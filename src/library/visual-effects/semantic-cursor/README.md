@@ -1,20 +1,20 @@
-# Semantic Drag Cursor
+# Semantic Cursor
 
 Changes a decorative cursor according to the hovered element’s action. It does not implement dragging, navigation or playback.
 
 ## Usage
 
 ```tsx
-import { SemanticDragCursor } from './semantic-drag-cursor'
+import { SemanticCursor } from './semantic-cursor'
 
 export function Example() {
   return (
-    <SemanticDragCursor style={{ padding: 60 }}>
+    <SemanticCursor style={{ padding: 60 }}>
       <a href="/work" data-cursor="link">
         Open work
       </a>
       <div data-cursor="drag">Your draggable content</div>
-    </SemanticDragCursor>
+    </SemanticCursor>
   )
 }
 ```

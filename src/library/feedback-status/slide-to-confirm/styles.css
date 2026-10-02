@@ -62,10 +62,31 @@
   inset: 0;
   display: grid;
   place-items: center;
-  color: var(--control-muted);
+  padding-left: 30px;
+  background: linear-gradient(
+      100deg,
+      var(--control-muted) 42%,
+      var(--control-ink) 50%,
+      var(--control-muted) 58%
+    )
+    0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   opacity: calc(1 - var(--slide-progress) * 1.8);
   transition: opacity 180ms;
-  padding-left: 30px;
+  animation: slide-confirm-shine 2.8s linear infinite;
+}
+.slide-confirm[data-dragging='true'] .slide-confirm__label {
+  animation-play-state: paused;
+}
+@keyframes slide-confirm-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }
 .slide-confirm__wash {
   position: absolute;

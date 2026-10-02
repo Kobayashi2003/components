@@ -35,7 +35,7 @@ export function ExpandingSearch({
     <form
       role="search"
       aria-label={label}
-      className={`atlas-control expanding-search ${className}`}
+      className={['atlas-control', 'expanding-search', className].filter(Boolean).join(' ')}
       data-open={open}
       style={style}
       onSubmit={(event) => {
@@ -52,7 +52,10 @@ export function ExpandingSearch({
         aria-label={label}
         aria-expanded={open}
         disabled={disabled}
+        title={open && text.trim() ? 'Search' : undefined}
         onClick={() => {
+          // Once open with text, the icon doubles as the submit action.
+          if (open && text.trim()) onSearch?.(text.trim())
           setExpanded(true)
           field.current?.focus()
         }}
@@ -78,6 +81,20 @@ export function ExpandingSearch({
           }
         }}
       />
+      {open && text && (
+        <button
+          type="button"
+          className="expanding-search__clear"
+          aria-label="Clear search"
+          disabled={disabled}
+          onClick={() => {
+            update('')
+            field.current?.focus()
+          }}
+        >
+          <ControlIcon name="close" size={16} />
+        </button>
+      )}
     </form>
   )
 }

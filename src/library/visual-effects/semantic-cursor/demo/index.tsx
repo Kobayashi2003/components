@@ -1,7 +1,7 @@
 import './styles.css'
 import { useRef } from 'react'
 import type { PointerEvent } from 'react'
-import { SemanticDragCursor } from '..'
+import { SemanticCursor } from '..'
 
 const projects = [
   { number: '01', title: 'Monument' },
@@ -11,7 +11,7 @@ const projects = [
   { number: '05', title: 'Continuum' },
 ]
 
-export default function SemanticDragCursorShowcase() {
+export default function SemanticCursorShowcase() {
   const rail = useRef<HTMLDivElement>(null)
   const drag = useRef({ active: false, startX: 0, startScroll: 0 })
 
@@ -38,7 +38,7 @@ export default function SemanticDragCursorShowcase() {
   }
 
   return (
-    <SemanticDragCursor className="semantic-cursor-demo">
+    <SemanticCursor className="semantic-cursor-demo">
       <div className="semantic-demo__topline">
         <span>CURSOR STATES / 05—06</span>
         <a href="#semantic-docs" data-cursor="link" aria-label="Open documentation">
@@ -88,6 +88,6 @@ export default function SemanticDragCursorShowcase() {
           Play film
         </button>
       </div>
-    </SemanticDragCursor>
+    </SemanticCursor>
   )
 }

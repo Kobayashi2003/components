@@ -1,9 +1,8 @@
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
 import { BookArtwork } from './components/BookArtwork'
 import { BookBookmark } from './components/BookBookmark'
 import { initialView, orbit, viewMatrix, views } from './rendering/camera'
-import './styles.css'
 
 export interface TypographicBookProps {
   className?: string
@@ -28,12 +27,26 @@ export function TypographicBook({
   const [dragging, setDragging] = useState(false)
   const drag = useRef<{ id: number; x: number; y: number } | null>(null)
   const hintId = useId()
+  const viewport = useRef<HTMLDivElement>(null)
   const changeZoom = (delta: number) =>
     setZoom((current) => Math.max(0.65, Math.min(1.4, current + delta)))
   const reset = () => {
     setOrientation(initialView)
     setZoom(1)
   }
+
+  // Trackpad pinches arrive as ctrl + wheel; React wheel listeners are passive and cannot cancel them.
+  useEffect(() => {
+    const node = viewport.current
+    if (!node) return
+    const pinch = (event: WheelEvent) => {
+      if (!event.ctrlKey) return
+      event.preventDefault()
+      setZoom((current) => Math.max(0.65, Math.min(1.4, current - event.deltaY * 0.01)))
+    }
+    node.addEventListener('wheel', pinch, { passive: false })
+    return () => node.removeEventListener('wheel', pinch)
+  }, [])
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (event.button !== 0 || drag.current) return
@@ -88,6 +101,7 @@ export function TypographicBook({
         <span>THE BOOK OF NEW WORLDS — 01</span>
       </header>
       <div
+        ref={viewport}
         className={`type-book__viewport${dragging ? ' is-dragging' : ''}`}
         tabIndex={0}
         role="group"
@@ -170,7 +184,7 @@ export function TypographicBook({
       </div>
       <p className="type-book__help" id={hintId}>
         Front / left / below only · Drag or arrow keys to orbit · Shift + drag or Q / E to roll · +
-        / − to zoom · 0 to reset
+        / − or pinch to zoom · 0 to reset
       </p>
     </section>
   )

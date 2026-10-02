@@ -35,18 +35,22 @@ export function TaskChecklist({
   const addRef = useRef<HTMLButtonElement>(null)
   const serial = useRef(0)
   const id = useId()
-  const save = () => {
-    if (disabled) return
+  const cancelled = useRef(false)
+  const commitDraft = () => {
     const text = draft.trim()
-    if (text) update([...list, { id: `${id}-${++serial.current}`, label: text, checked: false }])
+    if (!disabled && text)
+      update([...list, { id: `${id}-${++serial.current}`, label: text, checked: false }])
     setDraft('')
+    return !!text
+  }
+  const close = (restoreFocus: boolean) => {
     setEditing(false)
-    requestAnimationFrame(() => addRef.current?.focus())
+    if (restoreFocus) requestAnimationFrame(() => addRef.current?.focus())
   }
 
   return (
     <div
-      className={`atlas-control task-checklist ${className}`}
+      className={['atlas-control', 'task-checklist', className].filter(Boolean).join(' ')}
       style={style}
       role="group"
       aria-label={label}
@@ -74,7 +78,8 @@ export function TaskChecklist({
           <form
             onSubmit={(event) => {
               event.preventDefault()
-              save()
+              // Enter keeps the field open for the next task; an empty Enter finishes.
+              if (!commitDraft()) close(true)
             }}
             className="task-checklist__add"
           >
@@ -87,13 +92,18 @@ export function TaskChecklist({
               value={draft}
               disabled={disabled}
               onChange={(event) => setDraft(event.target.value)}
-              onBlur={save}
+              onBlur={() => {
+                if (!cancelled.current) commitDraft()
+                cancelled.current = false
+                close(false)
+              }}
               onKeyDown={(event) => {
                 if (event.key === 'Escape') {
                   event.preventDefault()
+                  event.stopPropagation()
+                  cancelled.current = true
                   setDraft('')
-                  setEditing(false)
-                  requestAnimationFrame(() => addRef.current?.focus())
+                  close(true)
                 }
               }}
             />
@@ -104,7 +114,10 @@ export function TaskChecklist({
             type="button"
             className="task-checklist__add"
             disabled={disabled}
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              cancelled.current = false
+              setEditing(true)
+            }}
           >
             <span className="task-checklist__empty" aria-hidden="true" />
             Add new task

@@ -124,3 +124,6 @@
     opacity: 0 !important;
   }
 }
+.vhs-effect[data-disabled] :is(.vhs-effect__scanlines, .vhs-effect__vignette) {
+  display: none;
+}

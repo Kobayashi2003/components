@@ -33,7 +33,8 @@ export function Example() {
 | `detentStep` / `detentStrength` | `10` / `0.6`      | Notch spacing and resistance; zero spacing disables notches. |
 | `appearance`                    | `graphite`        | `graphite`, `ivory`, or `signal`.                            |
 | `disabled`                      | `false`           | Prevents input.                                              |
+| `className` / `style`           | —                 | Root styling.                                                |
 
 ## Notes
 
-Drag around the rim. Arrow keys adjust a step, Page Up/Down ten steps, Home/End reach the bounds. Touch dragging suppresses scrolling only on the knob. Reduced motion removes settling animation. Detents simulate input resistance, not hardware vibration.
+Drag around the rim; double-click resets to `defaultValue`. Arrow keys adjust a step, Page Up/Down ten steps, Home/End reach the bounds. Touch dragging suppresses scrolling only on the knob. Reduced motion removes settling animation. Detents simulate input resistance, not hardware vibration.

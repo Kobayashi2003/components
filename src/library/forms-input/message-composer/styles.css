@@ -155,3 +155,9 @@
   transform: none;
   pointer-events: auto;
 }
+.message-composer__field {
+  border-radius: 28px;
+}
+.message-composer__field:has(input:focus-visible) {
+  box-shadow: inset 0 0 0 1px #55565a;
+}

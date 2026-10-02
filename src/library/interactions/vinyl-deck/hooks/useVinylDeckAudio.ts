@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { Ref } from 'react'
 
 export type VinylDeckAudioSource = string | URL | Blob | MediaStream
@@ -100,7 +100,8 @@ export function useVinylDeckAudio({
   const resumeOnSourceChangeRef = useRef(false)
   const [playing, setPlayingState] = useState(initiallyPlaying)
 
-  const commitPlaying = useCallback(
+  // Effect events keep callers' inline callbacks current without reloading the source.
+  const applyPlaying = useCallback(
     (next: boolean) => {
       playingRef.current = next
       setPlayingState(next)
@@ -108,6 +109,10 @@ export function useVinylDeckAudio({
     },
     [onPlaybackChange],
   )
+  const commitPlaying = useEffectEvent(applyPlaying)
+  const reportEnded = useEffectEvent(() => onEnded?.())
+  const reportError = useEffectEvent((error: MediaError | Event) => onError?.(error))
+  const reportTime = useEffectEvent((snapshot: VinylDeckAudioSnapshot) => onTimeUpdate?.(snapshot))
 
   useEffect(() => {
     assignRef(externalRef, elementRef.current)
@@ -176,7 +181,7 @@ export function useVinylDeckAudio({
       audio.srcObject = null
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [autoPlay, commitPlaying, source])
+  }, [autoPlay, source])
 
   useEffect(() => {
     const audio = elementRef.current
@@ -186,19 +191,19 @@ export function useVinylDeckAudio({
     const handlePause = () => commitPlaying(false)
     const handleEnded = () => {
       if (audio.loop) return
-      if (onEnded?.() === true) {
+      if (reportEnded() === true) {
         resumeOnSourceChangeRef.current = true
         return
       }
       commitPlaying(false)
     }
     const handleTimeUpdate = () =>
-      onTimeUpdate?.({
+      reportTime({
         currentTime: audio.currentTime,
         duration: Number.isFinite(audio.duration) ? audio.duration : 0,
         playing: playingRef.current,
       })
-    const handleError = (event: Event) => onError?.(audio.error ?? event)
+    const handleError = (event: Event) => reportError(audio.error ?? event)
 
     audio.addEventListener('play', handlePlay)
     audio.addEventListener('pause', handlePause)
@@ -213,14 +218,14 @@ export function useVinylDeckAudio({
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('error', handleError)
     }
-  }, [commitPlaying, onEnded, onError, onTimeUpdate])
+  }, [])
 
   const setPlayback = useCallback(
     async (next: boolean) => {
       const audio = elementRef.current
 
       if (!source || !audio) {
-        commitPlaying(next)
+        applyPlaying(next)
         return
       }
 
@@ -233,11 +238,11 @@ export function useVinylDeckAudio({
         if (audioContextRef.current?.state === 'suspended') await audioContextRef.current.resume()
         await audio.play()
       } catch (error) {
-        commitPlaying(false)
+        applyPlaying(false)
         onError?.(error instanceof Event ? error : new Event('audio-playback-error'))
       }
     },
-    [commitPlaying, onError, source],
+    [applyPlaying, onError, source],
   )
 
   const togglePlayback = useCallback(() => {

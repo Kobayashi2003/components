@@ -111,3 +111,6 @@
     transform: scaleX(0);
   }
 }
+.inline-confirm[data-paused='true'] .inline-confirm__undo i {
+  animation-play-state: paused;
+}

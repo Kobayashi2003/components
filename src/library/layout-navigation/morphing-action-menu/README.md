@@ -1,14 +1,16 @@
-# Create Menu
+# Morphing Action Menu
 
-A compact Create pill that expands into a rounded action menu with staggered items. Inspired by [Bencho](https://bencho.dev/blocks/liq-create).
+A compact pill, labelled Create by default, that morphs into a rounded action menu with staggered items. Inspired by [Bencho](https://bencho.dev/blocks/liq-create).
 
 ## Usage
 
 ```tsx
-import { CreateMenu } from './create-menu'
+import { MorphingActionMenu } from './morphing-action-menu'
 
 export function Example() {
-  return <CreateMenu items={[{ id: 'document', label: 'Document' }]} onSelect={console.log} />
+  return (
+    <MorphingActionMenu items={[{ id: 'document', label: 'Document' }]} onSelect={console.log} />
+  )
 }
 ```
 

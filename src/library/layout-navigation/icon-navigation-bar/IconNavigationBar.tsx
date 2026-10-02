@@ -48,9 +48,12 @@ export function IconNavigationBar({
             key={item.id}
             type="button"
             aria-label={item.label}
+            title={item.label}
             aria-current={selected === item.id ? 'page' : undefined}
             disabled={disabled || item.disabled}
-            onClick={() => update(item.id)}
+            onClick={() => {
+              if (item.id !== selected) update(item.id)
+            }}
           >
             {item.icon}
           </button>

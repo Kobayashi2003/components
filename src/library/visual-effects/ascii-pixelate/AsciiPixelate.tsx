@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
 import type { CSSProperties, Ref } from 'react'
 import { captureAsciiCanvas } from './rendering/captureCanvas'
 import {
@@ -85,6 +85,7 @@ export function AsciiPixelate({
   const detailRefreshRef = useRef<() => void>(() => {})
   const textRef = useRef('')
   const [naturalAspect, setNaturalAspect] = useState<number | null>(null)
+  const reportError = useEffectEvent((error: Error) => onError?.(error))
 
   useImperativeHandle(
     ref,
@@ -148,7 +149,7 @@ export function AsciiPixelate({
     function report(error: unknown) {
       if (reportedError) return
       reportedError = true
-      onError?.(error instanceof Error ? error : new Error(String(error)))
+      reportError(error instanceof Error ? error : new Error(String(error)))
     }
 
     function renderLayer(canvas: HTMLCanvasElement, columns: number) {
@@ -306,7 +307,6 @@ export function AsciiPixelate({
     background,
     fit,
     fps,
-    onError,
   ])
 
   useEffect(() => {
@@ -339,11 +339,14 @@ export function AsciiPixelate({
       base.style.filter = `blur(${Math.max(0, blur) * (1 - strength * 0.75)}px)`
     }
     reset()
+    const page = document.documentElement
     window.addEventListener('pointermove', update, { passive: true })
     window.addEventListener('blur', reset)
+    page.addEventListener('pointerleave', reset)
     return () => {
       window.removeEventListener('pointermove', update)
       window.removeEventListener('blur', reset)
+      page.removeEventListener('pointerleave', reset)
     }
   }, [disabled, focusRadius, blur])
 

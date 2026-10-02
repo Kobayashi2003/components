@@ -14,4 +14,4 @@ export function Example() {
 
 ## Notes
 
-Requires WebGL2. The embedded scene includes its own controls; drag lights or use their numeric controls.
+Requires WebGL2. The embedded scene includes its own controls; drag lights, focus one and use arrow keys (Shift for larger steps), or use their numeric controls.

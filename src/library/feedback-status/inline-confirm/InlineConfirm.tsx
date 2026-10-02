@@ -29,8 +29,10 @@ export function InlineConfirm({
   const [error, setError] = useState('')
   const root = useRef<HTMLDivElement>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const countdown = useRef({ deadline: 0, remaining: 0, paused: false })
   const mounted = useRef(true)
   const busy = useRef(false)
+  const [paused, setPaused] = useState(false)
   useEffect(() => {
     mounted.current = true
     return () => {
@@ -48,6 +50,32 @@ export function InlineConfirm({
     setError('')
     focusFirst()
   }
+  const expire = () => {
+    const restoreFocus = root.current?.contains(document.activeElement)
+    setPhase('idle')
+    setError('')
+    setPaused(false)
+    if (restoreFocus) focusFirst()
+  }
+  const startCountdown = () => {
+    const state = countdown.current
+    clearTimeout(timer.current)
+    state.paused = false
+    state.deadline = Date.now() + state.remaining
+    timer.current = setTimeout(expire, state.remaining)
+    setPaused(false)
+  }
+  // Hover and focus hold the Undo window open so slower users are not timed out.
+  const holdCountdown = (hold: boolean) => {
+    const state = countdown.current
+    if (phase !== 'done' || undoDuration <= 0 || hold === state.paused) return
+    if (hold) {
+      clearTimeout(timer.current)
+      state.remaining = Math.max(0, state.deadline - Date.now())
+      state.paused = true
+      setPaused(true)
+    } else startCountdown()
+  }
   const run = async (undo: boolean) => {
     if (disabled || busy.current) return
     busy.current = true
@@ -61,13 +89,10 @@ export function InlineConfirm({
       else {
         setPhase('done')
         focusFirst()
-        if (undoDuration > 0)
-          timer.current = setTimeout(() => {
-            const restoreFocus = root.current?.contains(document.activeElement)
-            setPhase('idle')
-            setError('')
-            if (restoreFocus) focusFirst()
-          }, undoDuration)
+        if (undoDuration > 0) {
+          countdown.current = { deadline: 0, remaining: undoDuration, paused: false }
+          startCountdown()
+        }
       }
     } catch {
       if (mounted.current) {
@@ -82,8 +107,26 @@ export function InlineConfirm({
   return (
     <div
       ref={root}
-      className={`atlas-control inline-confirm ${className}`}
+      className={['atlas-control', 'inline-confirm', className].filter(Boolean).join(' ')}
       style={style}
+      data-paused={paused}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') holdCountdown(true)
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === 'mouse' && !root.current?.contains(document.activeElement))
+          holdCountdown(false)
+      }}
+      onFocus={(event) => {
+        if (event.target.matches(':focus-visible')) holdCountdown(true)
+      }}
+      onBlur={(event) => {
+        if (
+          !event.currentTarget.contains(event.relatedTarget) &&
+          !event.currentTarget.matches(':hover')
+        )
+          holdCountdown(false)
+      }}
       onKeyDown={(event) => {
         if (event.key === 'Escape' && phase === 'asking') {
           event.preventDefault()

@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
-export interface AnalogVideoEffectProps {
+export interface AnalogVideoDistortionProps {
   children: ReactNode
   className?: string
+  style?: CSSProperties
+  disabled?: boolean
   noise?: number
   tearing?: number
   smear?: number
@@ -15,15 +17,17 @@ const clamp = (value: number) => Math.min(1, Math.max(0, value))
 const randomBetween = (minimum: number, maximum: number) =>
   minimum + Math.random() * (maximum - minimum)
 
-export function AnalogVideoEffect({
+export function AnalogVideoDistortion({
   children,
   className = '',
+  style,
+  disabled = false,
   noise = 0.15,
   tearing = 0.7,
   smear = 0.6,
   scanlines = 0.25,
   colorShift = 0.4,
-}: AnalogVideoEffectProps) {
+}: AnalogVideoDistortionProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -32,6 +36,7 @@ export function AnalogVideoEffect({
   const ghostRefs = useRef<Array<HTMLDivElement | null>>([])
   const artifactRefs = useRef<Array<HTMLSpanElement | null>>([])
   const faultIntensityRef = useRef(0)
+  const onScreenRef = useRef(true)
 
   const safeNoise = clamp(noise)
   const safeTearing = clamp(tearing)
@@ -66,9 +71,20 @@ export function AnalogVideoEffect({
     // depending on `children` would only re-clone on each parent render.
   }, [])
 
+  // Both animation loops idle while the effect is scrolled out of view.
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreenRef.current = entry.isIntersecting
+    })
+    observer.observe(root)
+    return () => observer.disconnect()
+  }, [])
+
   useEffect(() => {
     const tracking = trackingRef.current
-    if (!tracking) return
+    if (!tracking || disabled) return
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     let reducedMotion = motionQuery.matches
@@ -148,7 +164,7 @@ export function AnalogVideoEffect({
     }
 
     const tick = (now: number) => {
-      if (document.hidden) {
+      if (document.hidden || !onScreenRef.current) {
         hideFaultLayers()
         nextFault = now + 1000
         animationFrame = requestAnimationFrame(tick)
@@ -195,12 +211,12 @@ export function AnalogVideoEffect({
       motionQuery.removeEventListener('change', handleMotionChange)
       hideFaultLayers()
     }
-  }, [safeColorShift, safeSmear, safeTearing])
+  }, [disabled, safeColorShift, safeSmear, safeTearing])
 
   useEffect(() => {
     const root = rootRef.current
     const canvas = canvasRef.current
-    if (!root || !canvas) return
+    if (!root || !canvas || disabled) return
     const context = canvas.getContext('2d', { alpha: true })
     if (!context) return
 
@@ -309,7 +325,7 @@ export function AnalogVideoEffect({
 
     const render = (now: number) => {
       const frameInterval = reducedMotion ? 125 : 1000 / 30
-      if (!document.hidden && now - lastFrame >= frameInterval) {
+      if (!document.hidden && onScreenRef.current && now - lastFrame >= frameInterval) {
         lastFrame = now
         context.clearRect(0, 0, width, height)
         drawNoise()
@@ -333,15 +349,21 @@ export function AnalogVideoEffect({
       cancelAnimationFrame(animationFrame)
       observer.disconnect()
       motionQuery.removeEventListener('change', handleMotionChange)
+      context.clearRect(0, 0, width, height)
     }
-  }, [safeNoise, safeSmear])
+  }, [disabled, safeNoise, safeSmear])
 
   const rootStyle = {
     '--vhs-scanline-opacity': safeScanlines * 0.32,
   } as CSSProperties
 
   return (
-    <div ref={rootRef} className={`vhs-effect ${className}`.trim()} style={rootStyle}>
+    <div
+      ref={rootRef}
+      className={`vhs-effect ${className}`.trim()}
+      style={{ ...rootStyle, ...style }}
+      data-disabled={disabled || undefined}
+    >
       <div ref={contentRef} className="vhs-effect__content">
         {children}
       </div>

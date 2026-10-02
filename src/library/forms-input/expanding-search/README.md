@@ -18,11 +18,11 @@ export function Example() {
 | ----------------------- | -------- | ------------------------------------------- |
 | `value` / `onChange`    | —        | Controlled search text and change callback. |
 | `defaultValue`          | `""`     | Initial uncontrolled text.                  |
-| `onSearch`              | —        | Receives trimmed, nonempty text on Enter.   |
+| `onSearch`              | —        | Receives trimmed, nonempty text on submit.  |
 | `label` / `placeholder` | `Search` | Accessible name and field hint.             |
 | `disabled`              | `false`  | Prevents input.                             |
 
 ## Notes
 
-- Escape clears and collapses; an empty field collapses on blur. `disabled`: `false`.
+- Enter or the search icon submits; the clear button empties the field. Escape clears and collapses; an empty field collapses on blur.
 - Supports `className` and `style`; reduced motion disables decorative animation.

@@ -26,5 +26,5 @@ export function Example() {
 
 ## Notes
 
-- Undo is shown only when `onUndo` is supplied. The caller implements deletion and restoration. `disabled`: `false`; Escape cancels the asking state.
+- Undo is shown only when `onUndo` is supplied. The caller implements deletion and restoration. Escape cancels the asking state; hovering or keyboard focus pauses the Undo countdown.
 - Supports `className` and `style`; reduced motion disables decorative animation.

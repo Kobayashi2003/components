@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { CSSProperties, Ref } from 'react'
-import './styles.css'
 
 const DEFAULT_GLYPHS = '$#@/\\|=+*%▒░'
 
@@ -31,6 +30,7 @@ export interface AsciiGlitchProps {
   flicker?: boolean
   triggerOnHover?: boolean
   loopInterval?: number
+  disabled?: boolean
   className?: string
   style?: CSSProperties
 }
@@ -72,6 +72,7 @@ export function AsciiGlitch({
   flicker = true,
   triggerOnHover = true,
   loopInterval,
+  disabled = false,
   className = '',
   style,
   ref,
@@ -86,7 +87,7 @@ export function AsciiGlitch({
 
   const trigger = useCallback(() => {
     if (typeof window === 'undefined') return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (disabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       cancelAnimationFrame(animationRef.current)
       setFrame(null)
       return
@@ -124,15 +125,15 @@ export function AsciiGlitch({
     }
 
     animationRef.current = requestAnimationFrame(tick)
-  }, [duration, flicker, glyphs, intensity, shift])
+  }, [disabled, duration, flicker, glyphs, intensity, shift])
 
   useImperativeHandle(ref, () => ({ trigger }), [trigger])
 
   useEffect(() => {
-    if (!loopInterval || loopInterval <= 0) return
+    if (disabled || !loopInterval || loopInterval <= 0) return
     const timer = window.setInterval(trigger, Math.max(duration + 100, loopInterval))
     return () => window.clearInterval(timer)
-  }, [duration, loopInterval, trigger])
+  }, [disabled, duration, loopInterval, trigger])
 
   useEffect(() => () => cancelAnimationFrame(animationRef.current), [])
 
@@ -147,10 +148,10 @@ export function AsciiGlitch({
     return () => preference.removeEventListener('change', stop)
   }, [])
 
-  const visibleText = frame?.text ?? text
+  const visibleText = (!disabled && frame?.text) || text
   const classes = [
     'ascii-glitch',
-    frame ? 'ascii-glitch--active' : '',
+    frame && !disabled ? 'ascii-glitch--active' : '',
     scanlines ? 'ascii-glitch--scanlines' : '',
     className,
   ]
@@ -158,15 +159,20 @@ export function AsciiGlitch({
     .join(' ')
 
   return (
-    <span className={classes} style={style} onPointerEnter={triggerOnHover ? trigger : undefined}>
+    <span
+      className={classes}
+      style={style}
+      onPointerEnter={triggerOnHover && !disabled ? trigger : undefined}
+    >
       <span className="ascii-glitch__accessible">{text}</span>
       <span
         className="ascii-glitch__visual"
         aria-hidden="true"
-        style={{ opacity: frame?.opacity ?? 1 }}
+        style={{ opacity: disabled ? 1 : (frame?.opacity ?? 1) }}
       >
         <span className="ascii-glitch__base">{visibleText}</span>
         {shift > 0 &&
+          !disabled &&
           frame?.bands.map((band, index) => (
             <span
               className="ascii-glitch__band"

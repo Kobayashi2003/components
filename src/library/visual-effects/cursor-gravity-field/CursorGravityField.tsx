@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
 import type { CSSProperties, PointerEvent, ReactNode } from 'react'
-import './styles.css'
 
 export interface CursorGravityFieldProps {
   children: ReactNode
