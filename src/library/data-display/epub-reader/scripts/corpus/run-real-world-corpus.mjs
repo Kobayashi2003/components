@@ -1,23 +1,23 @@
-import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
+import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import {
   existsSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
-} from "node:fs";
-import { basename, join } from "node:path";
-import { fileURLToPath } from "node:url";
+} from 'node:fs';
+import { basename, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   loadRealWorldManifest,
   resolveRealWorldCasePath,
-} from "./real-world-manifest.mjs";
-import { runTypeScript } from "../shared/typescript-cli.mjs";
+} from './real-world-manifest.mjs';
+import { runTypeScript } from '../shared/typescript-cli.mjs';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
+const root = fileURLToPath(new URL('../..', import.meta.url));
 const { manifest, manifestPath } = loadRealWorldManifest(root);
-const out = join(root, ".realworld-dist");
+const out = join(root, '.realworld-dist');
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
@@ -26,25 +26,25 @@ let failed = 0;
 try {
   runTypeScript(
     [
-      "-p",
-      join(root, "tsconfig.core.json"),
-      "--noEmit",
-      "false",
-      "--module",
-      "commonjs",
-      "--moduleResolution",
-      "node",
-      "--outDir",
+      '-p',
+      join(root, 'tsconfig.core.json'),
+      '--noEmit',
+      'false',
+      '--module',
+      'commonjs',
+      '--moduleResolution',
+      'node',
+      '--outDir',
       out,
     ],
-    { stdio: "inherit" },
+    { stdio: 'inherit' },
   );
   writeFileSync(
-    join(out, "package.json"),
-    JSON.stringify({ type: "commonjs" }),
+    join(out, 'package.json'),
+    JSON.stringify({ type: 'commonjs' }),
   );
   const require = createRequire(import.meta.url);
-  const core = require(join(out, "core", "index.js"));
+  const core = require(join(out, 'core', 'index.js'));
 
   for (const test of manifest.cases) {
     const file = resolveRealWorldCasePath(manifestPath, test);
@@ -61,18 +61,18 @@ try {
       continue;
     }
     const bytes = readFileSync(file);
-    const sha = createHash("sha256").update(bytes).digest("hex");
+    const sha = createHash('sha256').update(bytes).digest('hex');
     if (sha !== test.sha256) failures.push(`SHA-256 mismatch: ${sha}`);
 
-    const strict = await core.OcfZipArchive.open(bytes, {}, "strict");
+    const strict = await core.OcfZipArchive.open(bytes, {}, 'strict');
     if (Boolean(strict.archive) !== test.strictArchive)
       failures.push(
         `strict archive expected ${test.strictArchive}, got ${Boolean(strict.archive)}`,
       );
 
-    const opened = await core.OcfZipArchive.open(bytes, {}, "compatible");
+    const opened = await core.OcfZipArchive.open(bytes, {}, 'compatible');
     if (!opened.archive) {
-      failures.push("compatible mode could not open OCF archive");
+      failures.push('compatible mode could not open OCF archive');
       observations.push({
         id: test.id,
         file: basename(file),
@@ -88,7 +88,7 @@ try {
       opened.diagnostics,
     );
     if (!loaded.publication) {
-      failures.push("package loader did not produce Publication");
+      failures.push('package loader did not produce Publication');
       observations.push({
         id: test.id,
         file: basename(file),
@@ -107,8 +107,8 @@ try {
     const diagnostics = [...loaded.diagnostics, ...preflight.diagnostics];
     const compatibility = core.createCompatibilityReport(diagnostics);
     if (
-      compatibility.status === "blocked" ||
-      compatibility.status === "degraded"
+      compatibility.status === 'blocked' ||
+      compatibility.status === 'degraded'
     )
       failures.push(`compatibility status is ${compatibility.status}`);
     if (publication.spine.length !== test.spineCount)
@@ -136,16 +136,16 @@ try {
 
     for (const item of publication.spine) {
       const hints = preflight.hints.get(item.index);
-      if (hints?.writingMode === "vertical-rl") verticalCount += 1;
+      if (hints?.writingMode === 'vertical-rl') verticalCount += 1;
       if (
         hints?.page?.pageLike &&
-        core.resolveSpineRendition(publication, item).layout === "reflowable"
+        core.resolveSpineRendition(publication, item).layout === 'reflowable'
       ) {
         reflowableImagePageCount += 1;
         if (hints.page.likelySpanningSpread) spanningImageCount += 1;
       }
       const rendition = core.resolveSpineRendition(publication, item);
-      if (rendition.layout === "pre-paginated") prePaginatedCount += 1;
+      if (rendition.layout === 'pre-paginated') prePaginatedCount += 1;
       const plan = core.planRendition({
         publication,
         spineItem: item,
@@ -153,34 +153,34 @@ try {
         contentHints: hints,
       });
       if (
-        hints?.writingMode === "vertical-rl" &&
-        plan.writingMode.value !== "vertical-rl"
+        hints?.writingMode === 'vertical-rl' &&
+        plan.writingMode.value !== 'vertical-rl'
       )
         failures.push(
           `spine ${item.index}: vertical preflight did not reach planner`,
         );
       if (
-        rendition.layout === "pre-paginated" &&
-        plan.renderer !== "fixed-layout"
+        rendition.layout === 'pre-paginated' &&
+        plan.renderer !== 'fixed-layout'
       )
         fixedRendererMismatch += 1;
       if (
-        rendition.layout === "reflowable" &&
+        rendition.layout === 'reflowable' &&
         !hints?.page?.pageLike &&
-        plan.spread.execution === "cross-spine"
+        plan.spread.execution === 'cross-spine'
       )
         invalidCrossSpineTextPlans += 1;
-      if (hints?.page?.pageLike && plan.spread.mode === "double") {
+      if (hints?.page?.pageLike && plan.spread.mode === 'double') {
         const expected = hints.page.likelySpanningSpread
-          ? "spanning-document"
-          : "cross-spine";
+          ? 'spanning-document'
+          : 'cross-spine';
         if (plan.spread.execution !== expected)
           failures.push(
             `spine ${item.index}: page-like image expected ${expected}, got ${plan.spread.execution}`,
           );
       }
 
-      if (plan.spread.execution === "cross-spine") {
+      if (plan.spread.execution === 'cross-spine') {
         const slots = core.resolveSpreadSlotAssignment(
           publication,
           plan,
@@ -190,37 +190,37 @@ try {
               spineItem: candidate,
               viewport: manifest.viewport,
               contentHints: preflight.hints.get(candidate.index),
-            }).spread.mode === "double",
+            }).spread.mode === 'double',
         );
         crossSpineSlotChecks += 1;
-        if (rendition.pageSpread === "left" && slots.activeSlot !== "left")
+        if (rendition.pageSpread === 'left' && slots.activeSlot !== 'left')
           failures.push(
             `spine ${item.index}: authored page-spread-left resolved to ${slots.activeSlot}`,
           );
-        if (rendition.pageSpread === "right" && slots.activeSlot !== "right")
+        if (rendition.pageSpread === 'right' && slots.activeSlot !== 'right')
           failures.push(
             `spine ${item.index}: authored page-spread-right resolved to ${slots.activeSlot}`,
           );
         if (
           item.index === 0 &&
           rendition.pageSpread == null &&
-          publication.pageProgressionDirection === "rtl" &&
-          slots.activeSlot !== "right"
+          publication.pageProgressionDirection === 'rtl' &&
+          slots.activeSlot !== 'right'
         ) {
           failures.push(
-            "RTL first automatic physical page must occupy the right spread slot",
+            'RTL first automatic physical page must occupy the right spread slot',
           );
         }
       }
 
       if (
-        rendition.layout === "reflowable" &&
-        plan.spread.execution === "intra-document" &&
-        (rendition.pageSpread === "left" || rendition.pageSpread === "right")
+        rendition.layout === 'reflowable' &&
+        plan.spread.execution === 'intra-document' &&
+        (rendition.pageSpread === 'left' || rendition.pageSpread === 'right')
       ) {
         reflowableFirstPagePlacementChecks += 1;
         const firstPhysicalSlot =
-          plan.pageProgression.value === "rtl" ? "right" : "left";
+          plan.pageProgression.value === 'rtl' ? 'right' : 'left';
         const expectedBlank = rendition.pageSpread !== firstPhysicalSlot;
         if (core.reflowableNeedsLeadingBlankPage(plan) !== expectedBlank) {
           failures.push(
@@ -235,8 +235,8 @@ try {
         opened.archive.has(item.path)
       ) {
         const source = await opened.archive.readText(item.path);
-        if (source.includes("<ruby") || source.includes(":ruby")) {
-          const parsed = core.parseXml(source, item.path, "content");
+        if (source.includes('<ruby') || source.includes(':ruby')) {
+          const parsed = core.parseXml(source, item.path, 'content');
           if (parsed.root) {
             const samples = core.collectRubySamples(parsed.root, 64);
             if (samples.length > 0) {
@@ -257,8 +257,8 @@ try {
                 rubyElementChecks += 1;
                 const projected = core
                   .semanticXmlText(ruby)
-                  .replace(/\s+/gu, "");
-                const expectedBase = sample.base.replace(/\s+/gu, "");
+                  .replace(/\s+/gu, '');
+                const expectedBase = sample.base.replace(/\s+/gu, '');
                 if (projected !== expectedBase) {
                   failures.push(
                     `spine ${item.index}: ruby primary projection expected ${JSON.stringify(expectedBase)}, got ${JSON.stringify(projected)}`,
@@ -267,7 +267,7 @@ try {
                 }
                 if (
                   sample.reading &&
-                  projected.includes(sample.reading.replace(/\s+/gu, ""))
+                  projected.includes(sample.reading.replace(/\s+/gu, ''))
                 ) {
                   failures.push(
                     `spine ${item.index}: ruby reading leaked into ruby primary projection`,
@@ -322,11 +322,11 @@ try {
     const expectRuby = test.expectRuby ?? true;
     if (expectRuby && rubyDocuments === 0)
       failures.push(
-        "sample contains no parsed ruby document for semantic-text gate",
+        'sample contains no parsed ruby document for semantic-text gate',
       );
     if (expectRuby && rubyElementChecks === 0)
       failures.push(
-        "could not validate any ruby element for semantic-text gate",
+        'could not validate any ruby element for semantic-text gate',
       );
 
     if (semanticSearchNeedle) {
@@ -350,13 +350,13 @@ try {
           `semantic search could not find ruby base text ${JSON.stringify(semanticSearchNeedle)}`,
         );
     } else if (expectRuby) {
-      failures.push("could not choose ruby base text for semantic search gate");
+      failures.push('could not choose ruby base text for semantic search gate');
     }
 
     let cssCompatibilityChecked = false;
     let legacyCssPath = null;
     for (const path of opened.archive.entries) {
-      if (!path.toLowerCase().endsWith(".css")) continue;
+      if (!path.toLowerCase().endsWith('.css')) continue;
       const css = await opened.archive.readText(path);
       if (!/-epub-writing-mode|-webkit-writing-mode/iu.test(css)) continue;
       const normalized = core.normalizeLegacyEpubCss(css);
@@ -373,7 +373,7 @@ try {
     }
     if ((test.expectLegacyWritingMode ?? true) && !cssCompatibilityChecked) {
       failures.push(
-        "no legacy writing-mode stylesheet found for CSS compatibility gate",
+        'no legacy writing-mode stylesheet found for CSS compatibility gate',
       );
     }
 
@@ -384,8 +384,8 @@ try {
         opened.archive,
         publication,
         {
-          remotePolicy: "block",
-          unmanifestedPolicy: "warn",
+          remotePolicy: 'block',
+          unmanifestedPolicy: 'warn',
         },
       );
       let objectUrlId = 0;
@@ -401,10 +401,10 @@ try {
         },
       });
       try {
-        const materialized = await session.materialize("", legacyCssPath);
-        const url = materialized.resource?.url?.split("#", 1)[0];
+        const materialized = await session.materialize('', legacyCssPath);
+        const url = materialized.resource?.url?.split('#', 1)[0];
         const entry = url ? objectUrls.get(url) : null;
-        const publishedCss = entry ? new TextDecoder().decode(entry.bytes) : "";
+        const publishedCss = entry ? new TextDecoder().decode(entry.bytes) : '';
         if (
           !publishedCss ||
           !/\bwriting-mode\s*:\s*(?:vertical-rl|horizontal-tb|vertical-lr)/iu.test(
@@ -418,7 +418,7 @@ try {
         if (
           !materialized.diagnostics.some(
             (diagnostic) =>
-              diagnostic.code === "RESOURCE_LEGACY_EPUB_CSS_NORMALIZED",
+              diagnostic.code === 'RESOURCE_LEGACY_EPUB_CSS_NORMALIZED',
           )
         ) {
           failures.push(
@@ -451,20 +451,20 @@ try {
       failures,
     });
     console.log(
-      `${passed ? "PASS" : "FAIL"} ${test.id} — ${basename(file)} (${compatibility.status})`,
+      `${passed ? 'PASS' : 'FAIL'} ${test.id} — ${basename(file)} (${compatibility.status})`,
     );
     for (const failure of failures) console.error(`  - ${failure}`);
   }
 
-  const resultDirectory = join(root, ".test-results", "corpus");
+  const resultDirectory = join(root, '.test-results', 'corpus');
   mkdirSync(resultDirectory, { recursive: true });
   writeFileSync(
-    join(resultDirectory, "real-world.json"),
+    join(resultDirectory, 'real-world.json'),
     JSON.stringify(
       { generatedAt: new Date().toISOString(), observations },
       null,
       2,
-    ) + "\n",
+    ) + '\n',
   );
   if (failed) process.exitCode = 1;
 } finally {
@@ -472,15 +472,15 @@ try {
 }
 
 function normalizeSemantic(value) {
-  return value.replace(/\s+/gu, "");
+  return value.replace(/\s+/gu, '');
 }
 
 function collectRubyElements(root) {
   const result = [];
   const visit = (element) => {
-    if (element.localName?.toLowerCase() === "ruby") result.push(element);
+    if (element.localName?.toLowerCase() === 'ruby') result.push(element);
     for (const child of element.children ?? [])
-      if (child.type === "element") visit(child);
+      if (child.type === 'element') visit(child);
   };
   visit(root);
   return result;
@@ -492,16 +492,16 @@ function adjacentRubySequence(root, core) {
     if (result) return;
     let run = [];
     const flush = () => {
-      if (run.length >= 2 && !result) result = run.join("");
+      if (run.length >= 2 && !result) result = run.join('');
       run = [];
     };
     for (const child of element.children ?? []) {
-      if (child.type === "text") {
+      if (child.type === 'text') {
         if (child.value.trim()) flush();
         continue;
       }
-      if (child.localName?.toLowerCase() === "ruby") {
-        const base = core.semanticXmlText(child).replace(/\s+/gu, "");
+      if (child.localName?.toLowerCase() === 'ruby') {
+        const base = core.semanticXmlText(child).replace(/\s+/gu, '');
         if (base) run.push(base);
         continue;
       }

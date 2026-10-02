@@ -8,69 +8,69 @@ import {
   validatePublicationModel,
   type Publication,
   type SpineItem,
-} from "../../core/epub/publication";
-import { cloneAndFreezePlainData } from "../../core/shared/immutable";
+} from '../../core/epub/publication';
+import { cloneAndFreezePlainData } from '../../core/shared/immutable';
 
 const publication: Publication = {
-  version: "3.3",
-  packagePath: "EPUB/package.opf",
+  version: '3.3',
+  packagePath: 'EPUB/package.opf',
   metadata: {
-    title: "Mixed layout fixture",
+    title: 'Mixed layout fixture',
     creators: [],
     contributors: [],
     entries: [],
   },
   manifest: [
     {
-      id: "c1",
-      sourceHref: "c1.xhtml",
-      href: "EPUB/c1.xhtml",
-      path: "EPUB/c1.xhtml",
+      id: 'c1',
+      sourceHref: 'c1.xhtml',
+      href: 'EPUB/c1.xhtml',
+      path: 'EPUB/c1.xhtml',
       remote: false,
-      mediaType: "application/xhtml+xml",
+      mediaType: 'application/xhtml+xml',
       properties: [],
     },
     {
-      id: "p1",
-      sourceHref: "p1.xhtml",
-      href: "EPUB/p1.xhtml",
-      path: "EPUB/p1.xhtml",
+      id: 'p1',
+      sourceHref: 'p1.xhtml',
+      href: 'EPUB/p1.xhtml',
+      path: 'EPUB/p1.xhtml',
       remote: false,
-      mediaType: "application/xhtml+xml",
+      mediaType: 'application/xhtml+xml',
       properties: [],
     },
   ],
   spine: [
     {
       index: 0,
-      idref: "c1",
-      href: "EPUB/c1.xhtml",
-      path: "EPUB/c1.xhtml",
+      idref: 'c1',
+      href: 'EPUB/c1.xhtml',
+      path: 'EPUB/c1.xhtml',
       remote: false,
-      mediaType: "application/xhtml+xml",
+      mediaType: 'application/xhtml+xml',
       linear: true,
       properties: [],
       rendition: {},
     },
     {
       index: 1,
-      idref: "p1",
-      href: "EPUB/p1.xhtml",
-      path: "EPUB/p1.xhtml",
+      idref: 'p1',
+      href: 'EPUB/p1.xhtml',
+      path: 'EPUB/p1.xhtml',
       remote: false,
-      mediaType: "application/xhtml+xml",
+      mediaType: 'application/xhtml+xml',
       linear: true,
-      properties: ["rendition:layout-pre-paginated"],
-      rendition: { layout: "pre-paginated", pageSpread: "right" },
+      properties: ['rendition:layout-pre-paginated'],
+      rendition: { layout: 'pre-paginated', pageSpread: 'right' },
     },
   ],
-  navigation: { source: "none", toc: [], landmarks: [], pageList: [] },
-  pageProgressionDirection: "rtl",
+  navigation: { source: 'none', toc: [], landmarks: [], pageList: [] },
+  pageProgressionDirection: 'rtl',
   rendition: {
-    layout: "reflowable",
-    orientation: "auto",
-    spread: "auto",
-    flow: "auto",
+    layout: 'reflowable',
+    orientation: 'auto',
+    spread: 'auto',
+    flow: 'auto',
   },
 };
 
@@ -80,32 +80,32 @@ function assert(condition: unknown, message: string): asserts condition {
 
 assert(
   validatePublicationModel(publication).length === 0,
-  "fixture must satisfy model invariants",
+  'fixture must satisfy model invariants',
 );
 assert(
   hasMixedLayout(publication),
-  "mixed layout must be detected, not normalized away",
+  'mixed layout must be detected, not normalized away',
 );
 assert(
   !isFixedLayout(publication, publication.spine[0]!),
-  "first item should inherit reflowable",
+  'first item should inherit reflowable',
 );
 assert(
   isFixedLayout(publication, publication.spine[1]!),
-  "second item should override to fixed layout",
+  'second item should override to fixed layout',
 );
 assert(
   resolveSpineRendition(publication, publication.spine[1]!).pageSpread ===
-    "right",
-  "spread placement must survive resolution",
+    'right',
+  'spread placement must survive resolution',
 );
 
 // Publication-level layout profile. Reader chrome keys off this instead of the
 // active renderer plan, so that a book which alternates illustration pages with
 // chapters does not restyle its interface on every page turn.
 assert(
-  resolvePublicationLayoutProfile(publication) === "mixed",
-  "interleaved layouts must resolve to a mixed profile",
+  resolvePublicationLayoutProfile(publication) === 'mixed',
+  'interleaved layouts must resolve to a mixed profile',
 );
 
 const reflowableOnly: Publication = {
@@ -113,8 +113,8 @@ const reflowableOnly: Publication = {
   spine: [publication.spine[0]!],
 };
 assert(
-  resolvePublicationLayoutProfile(reflowableOnly) === "reflowable",
-  "an all-reflowable reading order must not report mixed",
+  resolvePublicationLayoutProfile(reflowableOnly) === 'reflowable',
+  'an all-reflowable reading order must not report mixed',
 );
 
 const fixedOnly: Publication = {
@@ -122,27 +122,27 @@ const fixedOnly: Publication = {
   spine: [publication.spine[1]!],
 };
 assert(
-  resolvePublicationLayoutProfile(fixedOnly) === "fixed-layout",
-  "an all-pre-paginated reading order must resolve to fixed-layout",
+  resolvePublicationLayoutProfile(fixedOnly) === 'fixed-layout',
+  'an all-pre-paginated reading order must resolve to fixed-layout',
 );
 
 // Only a publication that is pre-paginated from cover to colophon earns the
 // immersive chrome; a mixed one must stay on standard chrome throughout.
 const chromeFor = (book: Publication) =>
-  resolvePublicationLayoutProfile(book) === "fixed-layout"
-    ? "immersive"
-    : "standard";
+  resolvePublicationLayoutProfile(book) === 'fixed-layout'
+    ? 'immersive'
+    : 'standard';
 assert(
-  chromeFor(publication) === "standard",
-  "mixed-layout books must keep standard chrome",
+  chromeFor(publication) === 'standard',
+  'mixed-layout books must keep standard chrome',
 );
 assert(
-  chromeFor(fixedOnly) === "immersive",
-  "fully pre-paginated books keep the immersive chrome",
+  chromeFor(fixedOnly) === 'immersive',
+  'fully pre-paginated books keep the immersive chrome',
 );
 assert(
-  chromeFor(reflowableOnly) === "standard",
-  "reflowable books keep standard chrome",
+  chromeFor(reflowableOnly) === 'standard',
+  'reflowable books keep standard chrome',
 );
 
 // The profile must be decided by the whole reading order, not by whichever item
@@ -155,12 +155,12 @@ const fixedFrontMatter: Publication = {
   ],
 };
 assert(
-  resolvePublicationLayoutProfile(fixedFrontMatter) === "mixed",
-  "a pre-paginated first item must not make the whole book fixed-layout",
+  resolvePublicationLayoutProfile(fixedFrontMatter) === 'mixed',
+  'a pre-paginated first item must not make the whole book fixed-layout',
 );
 assert(
   hasMixedLayout(fixedFrontMatter),
-  "hasMixedLayout must agree with the layout profile",
+  'hasMixedLayout must agree with the layout profile',
 );
 
 const normalized = normalizeReaderPreferences({
@@ -168,41 +168,41 @@ const normalized = normalizeReaderPreferences({
   fontSizePercent: 999,
   lineHeight: 0.2,
   pageMarginPercent: 99,
-  fixedLayoutFit: "invalid" as typeof DEFAULT_READER_PREFERENCES.fixedLayoutFit,
+  fixedLayoutFit: 'invalid' as typeof DEFAULT_READER_PREFERENCES.fixedLayoutFit,
   fixedLayoutGutter:
-    "invalid" as typeof DEFAULT_READER_PREFERENCES.fixedLayoutGutter,
+    'invalid' as typeof DEFAULT_READER_PREFERENCES.fixedLayoutGutter,
   touchNavigation:
-    "invalid" as typeof DEFAULT_READER_PREFERENCES.touchNavigation,
+    'invalid' as typeof DEFAULT_READER_PREFERENCES.touchNavigation,
   pageTurnZonePercent: 99,
 });
-assert(normalized.fontSizePercent === 300, "font size should be clamped");
-assert(normalized.lineHeight === 0.8, "line height should be clamped");
-assert(normalized.pageMarginPercent === 18, "page margins should be clamped");
+assert(normalized.fontSizePercent === 300, 'font size should be clamped');
+assert(normalized.lineHeight === 0.8, 'line height should be clamped');
+assert(normalized.pageMarginPercent === 18, 'page margins should be clamped');
 assert(
-  normalized.fixedLayoutFit === "contain",
-  "unknown fixed-layout fit modes should fall back to contain",
+  normalized.fixedLayoutFit === 'contain',
+  'unknown fixed-layout fit modes should fall back to contain',
 );
 assert(
-  normalized.fixedLayoutGutter === "none",
-  "unknown fixed-layout gutter modes should fall back to none",
+  normalized.fixedLayoutGutter === 'none',
+  'unknown fixed-layout gutter modes should fall back to none',
 );
 assert(
-  normalized.touchNavigation === "both",
-  "unknown touch navigation modes should fall back to both gestures",
+  normalized.touchNavigation === 'both',
+  'unknown touch navigation modes should fall back to both gestures',
 );
 assert(
   normalized.pageTurnZonePercent === 40,
-  "page-turn zones should be clamped",
+  'page-turn zones should be clamped',
 );
 assert(
   Object.isFrozen(normalized) && Object.isFrozen(normalized.compatibility),
-  "normalized preferences must be deeply immutable at the public boundary",
+  'normalized preferences must be deeply immutable at the public boundary',
 );
 
 const immutableValue = cloneAndFreezePlainData({ nested: { value: 1 } });
 assert(
   cloneAndFreezePlainData(immutableValue) === immutableValue,
-  "trusted deep-frozen data should retain identity across snapshot composition",
+  'trusted deep-frozen data should retain identity across snapshot composition',
 );
 const shallowNested = { value: 1 };
 const shallowFrozen = Object.freeze({ nested: shallowNested });
@@ -211,7 +211,7 @@ assert(
   defensivelyCloned !== shallowFrozen &&
     defensivelyCloned.nested !== shallowNested &&
     Object.isFrozen(defensivelyCloned.nested),
-  "arbitrary shallow-frozen caller data must still be cloned and deeply frozen",
+  'arbitrary shallow-frozen caller data must still be cloned and deeply frozen',
 );
 
-console.log("Publication model unit test: PASS");
+console.log('Publication model unit test: PASS');

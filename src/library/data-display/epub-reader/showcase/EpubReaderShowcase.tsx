@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
 import {
   EpubFilePicker,
   EpubReader,
   EpubReaderBackground,
   type ReaderUiConfiguration,
-} from "../react";
-import type { ReaderTheme } from "../core";
+} from '../react';
+import type { ReaderTheme } from '../core';
 
 /**
  * Component Atlas demo boundary.
@@ -20,7 +20,7 @@ export function EpubReaderShowcase({
 } = {}) {
   const [file, setFile] = useState<File | null>(null);
   const [rejected, setRejected] = useState<string | null>(null);
-  const [readerTheme, setReaderTheme] = useState<ReaderTheme>("publisher");
+  const [readerTheme, setReaderTheme] = useState<ReaderTheme>('publisher');
   const choose = (next: File) => {
     setRejected(null);
     setFile(next);
@@ -36,7 +36,9 @@ export function EpubReaderShowcase({
       compact={Boolean(file)}
       currentFileName={file?.name ?? null}
       onFile={choose}
-      onRejected={(next) => setRejected(`${next.name} is not an EPUB file.`)}
+      onRejected={(next) =>
+        setRejected(`${next.name} is not an EPUB or AZW3 file.`)
+      }
     />
   );
 
@@ -48,7 +50,7 @@ export function EpubReaderShowcase({
       readerTheme={readerTheme}
       onCloseBook={() => {
         setFile(null);
-        setReaderTheme("publisher");
+        setReaderTheme('publisher');
       }}
       reader={
         file ? (

@@ -1,11 +1,11 @@
-import { OcfZipArchive, __zipTestUtils } from "../../core/epub/archive";
-import { createCompatibilityReport } from "../../core/epub/compatibility";
-import { loadEpub } from "../../core/epub/publication";
-import { runEpubCorpusCase } from "../../core/validation/conformance/corpus";
+import { OcfZipArchive, __zipTestUtils } from '../../core/epub/archive';
+import { createCompatibilityReport } from '../../core/epub/compatibility';
+import { loadEpub } from '../../core/epub/publication';
+import { runEpubCorpusCase } from '../../core/validation/conformance/corpus';
 import {
   W3cConformanceRecorder,
   summarizeW3cResults,
-} from "../../core/validation/conformance/report";
+} from '../../core/validation/conformance/report';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -64,11 +64,11 @@ const conflictingPackage = `<?xml version="1.0"?>
 
 async function main() {
   const validZip = buildStoredZip({
-    mimetype: "application/epub+zip",
-    "META-INF/container.xml": containerXml,
-    "EPUB/package.opf": validPackage,
-    "EPUB/nav.xhtml": navXml,
-    "EPUB/chapter.xhtml":
+    mimetype: 'application/epub+zip',
+    'META-INF/container.xml': containerXml,
+    'EPUB/package.opf': validPackage,
+    'EPUB/nav.xhtml': navXml,
+    'EPUB/chapter.xhtml':
       '<html xmlns="http://www.w3.org/1999/xhtml"><body><p>Hello</p></body></html>',
   });
 
@@ -80,25 +80,25 @@ async function main() {
     });
     assert(
       !tooLarge.archive,
-      "container byte limit must block oversized EPUBs",
+      'container byte limit must block oversized EPUBs',
     );
     assert(
       tooLarge.diagnostics.some(
-        (d) => d.code === "OCF_ZIP_CONTAINER_LIMIT_EXCEEDED",
+        (d) => d.code === 'OCF_ZIP_CONTAINER_LIMIT_EXCEEDED',
       ),
-      "container limit diagnostic must be explicit",
+      'container limit diagnostic must be explicit',
     );
 
     const tooMany = await OcfZipArchive.open(validZip, { maxEntries: 2 });
     assert(
       !tooMany.archive,
-      "entry-count limit must block archive bombs before reads",
+      'entry-count limit must block archive bombs before reads',
     );
     assert(
       tooMany.diagnostics.some(
-        (d) => d.code === "OCF_ZIP_ENTRY_COUNT_LIMIT_EXCEEDED",
+        (d) => d.code === 'OCF_ZIP_ENTRY_COUNT_LIMIT_EXCEEDED',
       ),
-      "entry-count diagnostic must be explicit",
+      'entry-count diagnostic must be explicit',
     );
 
     const oversizedEntry = await OcfZipArchive.open(validZip, {
@@ -106,28 +106,28 @@ async function main() {
     });
     assert(
       !oversizedEntry.archive,
-      "per-entry uncompressed limit must block oversized advertised entries",
+      'per-entry uncompressed limit must block oversized advertised entries',
     );
     assert(
       oversizedEntry.diagnostics.some(
-        (d) => d.code === "OCF_ZIP_ENTRY_SIZE_LIMIT_EXCEEDED",
+        (d) => d.code === 'OCF_ZIP_ENTRY_SIZE_LIMIT_EXCEEDED',
       ),
-      "entry-size diagnostic must be explicit",
+      'entry-size diagnostic must be explicit',
     );
 
-    const bomb = patchCentralEntryAsBomb(validZip, "EPUB/chapter.xhtml");
+    const bomb = patchCentralEntryAsBomb(validZip, 'EPUB/chapter.xhtml');
     const suspiciousRatio = await OcfZipArchive.open(bomb, {
       maxCompressionRatio: 20,
     });
     assert(
       !suspiciousRatio.archive,
-      "advertised Deflate bomb ratio must be rejected before decompression",
+      'advertised Deflate bomb ratio must be rejected before decompression',
     );
     assert(
       suspiciousRatio.diagnostics.some(
-        (d) => d.code === "OCF_ZIP_COMPRESSION_RATIO_LIMIT_EXCEEDED",
+        (d) => d.code === 'OCF_ZIP_COMPRESSION_RATIO_LIMIT_EXCEEDED',
       ),
-      "compression-ratio diagnostic must be explicit",
+      'compression-ratio diagnostic must be explicit',
     );
 
     const controlBudget = await loadEpub(validZip, {
@@ -135,23 +135,23 @@ async function main() {
     });
     assert(
       !controlBudget.publication,
-      "oversized package control documents must stop before XML parsing",
+      'oversized package control documents must stop before XML parsing',
     );
     assert(
       controlBudget.diagnostics.some(
-        (d) => d.code === "PACKAGE_DOCUMENT_LIMIT_EXCEEDED",
+        (d) => d.code === 'PACKAGE_DOCUMENT_LIMIT_EXCEEDED',
       ),
-      "package control-document budget must be diagnosed",
+      'package control-document budget must be diagnosed',
     );
   }
 
   // 2. Clean publications produce a clean compatibility summary.
   {
     const loaded = await loadEpub(validZip);
-    assert(loaded.publication, "valid conformance EPUB must load");
+    assert(loaded.publication, 'valid conformance EPUB must load');
     assert(
-      createCompatibilityReport(loaded.diagnostics).status === "clean",
-      "valid publication must remain compatibility-clean",
+      createCompatibilityReport(loaded.diagnostics).status === 'clean',
+      'valid publication must remain compatibility-clean',
     );
   }
 
@@ -159,52 +159,52 @@ async function main() {
   // not silently normalized or mislabeled as an unresolved failure.
   {
     const zip = buildStoredZip({
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": containerXml,
-      "EPUB/package.opf": conflictingPackage,
-      "EPUB/nav.xhtml": navXml,
-      "EPUB/chapter.xhtml":
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': containerXml,
+      'EPUB/package.opf': conflictingPackage,
+      'EPUB/nav.xhtml': navXml,
+      'EPUB/chapter.xhtml':
         '<html xmlns="http://www.w3.org/1999/xhtml"><body/></html>',
     });
     const loaded = await loadEpub(zip);
     const report = createCompatibilityReport(loaded.diagnostics);
     assert(
-      loaded.publication?.spine[0]?.rendition.flow === "scrolled-doc",
-      "first authored rendition override must remain the recovery value",
+      loaded.publication?.spine[0]?.rendition.flow === 'scrolled-doc',
+      'first authored rendition override must remain the recovery value',
     );
     assert(
-      report.status === "repaired",
-      "known deterministic recovery must be classified as repaired",
+      report.status === 'repaired',
+      'known deterministic recovery must be classified as repaired',
     );
     assert(
       report.repairs.some(
-        (repair) => repair.strategy === "use-first-authored-rendition-override",
+        (repair) => repair.strategy === 'use-first-authored-rendition-override',
       ),
-      "repair strategy must be surfaced",
+      'repair strategy must be surfaced',
     );
   }
 
   // 4. EPUB 3 NCX fallback is an explicit compatibility repair.
   {
     const zip = buildStoredZip({
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": containerXml,
-      "EPUB/package.opf": ncxFallbackPackage,
-      "EPUB/toc.ncx": ncxXml,
-      "EPUB/chapter.xhtml":
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': containerXml,
+      'EPUB/package.opf': ncxFallbackPackage,
+      'EPUB/toc.ncx': ncxXml,
+      'EPUB/chapter.xhtml':
         '<html xmlns="http://www.w3.org/1999/xhtml"><body/></html>',
     });
     const loaded = await loadEpub(zip);
     const report = createCompatibilityReport(loaded.diagnostics);
     assert(
-      loaded.publication?.navigation.source === "ncx",
-      "EPUB 3 compatibility fallback must produce NCX navigation",
+      loaded.publication?.navigation.source === 'ncx',
+      'EPUB 3 compatibility fallback must produce NCX navigation',
     );
     assert(
       report.repairs.some(
-        (repair) => repair.strategy === "use-ncx-navigation-fallback",
+        (repair) => repair.strategy === 'use-ncx-navigation-fallback',
       ),
-      "NCX fallback must be visible in compatibility report",
+      'NCX fallback must be visible in compatibility report',
     );
   }
 
@@ -212,27 +212,27 @@ async function main() {
   // “could load this test publication” with a W3C Reading System conformance pass.
   {
     const result = await runEpubCorpusCase({
-      id: "local-valid-reflowable",
+      id: 'local-valid-reflowable',
       bytes: validZip,
       expectPublication: true,
-      expectedCompatibilityStatus: "clean",
+      expectedCompatibilityStatus: 'clean',
     });
     assert(
       result.passed,
-      `local corpus case must pass: ${result.failures.join("; ")}`,
+      `local corpus case must pass: ${result.failures.join('; ')}`,
     );
 
     const blocked = await runEpubCorpusCase({
-      id: "local-archive-limit",
+      id: 'local-archive-limit',
       bytes: validZip,
       expectPublication: false,
-      expectedDiagnosticCodes: ["OCF_ZIP_ENTRY_COUNT_LIMIT_EXCEEDED"],
-      expectedCompatibilityStatus: "blocked",
+      expectedDiagnosticCodes: ['OCF_ZIP_ENTRY_COUNT_LIMIT_EXCEEDED'],
+      expectedCompatibilityStatus: 'blocked',
       archiveLimits: { maxEntries: 1 },
     });
     assert(
       blocked.passed,
-      `blocked corpus case must match declared expectation: ${blocked.failures.join("; ")}`,
+      `blocked corpus case must match declared expectation: ${blocked.failures.join('; ')}`,
     );
   }
 
@@ -240,19 +240,19 @@ async function main() {
   // implementation-report format.
   {
     const recorder = new W3cConformanceRecorder({
-      name: "EPUB Reader Engine",
-      variant: "Web",
-      tested_by: "implementer",
+      name: 'EPUB Reader Engine',
+      variant: 'Web',
+      tested_by: 'implementer',
     });
-    recorder.record("must-pass", true);
-    recorder.record("known-fail", false);
-    recorder.record("unsupported-feature", "n/a");
-    recorder.record("not-run", null);
+    recorder.record('must-pass', true);
+    recorder.record('known-fail', false);
+    recorder.record('unsupported-feature', 'n/a');
+    recorder.record('not-run', null);
     const report = recorder.report();
     assert(
-      report.tests["must-pass"] === true &&
-        report.tests["unsupported-feature"] === "n/a",
-      "W3C result values must round-trip exactly",
+      report.tests['must-pass'] === true &&
+        report.tests['unsupported-feature'] === 'n/a',
+      'W3C result values must round-trip exactly',
     );
     const summary = summarizeW3cResults(Object.values(report.tests));
     assert(
@@ -261,11 +261,11 @@ async function main() {
         summary.failed === 1 &&
         summary.notApplicable === 1 &&
         summary.notRun === 1,
-      "W3C summary counts must be stable",
+      'W3C summary counts must be stable',
     );
   }
 
-  console.log("Conformance reporting integration test: PASS");
+  console.log('Conformance reporting integration test: PASS');
 }
 
 function patchCentralEntryAsBomb(zip: Uint8Array, name: string): Uint8Array {

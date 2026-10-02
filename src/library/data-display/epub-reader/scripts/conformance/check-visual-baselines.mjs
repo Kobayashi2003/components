@@ -1,38 +1,38 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join, normalize, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync, readFileSync } from 'node:fs';
+import { join, normalize, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
-const matrixPath = join(root, "conformance", "visual", "matrix.json");
-const matrix = JSON.parse(readFileSync(matrixPath, "utf8"));
+const root = fileURLToPath(new URL('../..', import.meta.url));
+const matrixPath = join(root, 'conformance', 'visual', 'matrix.json');
+const matrix = JSON.parse(readFileSync(matrixPath, 'utf8'));
 const requiredStates = [
-  "empty",
-  "loading",
-  "reading",
-  "immersive-hidden",
-  "search-panel",
-  "portrait-single",
-  "landscape-double",
-  "warning-panel",
-  "error",
+  'empty',
+  'loading',
+  'reading',
+  'immersive-hidden',
+  'search-panel',
+  'portrait-single',
+  'landscape-double',
+  'warning-panel',
+  'error',
 ];
 const requiredContentTypes = [
-  "empty",
-  "text-horizontal",
-  "text-vertical",
-  "fixed-rtl",
-  "failure",
+  'empty',
+  'text-horizontal',
+  'text-vertical',
+  'fixed-rtl',
+  'failure',
 ];
 const ids = new Set();
 const failures = [];
 
 if (matrix.version !== 1 || !Array.isArray(matrix.cases))
-  failures.push("matrix must use version 1 and contain a cases array");
+  failures.push('matrix must use version 1 and contain a cases array');
 
 for (const entry of matrix.cases ?? []) {
   if (!entry.id || ids.has(entry.id))
     failures.push(
-      `case id is missing or duplicated: ${entry.id ?? "<missing>"}`,
+      `case id is missing or duplicated: ${entry.id ?? '<missing>'}`,
     );
   ids.add(entry.id);
   if (!(entry.viewport?.width > 0) || !(entry.viewport?.height > 0))
@@ -44,7 +44,7 @@ for (const entry of matrix.cases ?? []) {
       `${entry.id}: local-only real-book cases must not declare committed baselines`,
     );
   if (entry.baseline) {
-    const visualRoot = join(root, "conformance", "visual");
+    const visualRoot = join(root, 'conformance', 'visual');
     const path = resolve(visualRoot, normalize(entry.baseline));
     if (!path.startsWith(resolve(visualRoot)))
       failures.push(
@@ -67,7 +67,7 @@ for (const type of requiredContentTypes)
   if (!matrix.cases.some((entry) => entry.contentType === type))
     failures.push(`missing content-type coverage: ${type}`);
 
-if (process.env.EPUB_VISUAL_RESULTS_REQUIRED === "1") {
+if (process.env.EPUB_VISUAL_RESULTS_REQUIRED === '1') {
   const results = resolve(root, matrix.resultDirectory);
   for (const entry of matrix.cases) {
     const path = join(results, `${entry.id}.png`);
@@ -77,7 +77,7 @@ if (process.env.EPUB_VISUAL_RESULTS_REQUIRED === "1") {
 }
 
 if (failures.length > 0) {
-  console.error(`Visual baseline check failed:\n- ${failures.join("\n- ")}`);
+  console.error(`Visual baseline check failed:\n- ${failures.join('\n- ')}`);
   process.exitCode = 1;
 } else {
   console.log(
@@ -86,8 +86,8 @@ if (failures.length > 0) {
 }
 
 function pngDimensions(bytes) {
-  const signature = "89504e470d0a1a0a";
-  if (bytes.length < 24 || bytes.subarray(0, 8).toString("hex") !== signature)
+  const signature = '89504e470d0a1a0a';
+  if (bytes.length < 24 || bytes.subarray(0, 8).toString('hex') !== signature)
     return null;
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }

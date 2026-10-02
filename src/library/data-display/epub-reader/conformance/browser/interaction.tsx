@@ -1,21 +1,21 @@
-import { createRoot } from "react-dom/client";
-import { EpubReaderShowcase } from "../../showcase/EpubReaderShowcase";
-import "../../styles.css";
-import { TEST_UI_CONFIGURATION } from "./interaction/configuration";
-import { runBrowserInteractionScenario } from "./interaction/scenario";
+import { createRoot } from 'react-dom/client';
+import { EpubReaderShowcase } from '../../showcase/EpubReaderShowcase';
+import '../../styles.css';
+import { TEST_UI_CONFIGURATION } from './interaction/configuration';
+import { runBrowserInteractionScenario } from './interaction/scenario';
 
-const resultNode = requireElement("result");
-const rootElement = requireElement("root");
+const resultNode = requireElement('result');
+const rootElement = requireElement('root');
 
 createRoot(rootElement).render(
   <EpubReaderShowcase readerConfiguration={TEST_UI_CONFIGURATION} />,
 );
 
 void runBrowserInteractionScenario().then(
-  (steps) => finish({ status: "pass", steps }),
+  (steps) => finish({ status: 'pass', steps }),
   (error) =>
     finish({
-      status: "fail",
+      status: 'fail',
       reason: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     }),

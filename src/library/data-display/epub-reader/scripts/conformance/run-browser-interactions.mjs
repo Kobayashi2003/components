@@ -1,24 +1,24 @@
-import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { createServer } from "node:net";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { spawn } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   browserVersion,
   discoverChromium,
-} from "../shared/chromium-runtime.mjs";
+} from '../shared/chromium-runtime.mjs';
 
-const packageRoot = fileURLToPath(new URL("../..", import.meta.url));
-const workspaceRoot = resolve(packageRoot, "../../../..");
-const reportDirectory = join(packageRoot, ".test-results", "browser");
-const reportPath = join(reportDirectory, "interactions.json");
+const packageRoot = fileURLToPath(new URL('../..', import.meta.url));
+const workspaceRoot = resolve(packageRoot, '../../../..');
+const reportDirectory = join(packageRoot, '.test-results', 'browser');
+const reportPath = join(reportDirectory, 'interactions.json');
 const profile = mkdtempSync(
-  join(tmpdir(), "epub-reader-browser-interactions-"),
+  join(tmpdir(), 'epub-reader-browser-interactions-'),
 );
 mkdirSync(reportDirectory, { recursive: true });
 
-let report = { status: "not-run", reason: "unknown" };
+let report = { status: 'not-run', reason: 'unknown' };
 let server = null;
 let browserProcess = null;
 let cdp = null;
@@ -27,32 +27,32 @@ try {
   const chromium = discoverChromium();
   if (!chromium)
     throw new Error(
-      "Chromium executable not found. Set CHROMIUM_BIN to run browser interactions.",
+      'Chromium executable not found. Set CHROMIUM_BIN to run browser interactions.',
     );
   const port = await reservePort();
   const debuggingPort = await reservePort();
-  const vite = join(workspaceRoot, "node_modules", "vite", "bin", "vite.js");
+  const vite = join(workspaceRoot, 'node_modules', 'vite', 'bin', 'vite.js');
   const output = [];
   server = spawn(
     process.execPath,
     [
       vite,
-      "--host",
-      "127.0.0.1",
-      "--port",
+      '--host',
+      '127.0.0.1',
+      '--port',
       String(port),
-      "--strictPort",
-      "--clearScreen",
-      "false",
+      '--strictPort',
+      '--clearScreen',
+      'false',
     ],
     {
       cwd: workspaceRoot,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
     },
   );
-  server.stdout.on("data", (chunk) => output.push(String(chunk)));
-  server.stderr.on("data", (chunk) => output.push(String(chunk)));
+  server.stdout.on('data', (chunk) => output.push(String(chunk)));
+  server.stderr.on('data', (chunk) => output.push(String(chunk)));
 
   const url = `http://127.0.0.1:${port}/src/library/data-display/epub-reader/conformance/browser/interaction.html`;
   await waitForServer(url, server, output);
@@ -60,30 +60,30 @@ try {
   browserProcess = spawn(
     chromium,
     [
-      "--headless=new",
-      "--no-sandbox",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-      "--disable-background-timer-throttling",
-      "--disable-backgrounding-occluded-windows",
-      "--disable-renderer-backgrounding",
-      "--no-first-run",
-      "--no-default-browser-check",
+      '--headless=new',
+      '--no-sandbox',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
+      '--no-first-run',
+      '--no-default-browser-check',
       `--user-data-dir=${profile}`,
       `--remote-debugging-port=${debuggingPort}`,
-      "--window-size=1440,1000",
-      "--run-all-compositor-stages-before-draw",
+      '--window-size=1440,1000',
+      '--run-all-compositor-stages-before-draw',
       url,
     ],
     {
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
     },
   );
-  browserProcess.stdout.on("data", (chunk) =>
+  browserProcess.stdout.on('data', (chunk) =>
     browserOutput.push(String(chunk)),
   );
-  browserProcess.stderr.on("data", (chunk) =>
+  browserProcess.stderr.on('data', (chunk) =>
     browserOutput.push(String(chunk)),
   );
   const target = await waitForBrowserTarget(
@@ -93,7 +93,7 @@ try {
     browserOutput,
   );
   cdp = await connectCdp(target.webSocketDebuggerUrl);
-  await cdp.send("Runtime.enable");
+  await cdp.send('Runtime.enable');
   const result = await waitForBrowserReport(cdp, browserProcess, browserOutput);
   report = {
     ...result,
@@ -101,10 +101,10 @@ try {
     version: browserVersion(chromium),
   };
   console.log(JSON.stringify(report, null, 2));
-  if (result.status !== "pass") process.exitCode = 1;
+  if (result.status !== 'pass') process.exitCode = 1;
 } catch (error) {
   report = {
-    status: "not-run",
+    status: 'not-run',
     reason: error instanceof Error ? error.message : String(error),
   };
   console.error(report.reason);
@@ -119,7 +119,7 @@ try {
       { ...report, generatedAt: new Date().toISOString() },
       null,
       2,
-    ) + "\n",
+    ) + '\n',
   );
   rmSync(profile, { recursive: true, force: true });
 }
@@ -127,17 +127,17 @@ try {
 async function reservePort() {
   const probe = createServer();
   await new Promise((resolvePromise, reject) => {
-    probe.once("error", reject);
-    probe.listen(0, "127.0.0.1", resolvePromise);
+    probe.once('error', reject);
+    probe.listen(0, '127.0.0.1', resolvePromise);
   });
   const address = probe.address();
-  const port = typeof address === "object" && address ? address.port : 0;
+  const port = typeof address === 'object' && address ? address.port : 0;
   await new Promise((resolvePromise, reject) =>
     probe.close((error) => (error ? reject(error) : resolvePromise())),
   );
   if (!port)
     throw new Error(
-      "Could not reserve a local port for the browser test server.",
+      'Could not reserve a local port for the browser test server.',
     );
   return port;
 }
@@ -147,7 +147,7 @@ async function waitForServer(url, processHandle, output) {
   while (Date.now() < deadline) {
     if (processHandle.exitCode != null)
       throw new Error(
-        `Vite exited ${processHandle.exitCode}: ${output.join("").slice(-4000)}`,
+        `Vite exited ${processHandle.exitCode}: ${output.join('').slice(-4000)}`,
       );
     try {
       const response = await fetch(url);
@@ -158,7 +158,7 @@ async function waitForServer(url, processHandle, output) {
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 50));
   }
   throw new Error(
-    `Timed out waiting for Vite: ${output.join("").slice(-4000)}`,
+    `Timed out waiting for Vite: ${output.join('').slice(-4000)}`,
   );
 }
 
@@ -167,14 +167,14 @@ async function waitForBrowserTarget(port, url, processHandle, output) {
   while (Date.now() < deadline) {
     if (processHandle.exitCode != null)
       throw new Error(
-        `Browser exited ${processHandle.exitCode}: ${output.join("").slice(-4000)}`,
+        `Browser exited ${processHandle.exitCode}: ${output.join('').slice(-4000)}`,
       );
     try {
       const response = await fetch(`http://127.0.0.1:${port}/json/list`);
       if (response.ok) {
         const targets = await response.json();
         const target = targets.find(
-          (candidate) => candidate.type === "page" && candidate.url === url,
+          (candidate) => candidate.type === 'page' && candidate.url === url,
         );
         if (target?.webSocketDebuggerUrl) return target;
       }
@@ -184,7 +184,7 @@ async function waitForBrowserTarget(port, url, processHandle, output) {
     await delay(50);
   }
   throw new Error(
-    `Timed out waiting for Chromium debugging target: ${output.join("").slice(-4000)}`,
+    `Timed out waiting for Chromium debugging target: ${output.join('').slice(-4000)}`,
   );
 }
 
@@ -193,14 +193,14 @@ async function connectCdp(webSocketUrl) {
   const pending = new Map();
   let nextId = 0;
   await new Promise((resolvePromise, reject) => {
-    socket.addEventListener("open", resolvePromise, { once: true });
+    socket.addEventListener('open', resolvePromise, { once: true });
     socket.addEventListener(
-      "error",
-      () => reject(new Error("Could not connect to Chromium DevTools.")),
+      'error',
+      () => reject(new Error('Could not connect to Chromium DevTools.')),
       { once: true },
     );
   });
-  socket.addEventListener("message", (event) => {
+  socket.addEventListener('message', (event) => {
     const message = JSON.parse(String(event.data));
     if (!message.id) return;
     const request = pending.get(message.id);
@@ -226,18 +226,18 @@ async function connectCdp(webSocketUrl) {
 async function waitForBrowserReport(client, processHandle, output) {
   const timeout = Number(process.env.BROWSER_INTERACTION_TIMEOUT_MS ?? 45000);
   const deadline = Date.now() + timeout;
-  let lastValue = "PENDING";
+  let lastValue = 'PENDING';
   while (Date.now() < deadline) {
     if (processHandle.exitCode != null)
       throw new Error(
-        `Browser exited ${processHandle.exitCode}: ${output.join("").slice(-4000)}`,
+        `Browser exited ${processHandle.exitCode}: ${output.join('').slice(-4000)}`,
       );
-    const evaluated = await client.send("Runtime.evaluate", {
+    const evaluated = await client.send('Runtime.evaluate', {
       expression: "document.getElementById('result')?.textContent ?? 'MISSING'",
       returnByValue: true,
     });
-    lastValue = evaluated.result?.value ?? "MISSING";
-    if (lastValue !== "PENDING" && lastValue !== "MISSING")
+    lastValue = evaluated.result?.value ?? 'MISSING';
+    if (lastValue !== 'PENDING' && lastValue !== 'MISSING')
       return JSON.parse(lastValue);
     await delay(100);
   }
@@ -250,7 +250,7 @@ async function stopProcess(processHandle) {
   if (!processHandle || processHandle.exitCode != null) return;
   processHandle.kill();
   await Promise.race([
-    new Promise((resolvePromise) => processHandle.once("exit", resolvePromise)),
+    new Promise((resolvePromise) => processHandle.once('exit', resolvePromise)),
     delay(2000),
   ]);
 }

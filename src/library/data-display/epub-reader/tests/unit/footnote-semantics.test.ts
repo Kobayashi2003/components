@@ -1,4 +1,4 @@
-import { isFootnoteReference } from "../../core/interaction/navigation/footnote";
+import { isFootnoteReference } from '../../core/interaction/navigation/footnote';
 
 function equal(actual: unknown, expected: unknown): void {
   if (actual !== expected)
@@ -15,14 +15,14 @@ function semanticAnchor(attributes: Readonly<Record<string, string>>): Element {
   } as unknown as Element;
 }
 
-equal(isFootnoteReference(semanticAnchor({ "epub:type": "noteref" })), true);
+equal(isFootnoteReference(semanticAnchor({ 'epub:type': 'noteref' })), true);
 equal(
-  isFootnoteReference(semanticAnchor({ "epub:type": "pagebreak noteref" })),
+  isFootnoteReference(semanticAnchor({ 'epub:type': 'pagebreak noteref' })),
   true,
 );
-equal(isFootnoteReference(semanticAnchor({ role: "doc-noteref" })), true);
-equal(isFootnoteReference(semanticAnchor({ type: "NOTEREF" })), true);
-equal(isFootnoteReference(semanticAnchor({ "epub:type": "backlink" })), false);
+equal(isFootnoteReference(semanticAnchor({ role: 'doc-noteref' })), true);
+equal(isFootnoteReference(semanticAnchor({ type: 'NOTEREF' })), true);
+equal(isFootnoteReference(semanticAnchor({ 'epub:type': 'backlink' })), false);
 equal(isFootnoteReference(semanticAnchor({})), false);
 
-console.log("Footnote semantics unit test: PASS");
+console.log('Footnote semantics unit test: PASS');

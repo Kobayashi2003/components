@@ -1,10 +1,10 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { deflateSync } from "node:zlib";
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { deflateSync } from 'node:zlib';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
-const out = join(root, "fixtures", "corpus");
+const root = fileURLToPath(new URL('../..', import.meta.url));
+const out = join(root, 'fixtures', 'corpus');
 mkdirSync(out, { recursive: true });
 
 const container = `<?xml version="1.0"?>\n<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/></rootfiles></container>`;
@@ -33,8 +33,8 @@ const footnoteNotes = `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/
 const verticalMetadata = `<metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">urn:test:vertical-ruby</dc:identifier><dc:title>Vertical Ruby Fixture</dc:title><dc:language>ja</dc:language></metadata>`;
 const verticalCss = `html, .vrtl { -epub-writing-mode: vertical-rl; -webkit-writing-mode: vertical-rl; writing-mode: vertical-rl; }\nbody { margin: 0; padding: 0; font-size: 100%; line-height: 1.75; text-align: justify; }\np { margin: 0; }\nh1 { font-size: 160%; line-height: 1.5; margin: 0 0 1em 0; font-weight: normal; }`;
 const verticalParagraph =
-  "　<ruby>吾輩<rt>わがはい</rt></ruby>は猫である。名前はまだ無い。どこで<ruby>生<rt>う</rt></ruby>れたかとんと<ruby>見当<rt>けんとう</rt></ruby>がつかぬ。何でも<ruby>薄暗<rt>うすぐら</rt></ruby>いじめじめした所でニャーニャー<ruby>泣<rt>な</rt></ruby>いていた事だけは記憶している。";
-const verticalChapter = `<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" class="vrtl"><head><title>縦書き</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body><h1 id="start">第一章　<ruby>邂逅<rt>かいこう</rt></ruby></h1>${new Array(24).fill(`<p>${verticalParagraph}</p>`).join("")}</body></html>`;
+  '　<ruby>吾輩<rt>わがはい</rt></ruby>は猫である。名前はまだ無い。どこで<ruby>生<rt>う</rt></ruby>れたかとんと<ruby>見当<rt>けんとう</rt></ruby>がつかぬ。何でも<ruby>薄暗<rt>うすぐら</rt></ruby>いじめじめした所でニャーニャー<ruby>泣<rt>な</rt></ruby>いていた事だけは記憶している。';
+const verticalChapter = `<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" class="vrtl"><head><title>縦書き</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body><h1 id="start">第一章　<ruby>邂逅<rt>かいこう</rt></ruby></h1>${new Array(24).fill(`<p>${verticalParagraph}</p>`).join('')}</body></html>`;
 const verticalNav = `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"><body><nav epub:type="toc"><ol><li><span>本文</span><ol><li><a href="chapter.xhtml#start">縦書き</a></li></ol></li><li><span>補足</span><ol><li><a href="chapter.xhtml#appendix">付録</a></li></ol></li></ol></nav><nav epub:type="page-list"><ol><li><a href="chapter.xhtml#start">1</a></li></ol></nav><nav epub:type="landmarks"><ol><li><a epub:type="bodymatter" href="chapter.xhtml#start">本文開始</a></li></ol></nav></body></html>`;
 const verticalPackage = `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">urn:test:vertical-ruby</dc:identifier><dc:title>Vertical Ruby Fixture</dc:title><dc:language>ja</dc:language><meta property="rendition:layout">reflowable</meta></metadata><manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="css" href="style.css" media-type="text/css"/><item id="c1" href="chapter.xhtml" media-type="application/xhtml+xml"/></manifest><spine page-progression-direction="rtl"><itemref idref="c1"/></spine></package>`;
 
@@ -50,186 +50,191 @@ const verticalPackage = `<package xmlns="http://www.idpf.org/2007/opf" version="
 // so the leading-blank rule is covered too: that alignment column belongs to
 // horizontal two-up and must never cost a vertical chapter its first page.
 const platePage = `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Plate</title><meta name="viewport" content="width=600, height=800"/></head><body style="margin:0"><svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800"><rect width="600" height="800" fill="#2b2f3a"/><circle cx="300" cy="400" r="180" fill="#d5b570"/></svg></body></html>`;
-const mixedChapter = `<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" class="vrtl"><head><title>本文</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body><h1>本文</h1>${new Array(10).fill(`<p>${verticalParagraph}</p>`).join("")}</body></html>`;
+const mixedChapter = `<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" class="vrtl"><head><title>本文</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body><h1>本文</h1>${new Array(10).fill(`<p>${verticalParagraph}</p>`).join('')}</body></html>`;
 const mixedNav = `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"><body><nav epub:type="toc"><ol><li><a href="text-1.xhtml">本文</a></li></ol></nav></body></html>`;
 const mixedPackage = `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">urn:test:mixed-layout</dc:identifier><dc:title>Mixed Layout Fixture</dc:title><dc:language>ja</dc:language><meta property="rendition:layout">reflowable</meta></metadata><manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="css" href="style.css" media-type="text/css"/><item id="t1" href="text-1.xhtml" media-type="application/xhtml+xml"/><item id="p1" href="plate-1.xhtml" media-type="application/xhtml+xml"/><item id="p2" href="plate-2.xhtml" media-type="application/xhtml+xml"/><item id="t2" href="text-2.xhtml" media-type="application/xhtml+xml"/><item id="p3" href="plate-3.xhtml" media-type="application/xhtml+xml"/><item id="p4" href="plate-4.xhtml" media-type="application/xhtml+xml"/><item id="t3" href="text-3.xhtml" media-type="application/xhtml+xml"/></manifest><spine page-progression-direction="rtl"><itemref idref="t1"/><itemref idref="p1" properties="rendition:layout-pre-paginated rendition:spread-landscape page-spread-right"/><itemref idref="p2" properties="rendition:layout-pre-paginated rendition:spread-landscape page-spread-left"/><itemref idref="t2" properties="page-spread-left"/><itemref idref="p3" properties="rendition:layout-pre-paginated rendition:spread-landscape page-spread-right"/><itemref idref="p4" properties="rendition:layout-pre-paginated rendition:spread-landscape page-spread-left"/><itemref idref="t3"/></spine></package>`;
 
 const cases = [
   {
-    id: "svg-image-mixed",
-    file: "svg-image-mixed.epub",
+    id: 'svg-image-mixed',
+    file: 'svg-image-mixed.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id">${baseMetadata}<manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" properties="svg"/><item id="text" href="text.xhtml" media-type="application/xhtml+xml"/><item id="end" href="end.xhtml" media-type="application/xhtml+xml" properties="svg"/><item id="img" href="plate.png" media-type="image/png"/><item id="css" href="style.css" media-type="text/css"/></manifest><spine page-progression-direction="rtl"><itemref idref="cover" properties="rendition:layout-pre-paginated rendition:spread-none rendition:page-spread-center"/><itemref idref="text"/><itemref idref="end" properties="page-spread-left"/></spine></package>`,
-      "EPUB/nav.xhtml": nav.replaceAll("chapter.xhtml", "cover.xhtml"),
-      "EPUB/text.xhtml": mixedChapter,
-      "EPUB/style.css": ".vrtl{writing-mode:vertical-rl}p{line-height:1.75}",
-      ...Object.fromEntries(["cover", "end"].map((name) => [
-        `EPUB/${name}.xhtml`,
-        `<html xmlns="http://www.w3.org/1999/xhtml"><head><title>${name}</title><meta name="viewport" content="width=800,height=1600"/><style>html,body{margin:0;padding:0;font-size:0}</style></head><body><div><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 800 1600"><image width="800" height="1600" ${name === "cover" ? 'href' : 'xlink:href'}="plate.png"/></svg></div></body></html>`,
-      ])),
-      "EPUB/plate.png": solidPng(800, 1600),
-    },
-  },
-  {
-    id: "single-image-spread",
-    file: "single-image-spread.epub",
-    expectPublication: true,
-    expectedCompatibilityStatus: "clean",
-    files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id">${baseMetadata}<manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="a" href="a.xhtml" media-type="application/xhtml+xml"/><item id="b" href="b.xhtml" media-type="application/xhtml+xml"/><item id="c" href="c.xhtml" media-type="application/xhtml+xml"/><item id="img" href="plate.png" media-type="image/png"/></manifest><spine><itemref idref="a"/><itemref idref="b"/><itemref idref="c"/></spine></package>`,
-      "EPUB/nav.xhtml": nav.replaceAll("chapter.xhtml", "a.xhtml"),
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id">${baseMetadata}<manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" properties="svg"/><item id="text" href="text.xhtml" media-type="application/xhtml+xml"/><item id="end" href="end.xhtml" media-type="application/xhtml+xml" properties="svg"/><item id="img" href="plate.png" media-type="image/png"/><item id="css" href="style.css" media-type="text/css"/></manifest><spine page-progression-direction="rtl"><itemref idref="cover" properties="rendition:layout-pre-paginated rendition:spread-none rendition:page-spread-center"/><itemref idref="text"/><itemref idref="end" properties="page-spread-left"/></spine></package>`,
+      'EPUB/nav.xhtml': nav.replaceAll('chapter.xhtml', 'cover.xhtml'),
+      'EPUB/text.xhtml': mixedChapter,
+      'EPUB/style.css': '.vrtl{writing-mode:vertical-rl}p{line-height:1.75}',
       ...Object.fromEntries(
-        ["a", "b", "c"].map((name) => [
+        ['cover', 'end'].map((name) => [
           `EPUB/${name}.xhtml`,
-          `<html xmlns="http://www.w3.org/1999/xhtml"><head><title>${name}</title></head><body style="margin:0"><div><p><img src="plate.png" alt="" style="max-width:100%;max-height:100%"/></p></div>${name === "c" ? "<p>Caption</p>" : ""}</body></html>`,
+          `<html xmlns="http://www.w3.org/1999/xhtml"><head><title>${name}</title><meta name="viewport" content="width=800,height=1600"/><style>html,body{margin:0;padding:0;font-size:0}</style></head><body><div><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 800 1600"><image width="800" height="1600" ${name === 'cover' ? 'href' : 'xlink:href'}="plate.png"/></svg></div></body></html>`,
         ]),
       ),
-      "EPUB/plate.png": solidPng(800, 1600),
+      'EPUB/plate.png': solidPng(800, 1600),
     },
   },
   {
-    id: "valid-reflowable",
-    file: "valid-reflowable.epub",
+    id: 'single-image-spread',
+    file: 'single-image-spread.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": validPackage,
-      "EPUB/nav.xhtml": nav,
-      "EPUB/chapter.xhtml": chapter,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': `<package xmlns="http://www.idpf.org/2007/opf" version="3.3" unique-identifier="id">${baseMetadata}<manifest><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="a" href="a.xhtml" media-type="application/xhtml+xml"/><item id="b" href="b.xhtml" media-type="application/xhtml+xml"/><item id="c" href="c.xhtml" media-type="application/xhtml+xml"/><item id="img" href="plate.png" media-type="image/png"/></manifest><spine><itemref idref="a"/><itemref idref="b"/><itemref idref="c"/></spine></package>`,
+      'EPUB/nav.xhtml': nav.replaceAll('chapter.xhtml', 'a.xhtml'),
+      ...Object.fromEntries(
+        ['a', 'b', 'c'].map((name) => [
+          `EPUB/${name}.xhtml`,
+          `<html xmlns="http://www.w3.org/1999/xhtml"><head><title>${name}</title></head><body style="margin:0"><div><p><img src="plate.png" alt="" style="max-width:100%;max-height:100%"/></p></div>${name === 'c' ? '<p>Caption</p>' : ''}</body></html>`,
+        ]),
+      ),
+      'EPUB/plate.png': solidPng(800, 1600),
     },
   },
   {
-    id: "conflicting-rendition-repair",
-    file: "conflicting-rendition.epub",
+    id: 'valid-reflowable',
+    file: 'valid-reflowable.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "repaired",
-    expectedDiagnosticCodes: ["PACKAGE_SPINE_RENDITION_CONFLICT"],
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": conflictPackage,
-      "EPUB/nav.xhtml": nav,
-      "EPUB/chapter.xhtml": chapter,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': validPackage,
+      'EPUB/nav.xhtml': nav,
+      'EPUB/chapter.xhtml': chapter,
     },
   },
   {
-    id: "epub3-ncx-fallback-repair",
-    file: "epub3-ncx-fallback.epub",
+    id: 'conflicting-rendition-repair',
+    file: 'conflicting-rendition.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "repaired",
-    expectedDiagnosticCodes: ["NAV_COMPATIBILITY_NCX_FALLBACK"],
+    expectedCompatibilityStatus: 'repaired',
+    expectedDiagnosticCodes: ['PACKAGE_SPINE_RENDITION_CONFLICT'],
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": ncxPackage,
-      "EPUB/toc.ncx": ncx,
-      "EPUB/chapter.xhtml": chapter,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': conflictPackage,
+      'EPUB/nav.xhtml': nav,
+      'EPUB/chapter.xhtml': chapter,
     },
   },
   {
-    id: "missing-container-blocked",
-    file: "missing-container.epub",
+    id: 'epub3-ncx-fallback-repair',
+    file: 'epub3-ncx-fallback.epub',
+    expectPublication: true,
+    expectedCompatibilityStatus: 'repaired',
+    expectedDiagnosticCodes: ['NAV_COMPATIBILITY_NCX_FALLBACK'],
+    files: {
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': ncxPackage,
+      'EPUB/toc.ncx': ncx,
+      'EPUB/chapter.xhtml': chapter,
+    },
+  },
+  {
+    id: 'missing-container-blocked',
+    file: 'missing-container.epub',
     expectPublication: false,
-    expectedCompatibilityStatus: "blocked",
-    expectedDiagnosticCodes: ["OCF_CONTAINER_MISSING"],
-    files: { mimetype: "application/epub+zip", "EPUB/chapter.xhtml": chapter },
+    expectedCompatibilityStatus: 'blocked',
+    expectedDiagnosticCodes: ['OCF_CONTAINER_MISSING'],
+    files: { mimetype: 'application/epub+zip', 'EPUB/chapter.xhtml': chapter },
   },
   {
-    id: "browser-content-compatibility",
-    file: "browser-content-compatibility.epub",
+    id: 'browser-content-compatibility',
+    file: 'browser-content-compatibility.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": compatibilityPackage,
-      "EPUB/nav.xhtml": compatibilityNav,
-      "EPUB/broken.xhtml": malformedChapter,
-      "EPUB/text/base.xhtml": xmlBaseChapter,
-      "EPUB/assets/images/pixel.svg": pixelSvg,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': compatibilityPackage,
+      'EPUB/nav.xhtml': compatibilityNav,
+      'EPUB/broken.xhtml': malformedChapter,
+      'EPUB/text/base.xhtml': xmlBaseChapter,
+      'EPUB/assets/images/pixel.svg': pixelSvg,
     },
   },
   {
-    id: "cross-document-footnote",
-    file: "cross-document-footnote.epub",
+    id: 'cross-document-footnote',
+    file: 'cross-document-footnote.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": footnotePackage,
-      "EPUB/nav.xhtml": footnoteNav,
-      "EPUB/chapter.xhtml": footnoteChapter,
-      "EPUB/notes.xhtml": footnoteNotes,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': footnotePackage,
+      'EPUB/nav.xhtml': footnoteNav,
+      'EPUB/chapter.xhtml': footnoteChapter,
+      'EPUB/notes.xhtml': footnoteNotes,
     },
   },
   {
-    id: "vertical-ruby",
-    file: "vertical-ruby.epub",
+    id: 'vertical-ruby',
+    file: 'vertical-ruby.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": verticalPackage,
-      "EPUB/nav.xhtml": verticalNav,
-      "EPUB/style.css": verticalCss,
-      "EPUB/chapter.xhtml": verticalChapter,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': verticalPackage,
+      'EPUB/nav.xhtml': verticalNav,
+      'EPUB/style.css': verticalCss,
+      'EPUB/chapter.xhtml': verticalChapter,
     },
   },
   {
-    id: "mixed-layout",
-    file: "mixed-layout.epub",
+    id: 'mixed-layout',
+    file: 'mixed-layout.epub',
     expectPublication: true,
-    expectedCompatibilityStatus: "clean",
+    expectedCompatibilityStatus: 'clean',
     files: {
-      mimetype: "application/epub+zip",
-      "META-INF/container.xml": container,
-      "EPUB/package.opf": mixedPackage,
-      "EPUB/nav.xhtml": mixedNav,
-      "EPUB/style.css": verticalCss,
-      "EPUB/text-1.xhtml": mixedChapter,
-      "EPUB/text-2.xhtml": mixedChapter,
-      "EPUB/text-3.xhtml": mixedChapter,
-      "EPUB/plate-1.xhtml": platePage,
-      "EPUB/plate-2.xhtml": platePage,
-      "EPUB/plate-3.xhtml": platePage,
-      "EPUB/plate-4.xhtml": platePage,
+      mimetype: 'application/epub+zip',
+      'META-INF/container.xml': container,
+      'EPUB/package.opf': mixedPackage,
+      'EPUB/nav.xhtml': mixedNav,
+      'EPUB/style.css': verticalCss,
+      'EPUB/text-1.xhtml': mixedChapter,
+      'EPUB/text-2.xhtml': mixedChapter,
+      'EPUB/text-3.xhtml': mixedChapter,
+      'EPUB/plate-1.xhtml': platePage,
+      'EPUB/plate-2.xhtml': platePage,
+      'EPUB/plate-3.xhtml': platePage,
+      'EPUB/plate-4.xhtml': platePage,
     },
   },
 ];
 
-const svgMixed = cases.find((test) => test.id === "svg-image-mixed");
+const svgMixed = cases.find((test) => test.id === 'svg-image-mixed');
 cases.push({
   ...svgMixed,
-  id: "svg-image-no-viewbox",
-  file: "svg-image-no-viewbox.epub",
+  id: 'svg-image-no-viewbox',
+  file: 'svg-image-no-viewbox.epub',
   files: {
     ...svgMixed.files,
-    "EPUB/end.xhtml": svgMixed.files["EPUB/end.xhtml"].replace(' viewBox="0 0 800 1600"', ''),
+    'EPUB/end.xhtml': svgMixed.files['EPUB/end.xhtml'].replace(
+      ' viewBox="0 0 800 1600"',
+      '',
+    ),
   },
 });
 
 for (const test of cases)
   writeFileSync(join(out, test.file), buildStoredZip(test.files));
 writeFileSync(
-  join(out, "manifest.json"),
+  join(out, 'manifest.json'),
   JSON.stringify(
     {
-      generatedBy: "scripts/corpus/generate-local-corpus.mjs",
+      generatedBy: 'scripts/corpus/generate-local-corpus.mjs',
       cases: cases.map(({ files, ...rest }) => rest),
     },
     null,
     2,
-  ) + "\n",
+  ) + '\n',
 );
 console.log(`Generated ${cases.length} deterministic EPUB fixtures in ${out}`);
 
@@ -324,8 +329,8 @@ function solidPng(width, height) {
   for (let y = 0; y < height; y++) pixels[y * (width * 3 + 1)] = 0;
   return concat([
     new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
-    chunk("IHDR", header),
-    chunk("IDAT", deflateSync(pixels)),
-    chunk("IEND", new Uint8Array()),
+    chunk('IHDR', header),
+    chunk('IDAT', deflateSync(pixels)),
+    chunk('IEND', new Uint8Array()),
   ]);
 }

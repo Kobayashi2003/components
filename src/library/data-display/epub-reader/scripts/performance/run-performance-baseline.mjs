@@ -1,24 +1,24 @@
-import { createRequire } from "node:module";
+import { createRequire } from 'node:module';
 import {
   existsSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
-} from "node:fs";
-import { basename, join } from "node:path";
-import { performance } from "node:perf_hooks";
-import { fileURLToPath } from "node:url";
+} from 'node:fs';
+import { basename, join } from 'node:path';
+import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
 import {
   loadRealWorldManifest,
   resolveRealWorldCasePath,
-} from "../corpus/real-world-manifest.mjs";
-import { runTypeScript } from "../shared/typescript-cli.mjs";
+} from '../corpus/real-world-manifest.mjs';
+import { runTypeScript } from '../shared/typescript-cli.mjs';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
+const root = fileURLToPath(new URL('../..', import.meta.url));
 const { manifest, manifestPath } = loadRealWorldManifest(root);
-const out = join(root, ".performance-dist");
-const reportDirectory = join(root, ".test-results", "performance");
+const out = join(root, '.performance-dist');
+const reportDirectory = join(root, '.test-results', 'performance');
 const maxTotalMs = Math.max(
   1,
   Number(process.env.EPUB_PERFORMANCE_MAX_TOTAL_MS ?? 5000),
@@ -34,25 +34,25 @@ mkdirSync(reportDirectory, { recursive: true });
 try {
   runTypeScript(
     [
-      "-p",
-      join(root, "tsconfig.core.json"),
-      "--noEmit",
-      "false",
-      "--module",
-      "commonjs",
-      "--moduleResolution",
-      "node",
-      "--outDir",
+      '-p',
+      join(root, 'tsconfig.core.json'),
+      '--noEmit',
+      'false',
+      '--module',
+      'commonjs',
+      '--moduleResolution',
+      'node',
+      '--outDir',
       out,
     ],
-    { stdio: "inherit" },
+    { stdio: 'inherit' },
   );
   writeFileSync(
-    join(out, "package.json"),
-    JSON.stringify({ type: "commonjs" }),
+    join(out, 'package.json'),
+    JSON.stringify({ type: 'commonjs' }),
   );
   const require = createRequire(import.meta.url);
-  const core = require(join(out, "core", "index.js"));
+  const core = require(join(out, 'core', 'index.js'));
   const rows = [];
 
   for (const test of manifest.cases) {
@@ -63,7 +63,7 @@ try {
     const heapBefore = process.memoryUsage().heapUsed;
 
     const archiveStart = performance.now();
-    const opened = await core.OcfZipArchive.open(bytes, {}, "compatible");
+    const opened = await core.OcfZipArchive.open(bytes, {}, 'compatible');
     const archiveMs = performance.now() - archiveStart;
     if (!opened.archive) throw new Error(`Could not open ${file}`);
 
@@ -111,15 +111,15 @@ try {
   ]);
   const report = {
     generatedAt: new Date().toISOString(),
-    status: violations.length ? "fail" : "pass",
+    status: violations.length ? 'fail' : 'pass',
     gcAvailable: Boolean(global.gc),
     budgets: { maxTotalMs, maxHeapDeltaMiB },
     violations,
     rows,
   };
   writeFileSync(
-    join(reportDirectory, "real-world.json"),
-    JSON.stringify(report, null, 2) + "\n",
+    join(reportDirectory, 'real-world.json'),
+    JSON.stringify(report, null, 2) + '\n',
   );
   console.log(JSON.stringify(report, null, 2));
   if (violations.length)

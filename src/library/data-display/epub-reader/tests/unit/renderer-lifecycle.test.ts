@@ -2,15 +2,15 @@ import {
   DEFAULT_READER_PREFERENCES,
   type Locator,
   type PublicationHref,
-} from "../../core/epub/publication";
+} from '../../core/epub/publication';
 import type {
   RenditionPlan,
   RendererKind,
-} from "../../core/presentation/rendition";
-import { waitForLayoutStability } from "../../core/presentation/renderer/layout-stability";
-import { LayoutTransactionCoordinator } from "../../core/presentation/renderer/layout-transaction";
-import { LifecycleScope } from "../../core/presentation/renderer/lifecycle";
-import { RendererHost } from "../../core/presentation/renderer/renderer-host";
+} from '../../core/presentation/rendition';
+import { waitForLayoutStability } from '../../core/presentation/renderer/layout-stability';
+import { LayoutTransactionCoordinator } from '../../core/presentation/renderer/layout-transaction';
+import { LifecycleScope } from '../../core/presentation/renderer/lifecycle';
+import { RendererHost } from '../../core/presentation/renderer/renderer-host';
 import type {
   LayoutMeasurement,
   LayoutStabilityReport,
@@ -18,7 +18,7 @@ import type {
   LayoutTransactionContext,
   RendererFactory,
   RendererInstance,
-} from "../../core/presentation/renderer/model";
+} from '../../core/presentation/renderer/model';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Renderer lifecycle test failed: ${message}`);
@@ -33,21 +33,21 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
     const onAbort = () => {
       cleanup();
       const error =
-        signal?.reason instanceof Error ? signal.reason : new Error("aborted");
+        signal?.reason instanceof Error ? signal.reason : new Error('aborted');
       reject(error);
     };
     const cleanup = () => {
       clearTimeout(timer);
-      signal?.removeEventListener("abort", onAbort);
+      signal?.removeEventListener('abort', onAbort);
     };
-    signal?.addEventListener("abort", onAbort, { once: true });
+    signal?.addEventListener('abort', onAbort, { once: true });
     if (signal?.aborted) onAbort();
   });
 }
 
 function makePlan(
   spineIndex: number,
-  renderer: RendererKind = "reflowable-paginated",
+  renderer: RendererKind = 'reflowable-paginated',
   fontSizePercent = 100,
 ): RenditionPlan {
   return {
@@ -56,70 +56,70 @@ function makePlan(
     renderer,
     viewport: { width: 800, height: 600 },
     publicationRendition: {
-      layout: renderer === "fixed-layout" ? "pre-paginated" : "reflowable",
-      orientation: "auto",
-      spread: "auto",
-      flow: renderer === "reflowable-scroll" ? "scrolled-doc" : "paginated",
+      layout: renderer === 'fixed-layout' ? 'pre-paginated' : 'reflowable',
+      orientation: 'auto',
+      spread: 'auto',
+      flow: renderer === 'reflowable-scroll' ? 'scrolled-doc' : 'paginated',
       alignXCenter: false,
     },
-    pageProgression: { value: "ltr", source: "publication" },
+    pageProgression: { value: 'ltr', source: 'publication' },
     overflow: {
       value:
-        renderer === "fixed-layout"
-          ? "fixed-page"
-          : renderer === "reflowable-scroll"
-            ? "scrolled-doc"
-            : "paginated",
+        renderer === 'fixed-layout'
+          ? 'fixed-page'
+          : renderer === 'reflowable-scroll'
+            ? 'scrolled-doc'
+            : 'paginated',
       source:
-        renderer === "fixed-layout" ? "layout-requirement" : "publication",
+        renderer === 'fixed-layout' ? 'layout-requirement' : 'publication',
     },
-    writingMode: { value: "horizontal-tb", source: "content" },
-    textDirection: { value: "auto", source: "reading-system-default" },
+    writingMode: { value: 'horizontal-tb', source: 'content' },
+    textDirection: { value: 'auto', source: 'reading-system-default' },
     orientation: {
-      requested: "auto",
-      viewport: "landscape",
+      requested: 'auto',
+      viewport: 'landscape',
       matchesRequested: true,
-      preference: "any",
+      preference: 'any',
     },
     spread: {
-      mode: "single",
-      execution: "single",
+      mode: 'single',
+      execution: 'single',
       synthetic: false,
-      source: "reading-system-default",
-      placement: "auto",
-      gap: "renderer-default",
+      source: 'reading-system-default',
+      placement: 'auto',
+      gap: 'renderer-default',
     },
     alignXCenter: false,
     preferences: { ...DEFAULT_READER_PREFERENCES, fontSizePercent },
     compatibility: { fitSingleImagePage: false },
     capabilities: {
       textCustomization: {
-        fontSize: renderer !== "fixed-layout",
-        fontFamily: renderer !== "fixed-layout",
-        lineHeight: renderer !== "fixed-layout",
+        fontSize: renderer !== 'fixed-layout',
+        fontFamily: renderer !== 'fixed-layout',
+        lineHeight: renderer !== 'fixed-layout',
       },
       navigation: {
-        paginated: renderer !== "reflowable-scroll",
-        scroll: renderer === "reflowable-scroll",
+        paginated: renderer !== 'reflowable-scroll',
+        scroll: renderer === 'reflowable-scroll',
         syntheticSpread: true,
       },
       presentation: {
-        intrinsicZoom: renderer === "fixed-layout",
+        intrinsicZoom: renderer === 'fixed-layout',
         horizontalCentering: true,
       },
     },
     requirements: {
       intrinsicViewport:
-        renderer === "fixed-layout" ? "required" : "not-required",
-      contentPresentationInspection: "optional",
+        renderer === 'fixed-layout' ? 'required' : 'not-required',
+      contentPresentationInspection: 'optional',
     },
     diagnostics: [],
   };
 }
 
 const stableReport: LayoutStabilityReport = {
-  status: "stable",
-  fonts: "ready",
+  status: 'stable',
+  fonts: 'ready',
   images: { requested: 0, decoded: 0, failed: 0, timedOut: false },
   stableFramesObserved: 2,
   measurement: {
@@ -137,15 +137,15 @@ async function main(): Promise<void> {
     const cleanupOrder: number[] = [];
     scope.add(() => cleanupOrder.push(1));
     scope.add(() => cleanupOrder.push(2));
-    assert(!scope.signal.aborted, "lifecycle signal starts active");
+    assert(!scope.signal.aborted, 'lifecycle signal starts active');
     scope.dispose();
     assert(
       scope.signal.aborted,
-      "disposing lifecycle must abort owned async work",
+      'disposing lifecycle must abort owned async work',
     );
     assert(
-      cleanupOrder.join(",") === "2,1",
-      "cleanup must run in reverse acquisition order",
+      cleanupOrder.join(',') === '2,1',
+      'cleanup must run in reverse acquisition order',
     );
   }
 
@@ -154,31 +154,31 @@ async function main(): Promise<void> {
     const coordinator = new LayoutTransactionCoordinator();
     const mutations: string[] = [];
 
-    const slow = coordinator.run("preferences", async (tx) => {
+    const slow = coordinator.run('preferences', async (tx) => {
       await delay(30, tx.signal);
-      tx.mutate(() => mutations.push("slow"));
-      return "slow";
+      tx.mutate(() => mutations.push('slow'));
+      return 'slow';
     });
 
     await delay(1);
-    const fast = coordinator.run("preferences", async (tx) => {
+    const fast = coordinator.run('preferences', async (tx) => {
       await delay(2, tx.signal);
-      tx.mutate(() => mutations.push("fast"));
-      return "fast";
+      tx.mutate(() => mutations.push('fast'));
+      return 'fast';
     });
 
     const [slowResult, fastResult] = await Promise.all([slow, fast]);
     assert(
-      slowResult.status === "superseded",
-      "older transaction must report superseded",
+      slowResult.status === 'superseded',
+      'older transaction must report superseded',
     );
     assert(
-      fastResult.status === "committed" && fastResult.value === "fast",
-      "newer transaction must commit",
+      fastResult.status === 'committed' && fastResult.value === 'fast',
+      'newer transaction must commit',
     );
     assert(
-      mutations.join(",") === "fast",
-      "superseded transaction must not mutate after awaiting",
+      mutations.join(',') === 'fast',
+      'superseded transaction must not mutate after awaiting',
     );
   }
 
@@ -187,30 +187,30 @@ async function main(): Promise<void> {
   {
     const coordinator = new LayoutTransactionCoordinator();
     const order: string[] = [];
-    const layout = coordinator.run("preferences", async (tx) => {
+    const layout = coordinator.run('preferences', async (tx) => {
       await delay(10, tx.signal);
-      tx.mutate(() => order.push("layout"));
-      return "laid-out";
+      tx.mutate(() => order.push('layout'));
+      return 'laid-out';
     });
     await delay(1);
-    const observation = coordinator.observe("manual", async (tx) => {
+    const observation = coordinator.observe('manual', async (tx) => {
       tx.throwIfSuperseded();
-      order.push("locator");
-      return "captured";
+      order.push('locator');
+      return 'captured';
     });
     const [layoutResult, observationResult] = await Promise.all([
       layout,
       observation,
     ]);
     assert(
-      layoutResult.status === "committed",
-      "a locator capture must not supersede active layout work",
+      layoutResult.status === 'committed',
+      'a locator capture must not supersede active layout work',
     );
     assert(
-      observationResult.status === "committed" &&
-        observationResult.value === "captured" &&
-        order.join(",") === "layout,locator",
-      "a locator capture must observe the renderer after layout commits",
+      observationResult.status === 'committed' &&
+        observationResult.value === 'captured' &&
+        order.join(',') === 'layout,locator',
+      'a locator capture must observe the renderer after layout commits',
     );
     coordinator.dispose();
   }
@@ -272,18 +272,18 @@ async function main(): Promise<void> {
       },
     );
     assert(
-      report.status === "stable",
-      "stable geometry must commit before timeout",
+      report.status === 'stable',
+      'stable geometry must commit before timeout',
     );
     assert(
       report.images.requested === 3 &&
         report.images.decoded === 2 &&
         report.images.failed === 1,
-      "image readiness counts must survive",
+      'image readiness counts must survive',
     );
     assert(
       report.measurement.scrollHeight === 1100,
-      "final stable geometry must be reported",
+      'final stable geometry must be reported',
     );
   }
 
@@ -318,8 +318,8 @@ async function main(): Promise<void> {
       },
     );
     assert(
-      report.status === "timed-out",
-      "layout stability must have a finite timeout",
+      report.status === 'timed-out',
+      'layout stability must have a finite timeout',
     );
   }
 
@@ -331,10 +331,10 @@ async function main(): Promise<void> {
     committedFontSize = 100;
     visible = true;
     private spineIndex = 0;
-    private href = "EPUB/ch1.xhtml" as PublicationHref;
+    private href = 'EPUB/ch1.xhtml' as PublicationHref;
     private readonly layoutListeners = new Set<
       (
-        layout: import("../../core/presentation/renderer/model").RendererLayoutSnapshot,
+        layout: import('../../core/presentation/renderer/model').RendererLayoutSnapshot,
       ) => void
     >();
 
@@ -373,7 +373,7 @@ async function main(): Promise<void> {
     async captureLocator(
       tx: LayoutTransactionContext,
     ): Promise<Locator | null> {
-      if (this.disposed) throw new Error("Fake renderer has been disposed.");
+      if (this.disposed) throw new Error('Fake renderer has been disposed.');
       tx.throwIfSuperseded();
       return {
         href: this.href,
@@ -392,15 +392,15 @@ async function main(): Promise<void> {
     }
 
     async navigate(
-      direction: import("../../core/presentation/renderer/model").ReadingDirection,
+      direction: import('../../core/presentation/renderer/model').ReadingDirection,
       tx: LayoutTransactionContext,
     ): Promise<
-      import("../../core/presentation/renderer/model").RendererNavigationResult
+      import('../../core/presentation/renderer/model').RendererNavigationResult
     > {
       tx.throwIfSuperseded();
       return {
-        status: "boundary",
-        edge: direction === "forward" ? "end" : "start",
+        status: 'boundary',
+        edge: direction === 'forward' ? 'end' : 'start',
       };
     }
 
@@ -421,7 +421,7 @@ async function main(): Promise<void> {
 
     onLayoutChange(
       listener: (
-        layout: import("../../core/presentation/renderer/model").RendererLayoutSnapshot,
+        layout: import('../../core/presentation/renderer/model').RendererLayoutSnapshot,
       ) => void,
     ): () => void {
       this.layoutListeners.add(listener);
@@ -429,7 +429,7 @@ async function main(): Promise<void> {
     }
 
     emitLayout(
-      layout: import("../../core/presentation/renderer/model").RendererLayoutSnapshot,
+      layout: import('../../core/presentation/renderer/model').RendererLayoutSnapshot,
     ): void {
       for (const listener of this.layoutListeners) listener(layout);
     }
@@ -466,37 +466,37 @@ async function main(): Promise<void> {
     const paginated: FakeRenderer[] = [];
     const fixed: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", paginated, 30),
-      factory("fixed-layout", fixed, 1),
+      factory('reflowable-paginated', paginated, 30),
+      factory('fixed-layout', fixed, 1),
     ]);
 
     const first = host.present(
-      makePlan(0, "reflowable-paginated"),
-      "initial-render",
+      makePlan(0, 'reflowable-paginated'),
+      'initial-render',
     );
     await delay(2);
-    const second = host.present(makePlan(1, "fixed-layout"), "navigation");
+    const second = host.present(makePlan(1, 'fixed-layout'), 'navigation');
     await Promise.all([first, second]);
 
     assert(
       paginated.length === 1 && paginated[0]!.disposed,
-      "superseded renderer candidate must be disposed",
+      'superseded renderer candidate must be disposed',
     );
     assert(
       fixed.length === 1 && !fixed[0]!.disposed,
-      "winning renderer must remain active",
+      'winning renderer must remain active',
     );
     assert(
-      host.state.status === "ready" &&
-        host.state.rendererKind === "fixed-layout",
-      "host must publish only the newest renderer",
+      host.state.status === 'ready' &&
+        host.state.rendererKind === 'fixed-layout',
+      'host must publish only the newest renderer',
     );
     assert(
       host.state.plan?.spineIndex === 1,
-      "host state must point to newest plan",
+      'host state must point to newest plan',
     );
     host.dispose();
-    assert(fixed[0]!.disposed, "disposing host must dispose active renderer");
+    assert(fixed[0]!.disposed, 'disposing host must dispose active renderer');
   }
 
   // 4b. Replacement candidates remain visually hidden until the same atomic
@@ -505,29 +505,29 @@ async function main(): Promise<void> {
     const firstSet: FakeRenderer[] = [];
     const secondSet: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", firstSet, 1),
-      factory("fixed-layout", secondSet, 20),
+      factory('reflowable-paginated', firstSet, 1),
+      factory('fixed-layout', secondSet, 20),
     ]);
-    await host.present(makePlan(0, "reflowable-paginated"), "initial-render");
+    await host.present(makePlan(0, 'reflowable-paginated'), 'initial-render');
     const old = firstSet[0]!;
-    const replacement = host.present(makePlan(1, "fixed-layout"), "navigation");
+    const replacement = host.present(makePlan(1, 'fixed-layout'), 'navigation');
     await delay(2);
     assert(
       secondSet[0]?.visible === false,
-      "replacement renderer must preload hidden",
+      'replacement renderer must preload hidden',
     );
     assert(
       !old.disposed && old.visible,
-      "previous renderer must remain visible until replacement commits",
+      'previous renderer must remain visible until replacement commits',
     );
     await replacement;
     assert(
       secondSet[0]!.visible,
-      "winning renderer must become visible at commit",
+      'winning renderer must become visible at commit',
     );
     assert(
       old.disposed,
-      "old renderer must be disposed in the same winning commit",
+      'old renderer must be disposed in the same winning commit',
     );
     host.dispose();
   }
@@ -537,25 +537,25 @@ async function main(): Promise<void> {
   {
     const created: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", created, 1, 1),
+      factory('reflowable-paginated', created, 1, 1),
     ]);
     await host.present(
-      makePlan(0, "reflowable-paginated", 100),
-      "initial-render",
+      makePlan(0, 'reflowable-paginated', 100),
+      'initial-render',
     );
     const firstRenderer = created[0]!;
-    await host.present(makePlan(1, "reflowable-paginated", 100), "navigation");
+    await host.present(makePlan(1, 'reflowable-paginated', 100), 'navigation');
     assert(
       created.length === 2,
-      "same-kind navigation must create a fresh renderer/document lifetime",
+      'same-kind navigation must create a fresh renderer/document lifetime',
     );
     assert(
       firstRenderer.disposed,
-      "previous spine renderer must be disposed after replacement commits",
+      'previous spine renderer must be disposed after replacement commits',
     );
     assert(
       created[1]!.restoreCount === 0,
-      "previous spine locator must not be restored into the new spine item",
+      'previous spine locator must not be restored into the new spine item',
     );
     host.dispose();
   }
@@ -566,55 +566,49 @@ async function main(): Promise<void> {
     const committed: FakeRenderer[] = [];
     const failed: FakeRenderer[] = [];
     const failingFactory: RendererFactory = {
-      kind: "fixed-layout",
+      kind: 'fixed-layout',
       create() {
-        const renderer = new FakeRenderer("fixed-layout", 1, 1);
+        const renderer = new FakeRenderer('fixed-layout', 1, 1);
         renderer.mount = async () => {
-          throw new Error("expected replacement failure");
+          throw new Error('expected replacement failure');
         };
         failed.push(renderer);
         return renderer;
       },
     };
     const host = new RendererHost([
-      factory("reflowable-paginated", committed, 1),
+      factory('reflowable-paginated', committed, 1),
       failingFactory,
     ]);
-    await host.present(
-      makePlan(0, "reflowable-paginated"),
-      "initial-render",
-    );
+    await host.present(makePlan(0, 'reflowable-paginated'), 'initial-render');
     let rejected = false;
     try {
-      await host.present(makePlan(1, "fixed-layout"), "navigation");
+      await host.present(makePlan(1, 'fixed-layout'), 'navigation');
     } catch {
       rejected = true;
     }
-    assert(rejected, "the failed replacement must still reject its command");
+    assert(rejected, 'the failed replacement must still reject its command');
     assert(
-      host.state.status === "ready" &&
+      host.state.status === 'ready' &&
         host.state.plan?.spineIndex === 0 &&
         host.state.error instanceof Error,
-      "a committed renderer must keep the host ready while exposing the operational error",
+      'a committed renderer must keep the host ready while exposing the operational error',
     );
     assert(
       !committed[0]!.disposed && failed[0]!.disposed,
-      "replacement failure must retain the committed renderer and dispose the candidate",
+      'replacement failure must retain the committed renderer and dispose the candidate',
     );
     host.dispose();
 
     const unopenedHost = new RendererHost([failingFactory]);
     try {
-      await unopenedHost.present(
-        makePlan(0, "fixed-layout"),
-        "initial-render",
-      );
+      await unopenedHost.present(makePlan(0, 'fixed-layout'), 'initial-render');
     } catch {
       // Expected: without an earlier commit there is no renderer to recover.
     }
     assert(
-      unopenedHost.state.status === "error" && unopenedHost.state.plan == null,
-      "an initial renderer failure must remain a fatal host error",
+      unopenedHost.state.status === 'error' && unopenedHost.state.plan == null,
+      'an initial renderer failure must remain a fatal host error',
     );
     unopenedHost.dispose();
   }
@@ -625,30 +619,30 @@ async function main(): Promise<void> {
   {
     const created: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", created, 1, 1),
+      factory('reflowable-paginated', created, 1, 1),
     ]);
-    const single = makePlan(0, "reflowable-paginated", 100);
+    const single = makePlan(0, 'reflowable-paginated', 100);
     const cross: RenditionPlan = {
       ...single,
       spread: {
-        mode: "double",
-        execution: "cross-spine",
+        mode: 'double',
+        execution: 'cross-spine',
         synthetic: true,
-        source: "user",
-        placement: "right",
-        gap: "none",
+        source: 'user',
+        placement: 'right',
+        gap: 'none',
       },
     };
-    await host.present(single, "initial-render");
+    await host.present(single, 'initial-render');
     const firstRenderer = created[0]!;
-    await host.present(cross, "spread-change");
+    await host.present(cross, 'spread-change');
     assert(
       created.length === 2,
-      "single ↔ cross-spine topology change must create a fresh renderer instance",
+      'single ↔ cross-spine topology change must create a fresh renderer instance',
     );
     assert(
       firstRenderer.disposed,
-      "old topology renderer must be disposed after spread replacement commits",
+      'old topology renderer must be disposed after spread replacement commits',
     );
     host.dispose();
   }
@@ -658,23 +652,23 @@ async function main(): Promise<void> {
   {
     const created: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", created, 12, 1),
+      factory('reflowable-paginated', created, 12, 1),
     ]);
     await host.present(
-      makePlan(0, "reflowable-paginated", 100),
-      "initial-render",
+      makePlan(0, 'reflowable-paginated', 100),
+      'initial-render',
     );
     const previous = created[0]!;
     const replacement = host.present(
-      makePlan(1, "reflowable-paginated", 100),
-      "navigation",
+      makePlan(1, 'reflowable-paginated', 100),
+      'navigation',
     );
     await delay(1);
     const capture = host.captureLocator();
     const [, locator] = await Promise.all([replacement, capture]);
     assert(
       previous.disposed && locator?.spineIndex === 1,
-      "locator capture must use the replacement renderer after layout commits",
+      'locator capture must use the replacement renderer after layout commits',
     );
     host.dispose();
   }
@@ -684,16 +678,16 @@ async function main(): Promise<void> {
   {
     const created: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-scroll", created, 1, 1),
+      factory('reflowable-scroll', created, 1, 1),
     ]);
-    await host.present(makePlan(0, "reflowable-scroll", 100), "initial-render");
+    await host.present(makePlan(0, 'reflowable-scroll', 100), 'initial-render');
     created[0]!.emitLayout({
       progression: 0.375,
       measurement: stableReport.measurement,
     });
     assert(
       host.state.layout?.progression === 0.375,
-      "live renderer layout changes must update host state",
+      'live renderer layout changes must update host state',
     );
     host.dispose();
   }
@@ -703,42 +697,42 @@ async function main(): Promise<void> {
   {
     const created: FakeRenderer[] = [];
     const host = new RendererHost([
-      factory("reflowable-paginated", created, 1, 20),
+      factory('reflowable-paginated', created, 1, 20),
     ]);
     await host.present(
-      makePlan(0, "reflowable-paginated", 100),
-      "initial-render",
+      makePlan(0, 'reflowable-paginated', 100),
+      'initial-render',
     );
     const renderer = created[0]!;
 
     const oldUpdate = host.present(
-      makePlan(0, "reflowable-paginated", 120),
-      "preferences",
+      makePlan(0, 'reflowable-paginated', 120),
+      'preferences',
     );
     await delay(1);
     const newUpdate = host.present(
-      makePlan(0, "reflowable-paginated", 160),
-      "preferences",
+      makePlan(0, 'reflowable-paginated', 160),
+      'preferences',
     );
     await Promise.all([oldUpdate, newUpdate]);
 
-    assert(created.length === 1, "same renderer kind should relayout in place");
+    assert(created.length === 1, 'same renderer kind should relayout in place');
     assert(
       renderer.committedFontSize === 160,
-      "newest relayout must own the final mutation",
+      'newest relayout must own the final mutation',
     );
     assert(
       host.state.plan?.preferences.fontSizePercent === 160,
-      "host state must publish newest preferences",
+      'host state must publish newest preferences',
     );
     assert(
       host.state.layout?.pageCount === 16,
-      "snapshot must be taken after winning update",
+      'snapshot must be taken after winning update',
     );
     host.dispose();
   }
 
-  console.log("Renderer lifecycle unit test: PASS");
+  console.log('Renderer lifecycle unit test: PASS');
 }
 
 void main().catch((error) => {

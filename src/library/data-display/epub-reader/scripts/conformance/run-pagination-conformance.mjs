@@ -8,36 +8,36 @@
 // Playwright is an optional developer dependency. Without it this script
 // reports the engines it could not reach and exits successfully, so the offline
 // regression suite stays deterministic.
-import { createServer } from "node:http";
+import { createServer } from 'node:http';
 import {
   existsSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
-} from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
-import { runTypeScript } from "../shared/typescript-cli.mjs";
+} from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { runTypeScript } from '../shared/typescript-cli.mjs';
 import {
   measurePagination,
   walkMixedLayout,
-} from "./pagination-page-probes.mjs";
+} from './pagination-page-probes.mjs';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
-const build = join(root, ".pagination-dist");
+const root = fileURLToPath(new URL('../..', import.meta.url));
+const build = join(root, '.pagination-dist');
 const port = Number(process.env.EPUB_PAGINATION_PORT ?? 8744);
-const fixture = join(root, "fixtures", "corpus", "vertical-ruby.epub");
-const mixedFixture = join(root, "fixtures", "corpus", "mixed-layout.epub");
+const fixture = join(root, 'fixtures', 'corpus', 'vertical-ruby.epub');
+const mixedFixture = join(root, 'fixtures', 'corpus', 'mixed-layout.epub');
 
 const require = createRequire(import.meta.url);
 let playwright = null;
 try {
-  playwright = require("playwright");
+  playwright = require('playwright');
 } catch {
   try {
-    playwright = require("playwright-core");
+    playwright = require('playwright-core');
   } catch {
     playwright = null;
   }
@@ -53,7 +53,7 @@ for (const path of [fixture, mixedFixture]) {
 
 if (!playwright) {
   console.log(
-    "Pagination conformance: SKIPPED (install playwright to run browser engines)",
+    'Pagination conformance: SKIPPED (install playwright to run browser engines)',
   );
   process.exit(0);
 }
@@ -64,43 +64,43 @@ mkdirSync(build, { recursive: true });
 // The engine ships as TypeScript; emit browser-loadable ESM for the harness.
 runTypeScript(
   [
-    "-p",
-    join(root, "tsconfig.core.json"),
-    "--noEmit",
-    "false",
-    "--declaration",
-    "false",
-    "--composite",
-    "false",
-    "--rootDir",
-    join(root, "core"),
-    "--outDir",
-    join(build, "core"),
+    '-p',
+    join(root, 'tsconfig.core.json'),
+    '--noEmit',
+    'false',
+    '--declaration',
+    'false',
+    '--composite',
+    'false',
+    '--rootDir',
+    join(root, 'core'),
+    '--outDir',
+    join(build, 'core'),
   ],
-  { stdio: "inherit" },
+  { stdio: 'inherit' },
 );
 addExtensions(build);
 
 writeFileSync(
-  join(build, "harness.html"),
+  join(build, 'harness.html'),
   '<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>pagination conformance</title>' +
-    "<style>body{margin:0}#stage{width:900px;height:560px;background:#fff}</style></head>" +
+    '<style>body{margin:0}#stage{width:900px;height:560px;background:#fff}</style></head>' +
     '<body><div id="stage"></div></body></html>',
 );
-writeFileSync(join(build, "book.epub"), readFileSync(fixture));
-writeFileSync(join(build, "mixed.epub"), readFileSync(mixedFixture));
+writeFileSync(join(build, 'book.epub'), readFileSync(fixture));
+writeFileSync(join(build, 'mixed.epub'), readFileSync(mixedFixture));
 
 const server = createServer((request, response) => {
-  const name = (request.url === "/" ? "/harness.html" : request.url).split(
-    "?",
+  const name = (request.url === '/' ? '/harness.html' : request.url).split(
+    '?',
   )[0];
-  const type = name.endsWith(".html")
-    ? "text/html; charset=utf-8"
-    : name.endsWith(".js")
-      ? "text/javascript; charset=utf-8"
-      : name.endsWith(".epub")
-        ? "application/epub+zip"
-        : "application/octet-stream";
+  const type = name.endsWith('.html')
+    ? 'text/html; charset=utf-8'
+    : name.endsWith('.js')
+      ? 'text/javascript; charset=utf-8'
+      : name.endsWith('.epub')
+        ? 'application/epub+zip'
+        : 'application/octet-stream';
   // Read before writing headers, or a miss tries to set a status twice.
   let body = null;
   try {
@@ -110,10 +110,10 @@ const server = createServer((request, response) => {
   }
   if (!body) {
     response.writeHead(404);
-    response.end("not found");
+    response.end('not found');
     return;
   }
-  response.writeHead(200, { "content-type": type });
+  response.writeHead(200, { 'content-type': type });
   response.end(body);
 });
 await new Promise((resolve) => server.listen(port, resolve));
@@ -128,12 +128,12 @@ const VIEWPORTS = [
 
 const failures = [];
 const report = {
-  generatedBy: "scripts/conformance/run-pagination-conformance.mjs",
+  generatedBy: 'scripts/conformance/run-pagination-conformance.mjs',
   fixture: relative(root, fixture),
   engines: {},
 };
 
-for (const engine of ["chromium", "firefox", "webkit"]) {
+for (const engine of ['chromium', 'firefox', 'webkit']) {
   const launcher = playwright[engine];
   if (!launcher) continue;
   let browser = null;
@@ -141,8 +141,8 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
     browser = await launcher.launch();
   } catch (cause) {
     report.engines[engine] = {
-      status: "unavailable",
-      reason: String(cause?.message ?? cause).split("\n")[0],
+      status: 'unavailable',
+      reason: String(cause?.message ?? cause).split('\n')[0],
     };
     console.log(`${engine}: unavailable (${report.engines[engine].reason})`);
     continue;
@@ -152,8 +152,8 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
       viewport: { width: 1600, height: 1000 },
     });
     const pageErrors = [];
-    page.on("pageerror", (error) => pageErrors.push(String(error.message)));
-    await page.goto(`http://localhost:${port}/`, { waitUntil: "load" });
+    page.on('pageerror', (error) => pageErrors.push(String(error.message)));
+    await page.goto(`http://localhost:${port}/`, { waitUntil: 'load' });
     const result = await page.evaluate(measurePagination, VIEWPORTS);
     const visited = await page.evaluate(walkMixedLayout, 40);
     const seen = new Set(visited[0]?.showing ?? []);
@@ -168,13 +168,13 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
     }
     for (const sample of result.samples) {
       const where = `${engine} @ ${sample.viewport}`;
-      if (sample.writingMode === "horizontal-tb")
+      if (sample.writingMode === 'horizontal-tb')
         failures.push(`${where}: fixture did not resolve to vertical writing`);
-      if (sample.columnFill !== "auto")
+      if (sample.columnFill !== 'auto')
         failures.push(
           `${where}: expected CSS multicol fragmentation, got column-fill ${sample.columnFill}`,
         );
-      if (sample.scrollAxis !== "vertical")
+      if (sample.scrollAxis !== 'vertical')
         failures.push(
           `${where}: vertical pagination must advance on Y, got ${sample.scrollAxis}`,
         );
@@ -208,10 +208,10 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
         failures.push(
           `${where}: no content surface matches the active spine item`,
         );
-      } else if (stop.renderer !== "fixed-layout" && stop.painted === 0) {
+      } else if (stop.renderer !== 'fixed-layout' && stop.painted === 0) {
         failures.push(`${where}: page turn landed on a blank page`);
       }
-      if (stop.chrome !== "standard") {
+      if (stop.chrome !== 'standard') {
         failures.push(
           `${where}: mixed-layout publication must keep standard chrome, got ${stop.chrome}`,
         );
@@ -235,7 +235,7 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
         previous.scrollTop === current.scrollTop
       ) {
         failures.push(
-          `${engine}: page turn ${i} showed exactly what turn ${i - 1} did (${current.showing.join(" + ")})`,
+          `${engine}: page turn ${i} showed exactly what turn ${i - 1} did (${current.showing.join(' + ')})`,
         );
       }
       const revisited = current.boundary
@@ -257,29 +257,29 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
       );
     }
 
-    report.engines[engine] = { status: "automated", ...result };
+    report.engines[engine] = { status: 'automated', ...result };
     const total = result.samples.reduce((sum, sample) => sum + sample.rects, 0);
     const bad = result.samples.reduce(
       (sum, sample) => sum + sample.straddling,
       0,
     );
     const blank = visited.filter(
-      (stop) => stop.renderer !== "fixed-layout" && stop.painted === 0,
+      (stop) => stop.renderer !== 'fixed-layout' && stop.painted === 0,
     ).length;
     const positionless = visited.filter(
       (stop) => stop.currentPage == null,
     ).length;
     console.log(
-      `${engine}: ${bad === 0 ? "PASS" : "FAIL"} — ${bad} of ${total} line rects cross a page boundary; ` +
+      `${engine}: ${bad === 0 ? 'PASS' : 'FAIL'} — ${bad} of ${total} line rects cross a page boundary; ` +
         `mixed-layout walk ${visited.length} stops, ${blank} blank, ${positionless} without a position`,
     );
   } catch (cause) {
     failures.push(
-      `${engine}: ${String(cause?.message ?? cause).split("\n")[0]}`,
+      `${engine}: ${String(cause?.message ?? cause).split('\n')[0]}`,
     );
     report.engines[engine] = {
-      status: "error",
-      reason: String(cause?.message ?? cause).split("\n")[0],
+      status: 'error',
+      reason: String(cause?.message ?? cause).split('\n')[0],
     };
   } finally {
     await browser.close().catch(() => {});
@@ -288,34 +288,34 @@ for (const engine of ["chromium", "firefox", "webkit"]) {
 
 server.close();
 
-const results = join(root, ".test-results", "browser");
+const results = join(root, '.test-results', 'browser');
 mkdirSync(results, { recursive: true });
 writeFileSync(
-  join(results, "pagination.json"),
-  JSON.stringify(report, null, 2) + "\n",
+  join(results, 'pagination.json'),
+  JSON.stringify(report, null, 2) + '\n',
 );
 rmSync(build, { recursive: true, force: true });
 
 if (
-  Object.values(report.engines).every((entry) => entry.status !== "automated")
+  Object.values(report.engines).every((entry) => entry.status !== 'automated')
 ) {
   console.log(
-    "Pagination conformance: SKIPPED (no browser engine could be launched)",
+    'Pagination conformance: SKIPPED (no browser engine could be launched)',
   );
   process.exit(0);
 }
 if (failures.length > 0) {
-  console.error(`Pagination conformance failed:\n- ${failures.join("\n- ")}`);
+  console.error(`Pagination conformance failed:\n- ${failures.join('\n- ')}`);
   process.exit(1);
 }
-console.log("Pagination conformance: PASS");
+console.log('Pagination conformance: PASS');
 
 /**
  * TypeScript emits extensionless relative specifiers, which a browser cannot
  * resolve. Rewrite them against what was actually emitted.
  */
 function addExtensions(directory) {
-  const { readdirSync, statSync } = require("node:fs");
+  const { readdirSync, statSync } = require('node:fs');
   const walk = (current) => {
     for (const entry of readdirSync(current)) {
       const path = join(current, entry);
@@ -323,8 +323,8 @@ function addExtensions(directory) {
         walk(path);
         continue;
       }
-      if (!entry.endsWith(".js")) continue;
-      const source = readFileSync(path, "utf8");
+      if (!entry.endsWith('.js')) continue;
+      const source = readFileSync(path, 'utf8');
       const next = source.replace(
         /((?:^|[\s;{,(])(?:import|export)\b[^'"\n]*?from\s*|import\s*\(\s*)(['"])(\.\.?\/[^'"]*)\2/gm,
         (whole, head, quote, specifier) =>
@@ -337,9 +337,9 @@ function addExtensions(directory) {
 }
 
 function resolveSpecifier(base, specifier) {
-  if (specifier.endsWith(".js")) return specifier;
+  if (specifier.endsWith('.js')) return specifier;
   if (existsSync(join(base, `${specifier}.js`))) return `${specifier}.js`;
-  if (existsSync(join(base, specifier, "index.js")))
-    return `${specifier.replace(/\/$/, "")}/index.js`;
+  if (existsSync(join(base, specifier, 'index.js')))
+    return `${specifier.replace(/\/$/, '')}/index.js`;
   return specifier;
 }

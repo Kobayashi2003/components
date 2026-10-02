@@ -1,20 +1,20 @@
-import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   browserVersion,
   discoverChromium,
-} from "../shared/chromium-runtime.mjs";
+} from '../shared/chromium-runtime.mjs';
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
-const tmp = mkdtempSync(join(tmpdir(), "epub-reader-browser-probe-"));
-const reportDirectory = join(root, ".test-results", "browser");
-const reportPath = join(reportDirectory, "runtime.json");
+const root = fileURLToPath(new URL('../..', import.meta.url));
+const tmp = mkdtempSync(join(tmpdir(), 'epub-reader-browser-probe-'));
+const reportDirectory = join(root, '.test-results', 'browser');
+const reportPath = join(reportDirectory, 'runtime.json');
 mkdirSync(tmp, { recursive: true });
 mkdirSync(reportDirectory, { recursive: true });
-const html = join(tmp, "probe.html");
+const html = join(tmp, 'probe.html');
 writeFileSync(
   html,
   `<!doctype html><meta charset="utf-8"><body id="result">PENDING</body><script>
@@ -54,13 +54,13 @@ document.getElementById('result').textContent = JSON.stringify(result);
 </script>`,
 );
 
-let report = { status: "not-run", reason: "unknown" };
+let report = { status: 'not-run', reason: 'unknown' };
 try {
   const chromium = discoverChromium();
   if (!chromium) {
-    report = { status: "not-run", reason: "chromium executable not found" };
+    report = { status: 'not-run', reason: 'chromium executable not found' };
     console.error(
-      "Chromium executable not found. Set CHROMIUM_BIN to run the runtime probe.",
+      'Chromium executable not found. Set CHROMIUM_BIN to run the runtime probe.',
     );
     process.exitCode = 2;
   } else {
@@ -68,21 +68,21 @@ try {
     const run = spawnSync(
       chromium,
       [
-        "--headless=new",
-        "--no-sandbox",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--dump-dom",
+        '--headless=new',
+        '--no-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--dump-dom',
         pathToFileURL(html).href,
       ],
       {
-        encoding: "utf8",
+        encoding: 'utf8',
         timeout: Number(process.env.BROWSER_PROBE_TIMEOUT_MS ?? 15000),
       },
     );
     if (run.error) {
       report = {
-        status: "not-run",
+        status: 'not-run',
         browser: chromium,
         version,
         reason: run.error.message,
@@ -93,26 +93,26 @@ try {
       process.exitCode = 2;
     } else if (run.status !== 0) {
       report = {
-        status: "not-run",
+        status: 'not-run',
         browser: chromium,
         version,
         reason: `browser exited ${run.status}`,
-        stderr: (run.stderr || "").slice(-4000),
+        stderr: (run.stderr || '').slice(-4000),
       };
       console.error(`Browser runtime probe exited ${run.status}.`);
       process.exitCode = 2;
     } else {
-      const match = /<body id="result">([^<]+)<\/body>/.exec(run.stdout ?? "");
+      const match = /<body id="result">([^<]+)<\/body>/.exec(run.stdout ?? '');
       if (!match)
-        throw new Error("Browser probe result was not found in dumped DOM.");
+        throw new Error('Browser probe result was not found in dumped DOM.');
       const capabilities = JSON.parse(
-        match[1].replaceAll("&quot;", '"').replaceAll("&amp;", "&"),
+        match[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'),
       );
       const passed = Object.values(capabilities).every(
         (value) => value === true,
       );
       report = {
-        status: passed ? "pass" : "fail",
+        status: passed ? 'pass' : 'fail',
         browser: chromium,
         version,
         capabilities,
@@ -123,7 +123,7 @@ try {
   }
 } catch (error) {
   report = {
-    status: "not-run",
+    status: 'not-run',
     reason: error instanceof Error ? error.message : String(error),
   };
   console.error(report.reason);
@@ -135,7 +135,7 @@ try {
       { ...report, generatedAt: new Date().toISOString() },
       null,
       2,
-    ) + "\n",
+    ) + '\n',
   );
   rmSync(tmp, { recursive: true, force: true });
 }

@@ -1,44 +1,47 @@
-import { resolveReadingPosition, emptyRendererState } from "../../core/runtime/reader/browser-reader/state";
-import { ReaderThemeRegistry } from "../../core/presentation/appearance";
-import { describeReaderPosition } from "../../core/features/accessibility";
-import { MemoryReaderMarkStore } from "../../core/features/annotations/store";
-import { ReaderMarkController } from "../../core/features/annotations/controller";
+import {
+  resolveReadingPosition,
+  emptyRendererState,
+} from '../../core/runtime/reader/browser-reader/state';
+import { ReaderThemeRegistry } from '../../core/presentation/appearance';
+import { describeReaderPosition } from '../../core/features/accessibility';
+import { MemoryReaderMarkStore } from '../../core/features/annotations/store';
+import { ReaderMarkController } from '../../core/features/annotations/controller';
 import {
   PublicationSearch,
   ReaderSearchController,
-} from "../../core/features/search";
-import type { SearchDocumentProvider } from "../../core/features/search";
+} from '../../core/features/search';
+import type { SearchDocumentProvider } from '../../core/features/search';
 import type {
   Locator,
   LocatorRange,
   Publication,
-} from "../../core/epub/publication";
-import { commandForPageClick } from "../../core/interaction/input";
-import { buildReaderPreferenceCss } from "../../core/presentation/renderer/reflowable";
+} from '../../core/epub/publication';
+import { commandForPageClick } from '../../core/interaction/input';
+import { buildReaderPreferenceCss } from '../../core/presentation/renderer/reflowable';
 import {
   mapContentClientXToViewport,
   semanticCursorForClickZone,
   verticalScrollTarget,
-} from "../../core/interaction/input/browser-input-router";
-import type { RenditionPlan } from "../../core/presentation/rendition";
-import { PublicationDiagnosticCollector } from "../../core/runtime/reader/diagnostic-collector";
-import { addBookmarkAndNotify } from "../../core/runtime/reader/bookmark-event";
+} from '../../core/interaction/input/browser-input-router';
+import type { RenditionPlan } from '../../core/presentation/rendition';
+import { PublicationDiagnosticCollector } from '../../core/runtime/reader/diagnostic-collector';
+import { addBookmarkAndNotify } from '../../core/runtime/reader/bookmark-event';
 import {
   fixedLayoutPublicationProgress,
   locationForPublicationProgress,
   publicationProgress,
   spineIndexForPublicationProgress,
-} from "../../core/interaction/locator";
+} from '../../core/interaction/locator';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
 const publication: Publication = {
-  version: "3.3",
-  packagePath: "EPUB/package.opf",
+  version: '3.3',
+  packagePath: 'EPUB/package.opf',
   metadata: {
-    title: "Reader features fixture",
+    title: 'Reader features fixture',
     creators: [],
     contributors: [],
     entries: [],
@@ -49,7 +52,7 @@ const publication: Publication = {
     href: `EPUB/c${index}.xhtml`,
     path: `EPUB/c${index}.xhtml`,
     remote: false,
-    mediaType: "application/xhtml+xml",
+    mediaType: 'application/xhtml+xml',
     properties: [],
   })),
   spine: [0, 1, 2].map((index) => ({
@@ -58,54 +61,82 @@ const publication: Publication = {
     href: `EPUB/c${index}.xhtml`,
     path: `EPUB/c${index}.xhtml`,
     remote: false,
-    mediaType: "application/xhtml+xml",
+    mediaType: 'application/xhtml+xml',
     linear: index !== 1,
     properties: [],
     rendition: {},
   })),
-  navigation: { source: "none", toc: [], landmarks: [], pageList: [] },
-  pageProgressionDirection: "ltr",
+  navigation: { source: 'none', toc: [], landmarks: [], pageList: [] },
+  pageProgressionDirection: 'ltr',
   rendition: {
-    layout: "reflowable",
-    orientation: "auto",
-    spread: "auto",
-    flow: "paginated",
+    layout: 'reflowable',
+    orientation: 'auto',
+    spread: 'auto',
+    flow: 'paginated',
   },
 };
 
 {
-  const locator: Locator = { href: 'EPUB/c2.xhtml', spineIndex: 2, locations: { progression: 0 } }
+  const locator: Locator = {
+    href: 'EPUB/c2.xhtml',
+    spineIndex: 2,
+    locations: { progression: 0 },
+  };
   const presentation = {
     layout: 'mixed' as const,
     writingMode: 'vertical-rl' as const,
     chrome: 'standard' as const,
-  }
+  };
   const position = (atEnd: boolean, visibleSpineIndices?: number[]) =>
     resolveReadingPosition(
       publication,
       locator,
       {
         ...emptyRendererState(),
-        layout: { progression: 0, resourceBoundary: { atStart: true, atEnd }, visibleSpineIndices },
+        layout: {
+          progression: 0,
+          resourceBoundary: { atStart: true, atEnd },
+          visibleSpineIndices,
+        },
       },
       presentation,
-    )
-  assert(position(true).publicationProgression === 1, 'visible single-page book end reaches 100%')
+    );
+  assert(
+    position(true).publicationProgression === 1,
+    'visible single-page book end reaches 100%',
+  );
   assert(
     position(false).publicationProgression === 2 / 3,
     'last prose start must retain partial progress',
-  )
-  assert(locator.locations.progression === 0, 'visible completion must not mutate locator')
-  assert(!position(true, [0, 1]).atEnd, 'a spread before the final section is not book end')
-  assert(position(true, [1, 2]).atEnd, 'visible final leaf determines book end')
-  const unknown = resolveReadingPosition(publication, locator, emptyRendererState(), presentation)
-  assert(!unknown.atStart && !unknown.atEnd, 'unknown geometry must not disable navigation')
+  );
+  assert(
+    locator.locations.progression === 0,
+    'visible completion must not mutate locator',
+  );
+  assert(
+    !position(true, [0, 1]).atEnd,
+    'a spread before the final section is not book end',
+  );
+  assert(
+    position(true, [1, 2]).atEnd,
+    'visible final leaf determines book end',
+  );
+  const unknown = resolveReadingPosition(
+    publication,
+    locator,
+    emptyRendererState(),
+    presentation,
+  );
+  assert(
+    !unknown.atStart && !unknown.atEnd,
+    'unknown geometry must not disable navigation',
+  );
 }
 
 const texts = [
-  "Alpha beta alpha. Alphabet should not count as whole word alpha. 𐐀alpha. İx match.",
-  "Non linear alpha secret.",
-  "Gamma ALPHA delta alpha.",
+  'Alpha beta alpha. Alphabet should not count as whole word alpha. 𐐀alpha. İx match.',
+  'Non linear alpha secret.',
+  'Gamma ALPHA delta alpha.',
 ];
 const searchDocumentLoads = [0, 0, 0];
 
@@ -116,7 +147,7 @@ const provider: SearchDocumentProvider = {
     if (!item) return null;
     searchDocumentLoads[spineIndex] =
       (searchDocumentLoads[spineIndex] ?? 0) + 1;
-    const text = texts[spineIndex] ?? "";
+    const text = texts[spineIndex] ?? '';
     return {
       spineIndex,
       href: item.href,
@@ -129,23 +160,23 @@ const provider: SearchDocumentProvider = {
 async function main() {
   assert(
     verticalScrollTarget(40, 300, 60) === 100,
-    "wheel routing should consume scroll while a fixed page can move downward",
+    'wheel routing should consume scroll while a fixed page can move downward',
   );
   assert(
     verticalScrollTarget(300, 300, 60) == null,
-    "wheel routing should expose the bottom boundary for page navigation",
+    'wheel routing should expose the bottom boundary for page navigation',
   );
   assert(
     verticalScrollTarget(0, 300, -60) == null,
-    "wheel routing should expose the top boundary for page navigation",
+    'wheel routing should expose the top boundary for page navigation',
   );
   assert(
-    semanticCursorForClickZone(10, 100, 0.2) === "pointer",
-    "fixed-layout edge zones should expose clickable cursor semantics",
+    semanticCursorForClickZone(10, 100, 0.2) === 'pointer',
+    'fixed-layout edge zones should expose clickable cursor semantics',
   );
   assert(
     semanticCursorForClickZone(50, 100, 0.2) == null,
-    "the fixed-layout center should retain its native cursor",
+    'the fixed-layout center should retain its native cursor',
   );
   const spreadCentre = mapContentClientXToViewport(
     0,
@@ -155,12 +186,12 @@ async function main() {
   );
   assert(
     spreadCentre === 400,
-    "the inner edge of a spread leaf must map to the centre of the shared reader viewport",
+    'the inner edge of a spread leaf must map to the centre of the shared reader viewport',
   );
   assert(
-    commandForPageClick(spreadCentre, 800, 0.22, "rtl", true)?.type ===
-      "toggle-chrome",
-    "a spread-centre click must toggle controls instead of turning a page",
+    commandForPageClick(spreadCentre, 800, 0.22, 'rtl', true)?.type ===
+      'toggle-chrome',
+    'a spread-centre click must toggle controls instead of turning a page',
   );
   const spreadOuterEdge = mapContentClientXToViewport(
     1000,
@@ -169,9 +200,9 @@ async function main() {
     { left: 0, width: 800 },
   );
   assert(
-    commandForPageClick(spreadOuterEdge, 800, 0.22, "rtl", true)?.type ===
-      "navigate",
-    "the outer edge of a spread must remain a page-turn zone",
+    commandForPageClick(spreadOuterEdge, 800, 0.22, 'rtl', true)?.type ===
+      'navigate',
+    'the outer edge of a spread must remain a page-turn zone',
   );
   const screenshotInnerPage = mapContentClientXToViewport(
     1450,
@@ -181,21 +212,21 @@ async function main() {
   );
   assert(
     screenshotInnerPage > 800 && screenshotInnerPage < 1035,
-    "a scaled left-page inner region must remain near the shared viewport centre",
+    'a scaled left-page inner region must remain near the shared viewport centre',
   );
   assert(
-    commandForPageClick(screenshotInnerPage, 2070, 0.4, "rtl", true)?.type ===
-      "toggle-chrome",
-    "the fit-width inner-page region must remain a control gesture even with the widest tap zones",
+    commandForPageClick(screenshotInnerPage, 2070, 0.4, 'rtl', true)?.type ===
+      'toggle-chrome',
+    'the fit-width inner-page region must remain a control gesture even with the widest tap zones',
   );
 
   assert(
     Math.round(fixedLayoutPublicationProgress(10, 197) * 100) === 5,
-    "fixed-layout controls should derive progress from the active spine page",
+    'fixed-layout controls should derive progress from the active spine page',
   );
   assert(
     spineIndexForPublicationProgress(0.5, 197) === 98,
-    "fixed-layout seeking should resolve publication progress to a spine page",
+    'fixed-layout seeking should resolve publication progress to a spine page',
   );
 
   // A mixed-layout book spends its whole front matter in single-page sections.
@@ -206,35 +237,35 @@ async function main() {
   );
   assert(
     new Set(frontMatter).size === frontMatter.length,
-    "every single-page section must report a distinct publication progress",
+    'every single-page section must report a distinct publication progress',
   );
-  assert(frontMatter[0] === 0, "the first section of a publication is 0%");
+  assert(frontMatter[0] === 0, 'the first section of a publication is 0%');
   assert(
     publicationProgress(24, 25, 0) < 1,
-    "the start of a final continuous section must leave room for its internal progress",
+    'the start of a final continuous section must leave room for its internal progress',
   );
   assert(
     publicationProgress(24, 25, 1) === 1,
-    "the end of the final section is 100%",
+    'the end of the final section is 100%',
   );
 
   // Blending the position inside the current section keeps a long chapter
   // advancing without ever passing the section that follows it.
   assert(
     publicationProgress(10, 25, 0.5) > publicationProgress(10, 25, 0),
-    "progress within a section must advance the publication bar",
+    'progress within a section must advance the publication bar',
   );
   assert(
     publicationProgress(10, 25, 1) === publicationProgress(11, 25, 0),
-    "the end of one section must meet the start of the next",
+    'the end of one section must meet the start of the next',
   );
   assert(
     publicationProgress(10, 25, 2) === publicationProgress(10, 25, 1),
-    "out-of-range section progress must clamp",
+    'out-of-range section progress must clamp',
   );
   assert(
     publicationProgress(10, 25, Number.NaN) === publicationProgress(10, 25, 0),
-    "a non-finite section progress must not poison the bar",
+    'a non-finite section progress must not poison the bar',
   );
 
   // Seeking has to invert whatever the bar is showing.
@@ -261,52 +292,52 @@ async function main() {
   }
   assert(
     locationForPublicationProgress(1.5, 25).spineIndex === 24,
-    "seeking past the end clamps to the last section",
+    'seeking past the end clamps to the last section',
   );
   assert(
     locationForPublicationProgress(-1, 25).spineIndex === 0,
-    "seeking before the start clamps to the first section",
+    'seeking before the start clamps to the first section',
   );
 
   const search = new PublicationSearch(publication, provider);
-  const normal = await search.search("alpha");
+  const normal = await search.search('alpha');
   assert(
     normal.hits.length === 7,
-    "search should find case-insensitive matches in linear spine items and skip non-linear items",
+    'search should find case-insensitive matches in linear spine items and skip non-linear items',
   );
   assert(
     normal.hits.every((hit) => hit.spineIndex !== 1),
     'ordinary search should skip linear="no" by default',
   );
 
-  const whole = await search.search("alpha", {
+  const whole = await search.search('alpha', {
     wholeWord: true,
     caseSensitive: false,
   });
   assert(
     whole.hits.length === 5,
-    "whole-word search should exclude Alphabet and astral-letter prefixes while retaining standalone alpha/ALPHA",
+    'whole-word search should exclude Alphabet and astral-letter prefixes while retaining standalone alpha/ALPHA',
   );
 
-  const unicodeExcerpt = (await search.search("match")).hits[0];
+  const unicodeExcerpt = (await search.search('match')).hits[0];
   assert(
     unicodeExcerpt != null,
-    "the Unicode excerpt fixture must produce a search hit",
+    'the Unicode excerpt fixture must produce a search hit',
   );
   assert(
     unicodeExcerpt.excerpt.slice(
       unicodeExcerpt.excerptMatchStart,
       unicodeExcerpt.excerptMatchEnd,
-    ) === "match",
-    "search must preserve excerpt offsets when earlier Unicode case folding changes string length",
+    ) === 'match',
+    'search must preserve excerpt offsets when earlier Unicode case folding changes string length',
   );
 
   const repeatedDiagnostic = {
-    code: "RENDER_REPEAT",
-    severity: "warning",
-    phase: "content",
-    message: "Repeated warning.",
-    path: "EPUB/c0.xhtml",
+    code: 'RENDER_REPEAT',
+    severity: 'warning',
+    phase: 'content',
+    message: 'Repeated warning.',
+    path: 'EPUB/c0.xhtml',
     spineIndex: 0,
   } as const;
   const diagnostics = new PublicationDiagnosticCollector([repeatedDiagnostic]);
@@ -314,20 +345,20 @@ async function main() {
   const compatibilitySnapshot = diagnostics.compatibility;
   assert(
     diagnostics.append([repeatedDiagnostic]).length === 0,
-    "revisiting a section must not append an identical diagnostic again",
+    'revisiting a section must not append an identical diagnostic again',
   );
   assert(
     diagnostics.all === diagnosticSnapshot &&
       diagnostics.compatibility === compatibilitySnapshot,
-    "duplicate diagnostics must preserve cached diagnostic and compatibility snapshots",
+    'duplicate diagnostics must preserve cached diagnostic and compatibility snapshots',
   );
   assert(
     diagnostics.append([{ ...repeatedDiagnostic, spineIndex: 2 }]).length === 1,
-    "the same diagnostic on another spine item must remain observable",
+    'the same diagnostic on another spine item must remain observable',
   );
   assert(
     diagnostics.all.length === 2 && diagnostics.all !== diagnosticSnapshot,
-    "diagnostic collection must retain only distinct publication occurrences",
+    'diagnostic collection must retain only distinct publication occurrences',
   );
 
   let bookmarkIntents = 0;
@@ -340,19 +371,19 @@ async function main() {
   );
   assert(
     missingBookmark === null && bookmarkIntents === 0,
-    "failed locator capture must not announce that a bookmark was saved",
+    'failed locator capture must not announce that a bookmark was saved',
   );
   const savedBookmark = await addBookmarkAndNotify(
     async () => ({
-      id: "bookmark-feedback",
-      kind: "bookmark",
+      id: 'bookmark-feedback',
+      kind: 'bookmark',
       locator: {
-        href: "EPUB/c0.xhtml",
+        href: 'EPUB/c0.xhtml',
         spineIndex: 0,
         locations: { progression: 0.25 },
       },
-      createdAt: "2026-01-01T00:00:00.000Z",
-      updatedAt: "2026-01-01T00:00:00.000Z",
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
     }),
     undefined,
     () => {
@@ -360,27 +391,27 @@ async function main() {
     },
   );
   assert(
-    savedBookmark?.id === "bookmark-feedback" && Number(bookmarkIntents) === 1,
-    "bookmark success feedback must follow a completed bookmark write",
+    savedBookmark?.id === 'bookmark-feedback' && Number(bookmarkIntents) === 1,
+    'bookmark success feedback must follow a completed bookmark write',
   );
 
-  const includingNonLinear = await search.search("secret", {
+  const includingNonLinear = await search.search('secret', {
     includeNonLinear: true,
   });
   assert(
     includingNonLinear.hits.length === 1 &&
       includingNonLinear.hits[0]?.spineIndex === 1,
-    "search policy should be able to include non-linear resources explicitly",
+    'search policy should be able to include non-linear resources explicitly',
   );
 
-  const limited = await search.search("alpha", { maxResults: 2 });
+  const limited = await search.search('alpha', { maxResults: 2 });
   assert(
     limited.hits.length === 2 && limited.truncated,
-    "search maxResults should report truncation",
+    'search maxResults should report truncation',
   );
   assert(
     searchDocumentLoads.every((count) => count === 1),
-    "repeated queries must reuse each parsed publication document",
+    'repeated queries must reuse each parsed publication document',
   );
 
   const boundedLoads = [0, 0, 0];
@@ -402,32 +433,32 @@ async function main() {
     cache: { maxDocuments: 2, maxBytes: 1024 * 1024 },
     preferredSpineIndex: () => 0,
   });
-  await boundedSearch.search("term", { includeNonLinear: true });
+  await boundedSearch.search('term', { includeNonLinear: true });
   assert(
-    boundedSearch.cacheSnapshot.spineIndexes.join(",") === "0,1",
-    "cache pressure should preserve the current and adjacent sections before distant ones",
+    boundedSearch.cacheSnapshot.spineIndexes.join(',') === '0,1',
+    'cache pressure should preserve the current and adjacent sections before distant ones',
   );
-  await boundedSearch.search("term", { includeNonLinear: true });
+  await boundedSearch.search('term', { includeNonLinear: true });
   assert(
-    boundedLoads.join(",") === "1,1,2",
-    "an evicted distant section should reload while preferred indexes remain cached",
+    boundedLoads.join(',') === '1,1,2',
+    'an evicted distant section should reload while preferred indexes remain cached',
   );
   boundedSearch.clearCache();
   assert(
     boundedSearch.cacheSnapshot.documents === 0 &&
       boundedSearch.cacheSnapshot.estimatedBytes === 0,
-    "clearCache should release all resolved indexes",
+    'clearCache should release all resolved indexes',
   );
 
   const uncached = new PublicationSearch(publication, boundedProvider, {
     cache: { maxDocuments: 3, maxBytes: 1 },
   });
-  const uncachedResults = await uncached.search("term", {
+  const uncachedResults = await uncached.search('term', {
     includeNonLinear: true,
   });
   assert(
     uncachedResults.hits.length === 3 && uncached.cacheSnapshot.documents === 0,
-    "an index larger than the byte budget should serve the active query without remaining cached",
+    'an index larger than the byte budget should serve the active query without remaining cached',
   );
 
   let pendingAborted = false;
@@ -435,7 +466,7 @@ async function main() {
     load(_spineIndex, signal) {
       return new Promise((_resolve, reject) =>
         signal.addEventListener(
-          "abort",
+          'abort',
           () => {
             pendingAborted = true;
             reject(signal.reason);
@@ -445,26 +476,26 @@ async function main() {
       );
     },
   });
-  const pendingResult = pendingSearch.search("term").then(
+  const pendingResult = pendingSearch.search('term').then(
     () => null,
     (error) => error,
   );
   await Promise.resolve();
   assert(
     pendingSearch.cacheSnapshot.pending === 1,
-    "an in-flight index should be visible as pending cache work",
+    'an in-flight index should be visible as pending cache work',
   );
   pendingSearch.clearCache();
   const pendingError = await pendingResult;
   assert(
     pendingAborted &&
       pendingError instanceof DOMException &&
-      pendingError.name === "AbortError",
-    "clearCache should abort pending index construction",
+      pendingError.name === 'AbortError',
+    'clearCache should abort pending index construction',
   );
   assert(
     Number(pendingSearch.cacheSnapshot.pending) === 0,
-    "clearing pending work should leave an empty cache",
+    'clearing pending work should leave an empty cache',
   );
 
   const visited: Locator[] = [];
@@ -474,38 +505,38 @@ async function main() {
       return locator;
     },
   });
-  const controllerResults = await searchController.run("alpha", {
+  const controllerResults = await searchController.run('alpha', {
     maxResults: 3,
   });
   assert(
     searchController.state.index === -1 && controllerResults.hits.length === 3,
-    "search results should remain unselected until navigation occurs",
+    'search results should remain unselected until navigation occurs',
   );
   const nextSearchNavigation = await searchController.next();
   assert(
     Number(searchController.state.index) === 0 && Number(visited.length) === 1,
-    "Next should navigate to the first hit when no result is selected",
+    'Next should navigate to the first hit when no result is selected',
   );
   assert(
     nextSearchNavigation?.locator === visited[0],
-    "search navigation should return the locator actually restored by the navigator",
+    'search navigation should return the locator actually restored by the navigator',
   );
   await searchController.previous();
   assert(
     Number(searchController.state.index) === 2 && Number(visited.length) === 2,
-    "search controller should navigate backward and wrap through results",
+    'search controller should navigate backward and wrap through results',
   );
   searchController.clearCache();
   assert(
     search.cacheSnapshot.documents === 0 &&
       searchController.state.hits.length === 3,
-    "cache clearing should release indexes without discarding visible results",
+    'cache clearing should release indexes without discarding visible results',
   );
   searchController.clear();
   assert(
     Number(searchController.state.hits.length) === 0 &&
       Number(searchController.state.index) === -1,
-    "search clear should reset feature state",
+    'search clear should reset feature state',
   );
 
   // Navigation can finish after the visible result set has been cleared. Its
@@ -520,7 +551,7 @@ async function main() {
       return locator;
     },
   });
-  await navigationRaceController.run("alpha", { maxResults: 3 });
+  await navigationRaceController.run('alpha', { maxResults: 3 });
   const pendingNavigation = navigationRaceController.goToHit(0);
   navigationRaceController.clear();
   releaseNavigation();
@@ -529,18 +560,18 @@ async function main() {
     staleNavigation === null &&
       navigationRaceController.state.hits.length === 0 &&
       navigationRaceController.state.index === -1,
-    "stale search navigation must not mutate a cleared result set",
+    'stale search navigation must not mutate a cleared result set',
   );
   navigationRaceController.dispose();
   let disposedSearchRejected = false;
   try {
-    await navigationRaceController.run("alpha");
+    await navigationRaceController.run('alpha');
   } catch {
     disposedSearchRejected = true;
   }
   assert(
     disposedSearchRejected,
-    "a disposed search controller must reject new operations",
+    'a disposed search controller must reject new operations',
   );
 
   // Superseded searches are a newest-wins feature operation: an older caller
@@ -555,7 +586,7 @@ async function main() {
         await Promise.race([
           slowGate,
           new Promise<never>((_, reject) =>
-            signal.addEventListener("abort", () => reject(signal.reason), {
+            signal.addEventListener('abort', () => reject(signal.reason), {
               once: true,
             }),
           ),
@@ -572,28 +603,28 @@ async function main() {
       },
     },
   );
-  const superseded = cancellableController.run("alpha");
-  const winner = cancellableController.run("gamma");
+  const superseded = cancellableController.run('alpha');
+  const winner = cancellableController.run('gamma');
   releaseSlow();
   await Promise.all([superseded, winner]);
   assert(
-    cancellableController.state.query === "gamma" &&
+    cancellableController.state.query === 'gamma' &&
       !cancellableController.state.searching,
-    "superseded search must not overwrite the winning query state",
+    'superseded search must not overwrite the winning query state',
   );
 
   const store = new MemoryReaderMarkStore();
   const emptyMarkSnapshot = store.snapshot();
   assert(
     store.snapshot() === emptyMarkSnapshot,
-    "unchanged mark stores must reuse their immutable snapshot",
+    'unchanged mark stores must reuse their immutable snapshot',
   );
   let publishes = 0;
   const unsubscribe = store.subscribe(() => {
     publishes += 1;
   });
   const first: Locator = {
-    href: "EPUB/c0.xhtml",
+    href: 'EPUB/c0.xhtml',
     spineIndex: 0,
     locations: { progression: 0.5 },
   };
@@ -602,29 +633,28 @@ async function main() {
     end: { ...first, locations: { progression: 0.6 } },
   };
   store.put({
-    id: "h1",
-    kind: "highlight",
+    id: 'h1',
+    kind: 'highlight',
     range,
-    color: "yellow",
-    highlight: "solid",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
+    color: 'yellow',
+    highlight: 'solid',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   });
   const immutableMarks = store.snapshot();
   assert(
     Object.isFrozen(immutableMarks) &&
       Object.isFrozen(immutableMarks.marks) &&
       Object.isFrozen(
-        immutableMarks.marks[0]?.kind === "highlight"
+        immutableMarks.marks[0]?.kind === 'highlight'
           ? immutableMarks.marks[0].range.start.locations
           : null,
       ),
-    "mark snapshots must be deeply immutable",
+    'mark snapshots must be deeply immutable',
   );
   assert(
-    store.snapshot() === immutableMarks &&
-      immutableMarks !== emptyMarkSnapshot,
-    "mark snapshots must change only when the store revision changes",
+    store.snapshot() === immutableMarks && immutableMarks !== emptyMarkSnapshot,
+    'mark snapshots must change only when the store revision changes',
   );
   const markController = new ReaderMarkController(
     store,
@@ -638,149 +668,149 @@ async function main() {
         return null;
       },
     },
-    () => new Date("2026-02-01T00:00:00.000Z"),
+    () => new Date('2026-02-01T00:00:00.000Z'),
   );
-  const updatedHighlight = markController.update("h1", {
-    color: "blue",
-    highlight: "underline",
-    tags: ["review", " review ", ""],
+  const updatedHighlight = markController.update('h1', {
+    color: 'blue',
+    highlight: 'underline',
+    tags: ['review', ' review ', ''],
   });
   assert(
-    updatedHighlight?.kind === "highlight" &&
-      updatedHighlight.color === "blue" &&
-      updatedHighlight.highlight === "underline",
-    "mark controller should update an existing highlight without changing its identity",
+    updatedHighlight?.kind === 'highlight' &&
+      updatedHighlight.color === 'blue' &&
+      updatedHighlight.highlight === 'underline',
+    'mark controller should update an existing highlight without changing its identity',
   );
   assert(
-    updatedHighlight?.tags?.join(",") === "review",
-    "mark tag edits should trim, deduplicate and discard empty tags",
+    updatedHighlight?.tags?.join(',') === 'review',
+    'mark tag edits should trim, deduplicate and discard empty tags',
   );
   store.put({
-    id: "b1",
-    kind: "bookmark",
+    id: 'b1',
+    kind: 'bookmark',
     locator: { ...first, locations: { progression: 0.1 } },
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   });
   assert(
-    store.snapshot().marks[0]?.id === "b1",
-    "mark store should present marks in publication reading-position order",
+    store.snapshot().marks[0]?.id === 'b1',
+    'mark store should present marks in publication reading-position order',
   );
   store.put({
-    id: "a1",
-    kind: "annotation",
+    id: 'a1',
+    kind: 'annotation',
     range,
-    body: "Note",
-    color: "pink",
-    highlight: "solid",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
+    body: 'Note',
+    color: 'pink',
+    highlight: 'solid',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   });
   assert(
-    store.removeMany(["h1", "a1", "missing", "h1"]) === 2 &&
+    store.removeMany(['h1', 'a1', 'missing', 'h1']) === 2 &&
       store.snapshot().marks.length === 1,
-    "batch removal should delete every matching mark exactly once",
+    'batch removal should delete every matching mark exactly once',
   );
   unsubscribe();
   assert(
     publishes === 6,
-    "batch removal should publish one atomic revision rather than one revision per mark",
+    'batch removal should publish one atomic revision rather than one revision per mark',
   );
 
   const themes = new ReaderThemeRegistry();
   const builtInThemeSnapshot = themes.list();
   assert(
     themes.list() === builtInThemeSnapshot,
-    "unchanged theme catalogs must reuse their immutable list",
+    'unchanged theme catalogs must reuse their immutable list',
   );
   assert(
-    themes.resolve("paper")?.background === "#f7f1e3" &&
-      themes.resolve("graphite")?.colorScheme === "dark",
-    "all exposed reader themes must resolve to real definitions",
+    themes.resolve('paper')?.background === '#f7f1e3' &&
+      themes.resolve('graphite')?.colorScheme === 'dark',
+    'all exposed reader themes must resolve to real definitions',
   );
   themes.register({
-    id: "custom-night",
-    label: "Custom night",
-    foreground: "#ddd",
-    background: "#111",
-    colorScheme: "dark",
+    id: 'custom-night',
+    label: 'Custom night',
+    foreground: '#ddd',
+    background: '#111',
+    colorScheme: 'dark',
   });
   const customThemeSnapshot = themes.list();
   assert(
-    themes.resolve("custom-night")?.background === "#111" &&
+    themes.resolve('custom-night')?.background === '#111' &&
       customThemeSnapshot !== builtInThemeSnapshot &&
       themes.list() === customThemeSnapshot,
-    "theme registry should accept user-defined themes",
+    'theme registry should accept user-defined themes',
   );
   assert(
-    themes.unregister("custom-night"),
-    "custom reader themes should be removable",
+    themes.unregister('custom-night'),
+    'custom reader themes should be removable',
   );
   assert(
-    !themes.unregister("publisher"),
-    "publisher theme is the non-removable semantic baseline",
+    !themes.unregister('publisher'),
+    'publisher theme is the non-removable semantic baseline',
   );
   assert(
-    !themes.unregister("paper"),
-    "built-in reader themes must not be removable from a shared catalog",
+    !themes.unregister('paper'),
+    'built-in reader themes must not be removable from a shared catalog',
   );
   let unsafeThemeRejected = false;
   try {
-    themes.register({ id: "unsafe-theme", foreground: "red; position:fixed" });
+    themes.register({ id: 'unsafe-theme', foreground: 'red; position:fixed' });
   } catch {
     unsafeThemeRejected = true;
   }
   assert(
     unsafeThemeRejected,
-    "theme contributions must reject declaration-breaking values at registration",
+    'theme contributions must reject declaration-breaking values at registration',
   );
   let networkThemeRejected = false;
   try {
     themes.register({
-      id: "network-theme",
-      background: "url(https://example.com/pixel)",
+      id: 'network-theme',
+      background: 'url(https://example.com/pixel)',
     });
   } catch {
     networkThemeRejected = true;
   }
   assert(
     networkThemeRejected,
-    "theme contributions must not introduce network-backed CSS values",
+    'theme contributions must not introduce network-backed CSS values',
   );
   const cssPlan = {
     preferences: {
-      flow: "auto",
-      spread: "auto",
-      pageProgression: "auto",
+      flow: 'auto',
+      spread: 'auto',
+      pageProgression: 'auto',
       fontSizePercent: 100,
       fontFamily: null,
       lineHeight: null,
-      theme: "unsafe",
+      theme: 'unsafe',
     },
   } as unknown as RenditionPlan;
   const safeThemeCss = buildReaderPreferenceCss(cssPlan, {
-    id: "unsafe",
-    foreground: "red; position:fixed",
-    background: "#fff",
+    id: 'unsafe',
+    foreground: 'red; position:fixed',
+    background: '#fff',
   });
   assert(
-    !safeThemeCss.includes("position:fixed") &&
-      safeThemeCss.includes("background: #fff"),
-    "reader theme CSS must reject declaration-breaking custom values",
+    !safeThemeCss.includes('position:fixed') &&
+      safeThemeCss.includes('background: #fff'),
+    'reader theme CSS must reject declaration-breaking custom values',
   );
 
   const described = describeReaderPosition(
     {
       ...publication,
       navigation: {
-        source: "epub3-nav",
+        source: 'epub3-nav',
         landmarks: [],
         pageList: [],
         toc: [
           {
-            label: "Chapter One",
-            href: "EPUB/c0.xhtml",
-            path: "EPUB/c0.xhtml",
+            label: 'Chapter One',
+            href: 'EPUB/c0.xhtml',
+            path: 'EPUB/c0.xhtml',
             children: [],
           },
         ],
@@ -788,7 +818,7 @@ async function main() {
     },
     {
       locator: {
-        href: "EPUB/c0.xhtml",
+        href: 'EPUB/c0.xhtml',
         spineIndex: 0,
         locations: { progression: 0.42 },
       },
@@ -796,13 +826,13 @@ async function main() {
     },
   );
   assert(
-    described.announcement.includes("Chapter One") &&
-      described.announcement.includes("Page 4 of 10") &&
-      described.announcement.includes("42%"),
-    "accessibility description should expose chapter, visual page projection and logical progress",
+    described.announcement.includes('Chapter One') &&
+      described.announcement.includes('Page 4 of 10') &&
+      described.announcement.includes('42%'),
+    'accessibility description should expose chapter, visual page projection and logical progress',
   );
 
-  console.log("Reader features unit test: PASS");
+  console.log('Reader features unit test: PASS');
 }
 
 void main();

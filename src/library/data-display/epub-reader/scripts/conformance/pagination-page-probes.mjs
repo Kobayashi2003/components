@@ -1,10 +1,10 @@
 /** Runs inside the page. Drives the real engine and measures the invariants. */
 export const measurePagination = async (viewports) => {
-  const core = await import("./core/index.js");
+  const core = await import('./core/index.js');
   const bytes = new Uint8Array(
-    await (await fetch("./book.epub")).arrayBuffer(),
+    await (await fetch('./book.epub')).arrayBuffer(),
   );
-  const stage = document.getElementById("stage");
+  const stage = document.getElementById('stage');
   const reader = await core.BrowserEpubReader.open(bytes, stage, {
     preferences: { pageMarginPercent: 4 },
   });
@@ -14,7 +14,7 @@ export const measurePagination = async (viewports) => {
     const snapshot = reader.snapshot;
     const layout = snapshot.renderer.layout;
     const plan = snapshot.renderer.plan;
-    const frame = stage.querySelector("iframe");
+    const frame = stage.querySelector('iframe');
     if (!frame?.contentDocument || !plan || !layout) return null;
     const document_ = frame.contentDocument;
     const root_ = document_.documentElement;
@@ -38,11 +38,11 @@ export const measurePagination = async (viewports) => {
         if (rect.width <= 0 || rect.height <= 0) continue;
         rects += 1;
         const near =
-          layout.scrollAxis === "vertical"
+          layout.scrollAxis === 'vertical'
             ? rect.top - body.top
             : rect.left - body.left;
         const far =
-          (layout.scrollAxis === "vertical"
+          (layout.scrollAxis === 'vertical'
             ? rect.bottom - body.top
             : rect.right - body.left) - 0.5;
         if (Math.floor(near / advance) !== Math.floor(far / advance))
@@ -50,7 +50,7 @@ export const measurePagination = async (viewports) => {
       }
     }
 
-    const annotations = [...document_.querySelectorAll("rt")];
+    const annotations = [...document_.querySelectorAll('rt')];
     return {
       viewport: `${plan.viewport.width}x${plan.viewport.height}`,
       writingMode: style.writingMode,
@@ -105,14 +105,14 @@ export const measurePagination = async (viewports) => {
  * a page that reports no position at all, and a page that is simply blank.
  */
 export const walkMixedLayout = async (steps) => {
-  const core = await import("./core/index.js");
+  const core = await import('./core/index.js');
   const bytes = new Uint8Array(
-    await (await fetch("./mixed.epub")).arrayBuffer(),
+    await (await fetch('./mixed.epub')).arrayBuffer(),
   );
   // Its own container: the geometry probe above leaves its reader mounted, and
   // sharing a stage would let that reader's surfaces count as on screen here.
-  const stage = document.createElement("div");
-  stage.style.cssText = "width:900px;height:560px;background:#fff";
+  const stage = document.createElement('div');
+  stage.style.cssText = 'width:900px;height:560px;background:#fff';
   document.body.appendChild(stage);
   const reader = await core.BrowserEpubReader.open(bytes, stage, {});
   const settle = () => new Promise((resolve) => setTimeout(resolve, 320));
@@ -125,10 +125,10 @@ export const walkMixedLayout = async (steps) => {
     // Match the surface to the active spine item by its title. A renderer swap
     // leaves the outgoing iframe in the tree for a moment, and reading that one
     // reports the previous page's ink for the page that just arrived.
-    const wanted = plan?.href ? plan.href.split("/").pop() : null;
-    const frame = [...stage.querySelectorAll("iframe")]
+    const wanted = plan?.href ? plan.href.split('/').pop() : null;
+    const frame = [...stage.querySelectorAll('iframe')]
       .reverse()
-      .find((element) => wanted && (element.title ?? "").endsWith(wanted));
+      .find((element) => wanted && (element.title ?? '').endsWith(wanted));
     const document_ = frame?.contentDocument;
     let painted = 0;
     if (document_?.body) {
@@ -161,10 +161,10 @@ export const walkMixedLayout = async (steps) => {
       chrome: snapshot.presentation?.chrome ?? null,
       currentPage: layout?.currentPage ?? null,
       pageCount: layout?.pageCount ?? null,
-      showing: [...stage.querySelectorAll("iframe")]
-        .filter((element) => element.style.visibility !== "hidden")
+      showing: [...stage.querySelectorAll('iframe')]
+        .filter((element) => element.style.visibility !== 'hidden')
         .map((element) =>
-          (element.title ?? "").replace(/^EPUB(?: fixed page)?: /, ""),
+          (element.title ?? '').replace(/^EPUB(?: fixed page)?: /, ''),
         )
         .sort(),
       scrollTop: frame?.contentDocument?.documentElement?.scrollTop ?? 0,
@@ -177,8 +177,8 @@ export const walkMixedLayout = async (steps) => {
   for (let i = 0; i < steps; i += 1) {
     const result = await reader.next();
     await settle();
-    visited.push({ ...look(), boundary: result?.status === "boundary" });
-    if (result?.status === "boundary") break;
+    visited.push({ ...look(), boundary: result?.status === 'boundary' });
+    if (result?.status === 'boundary') break;
   }
   stage.remove();
   return visited;

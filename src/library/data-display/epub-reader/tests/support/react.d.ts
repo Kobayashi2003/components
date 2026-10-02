@@ -1,4 +1,4 @@
-declare module "react" {
+declare module 'react' {
   export type ReactNode = unknown;
   export class Component<P = {}, S = {}> {
     constructor(props: P);
@@ -43,6 +43,13 @@ declare module "react" {
   export interface MouseEvent<T = Element> extends Event {
     readonly currentTarget: T;
   }
+  export interface PointerEvent<T = Element> extends Event {
+    readonly currentTarget: T;
+    readonly pointerId: number;
+    readonly button: number;
+    readonly clientX: number;
+    readonly clientY: number;
+  }
   export interface DragEvent<T = Element> extends Event {
     readonly currentTarget: T;
     readonly relatedTarget: EventTarget | null;
@@ -82,7 +89,7 @@ declare module "react" {
   ): T;
 }
 
-declare module "react/jsx-runtime" {
+declare module 'react/jsx-runtime' {
   export const Fragment: unknown;
   export function jsx(type: unknown, props: unknown, key?: unknown): unknown;
   export function jsxs(type: unknown, props: unknown, key?: unknown): unknown;

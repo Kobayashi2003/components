@@ -2,7 +2,7 @@ import {
   INITIAL_READER_CHROME_STATE,
   reduceReaderChrome,
   shouldLockReaderChrome,
-} from "../../react/chrome/reader-chrome-model";
+} from '../../react/chrome/reader-chrome-model';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition)
@@ -10,35 +10,35 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 const hidden = reduceReaderChrome(INITIAL_READER_CHROME_STATE, {
-  type: "hide",
+  type: 'hide',
 });
-assert(hidden.visibility === "hidden", "automatic chrome should be hideable");
+assert(hidden.visibility === 'hidden', 'automatic chrome should be hideable');
 assert(
-  reduceReaderChrome(hidden, { type: "show" }).visibility === "shown",
-  "hidden chrome should be revealable",
+  reduceReaderChrome(hidden, { type: 'show' }).visibility === 'shown',
+  'hidden chrome should be revealable',
 );
 assert(
-  reduceReaderChrome(hidden, { type: "toggle" }).visibility === "shown",
-  "toggle should invert visibility",
+  reduceReaderChrome(hidden, { type: 'toggle' }).visibility === 'shown',
+  'toggle should invert visibility',
 );
 
-const pinned = reduceReaderChrome(hidden, { type: "set-pinned", pinned: true });
+const pinned = reduceReaderChrome(hidden, { type: 'set-pinned', pinned: true });
 assert(
-  pinned.mode === "pinned" && pinned.visibility === "shown",
-  "pinning should reveal and hold chrome",
+  pinned.mode === 'pinned' && pinned.visibility === 'shown',
+  'pinning should reveal and hold chrome',
 );
 assert(
-  reduceReaderChrome(pinned, { type: "hide" }) === pinned,
-  "pinned chrome should ignore hide requests",
+  reduceReaderChrome(pinned, { type: 'hide' }) === pinned,
+  'pinned chrome should ignore hide requests',
 );
 
 const unpinned = reduceReaderChrome(pinned, {
-  type: "set-pinned",
+  type: 'set-pinned',
   pinned: false,
 });
 assert(
-  unpinned.mode === "auto" && unpinned.visibility === "shown",
-  "unpinning should restart visible auto mode",
+  unpinned.mode === 'auto' && unpinned.visibility === 'shown',
+  'unpinning should restart visible auto mode',
 );
 
 assert(
@@ -48,7 +48,7 @@ assert(
     pointerOverChrome: false,
     focusInChrome: false,
   }),
-  "the initial publication opening must keep controls available",
+  'the initial publication opening must keep controls available',
 );
 assert(
   !shouldLockReaderChrome({
@@ -57,7 +57,7 @@ assert(
     pointerOverChrome: false,
     focusInChrome: false,
   }),
-  "an existing publication snapshot must allow controls to stay hidden across navigation transactions",
+  'an existing publication snapshot must allow controls to stay hidden across navigation transactions',
 );
 assert(
   shouldLockReaderChrome({
@@ -66,7 +66,7 @@ assert(
     pointerOverChrome: false,
     focusInChrome: false,
   }),
-  "an open reader surface must keep its controls available",
+  'an open reader surface must keep its controls available',
 );
 assert(
   shouldLockReaderChrome({
@@ -75,7 +75,7 @@ assert(
     pointerOverChrome: true,
     focusInChrome: false,
   }),
-  "a pointer using the controls must keep them available",
+  'a pointer using the controls must keep them available',
 );
 assert(
   shouldLockReaderChrome({
@@ -84,7 +84,7 @@ assert(
     pointerOverChrome: false,
     focusInChrome: true,
   }),
-  "keyboard focus in the controls must keep them available",
+  'keyboard focus in the controls must keep them available',
 );
 
-console.log("Reader chrome model unit test: PASS");
+console.log('Reader chrome model unit test: PASS');

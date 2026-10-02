@@ -4,16 +4,16 @@ export interface PagePosition {
 }
 export async function chooseFile(file: File): Promise<void> {
   const input = await waitFor(
-    () => document.querySelector<HTMLInputElement>(".epub-file-picker__input"),
-    "EPUB file input",
+    () => document.querySelector<HTMLInputElement>('.epub-file-picker__input'),
+    'EPUB file input',
   );
   const transfer = new DataTransfer();
   transfer.items.add(file);
   input.files = transfer.files;
-  input.dispatchEvent(new Event("change", { bubbles: true }));
+  input.dispatchEvent(new Event('change', { bubbles: true }));
   await waitFor(
-    () => document.querySelector(".epub-reader-shell"),
-    "reader shell after choosing a file",
+    () => document.querySelector('.epub-reader-shell'),
+    'reader shell after choosing a file',
   );
 }
 
@@ -25,8 +25,8 @@ export async function waitForPage(
     () => {
       const text =
         document
-          .querySelector(".epub-reader-controls__status strong")
-          ?.textContent?.trim() ?? "";
+          .querySelector('.epub-reader-controls__status strong')
+          ?.textContent?.trim() ?? '';
       const match = /^(\d+)\s*\/\s*(\d+)$/u.exec(text);
       if (!match) return null;
       const position = { current: Number(match[1]), total: Number(match[2]) };
@@ -40,10 +40,10 @@ export async function waitForPage(
 export async function waitForPanel(title: string): Promise<HTMLElement> {
   return waitFor(() => {
     const panel = document.querySelector<HTMLElement>(
-      ".epub-reader-shell__panel",
+      '.epub-reader-shell__panel',
     );
     const heading = panel
-      ?.querySelector(".epub-reader-shell__panel-context strong")
+      ?.querySelector('.epub-reader-shell__panel-context strong')
       ?.textContent?.trim();
     return panel && heading === title ? panel : null;
   }, `${title} panel`);
@@ -63,8 +63,8 @@ export async function waitFor<T>(
   const active = document.activeElement;
   const focusDescription =
     active instanceof HTMLElement
-      ? `${active.tagName.toLowerCase()}${active.getAttribute("aria-label") ? `[aria-label="${active.getAttribute("aria-label")}"]` : ""}.${active.className || "<no-class>"}`
-      : "<none>";
+      ? `${active.tagName.toLowerCase()}${active.getAttribute('aria-label') ? `[aria-label="${active.getAttribute('aria-label')}"]` : ''}.${active.className || '<no-class>'}`
+      : '<none>';
   throw new Error(
     `Timed out waiting for ${description}. Active element: ${focusDescription}.`,
   );
@@ -89,7 +89,7 @@ export function buttonWithText(
   text: string,
 ): HTMLButtonElement {
   const button = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("button"),
+    root.querySelectorAll<HTMLButtonElement>('button'),
   ).find((candidate) => candidate.textContent?.trim() === text);
   if (!button) throw new Error(`Button was not found by text: ${text}`);
   return button;
@@ -109,25 +109,25 @@ export function fixedSpreadFacingGap(root: HTMLElement): number {
 export function click(button: HTMLButtonElement): void {
   if (button.disabled)
     throw new Error(
-      `Button is disabled: ${button.getAttribute("aria-label") ?? button.textContent?.trim() ?? "<unknown>"}`,
+      `Button is disabled: ${button.getAttribute('aria-label') ?? button.textContent?.trim() ?? '<unknown>'}`,
     );
   button.click();
 }
 
 export function dispatchKey(target: Element, init: KeyboardEventInit): void {
   target.dispatchEvent(
-    new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init }),
+    new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init }),
   );
 }
 
 export function setInputValue(input: HTMLInputElement, value: string): void {
   const setter = Object.getOwnPropertyDescriptor(
     HTMLInputElement.prototype,
-    "value",
+    'value',
   )?.set;
-  if (!setter) throw new Error("HTML input value setter is unavailable.");
+  if (!setter) throw new Error('HTML input value setter is unavailable.');
   setter.call(input, value);
-  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 export function assert(condition: unknown, message: string): asserts condition {
