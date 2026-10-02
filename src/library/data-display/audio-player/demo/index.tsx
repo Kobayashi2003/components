@@ -6,10 +6,27 @@ import { useAudioLibrary } from './useAudioLibrary'
 import { QueueNavigation } from './queue'
 import type { RepeatMode } from './queue'
 import { useMediaPreferences, readPreference, writePreference } from './preferences'
+import { DemoIcon } from './icons'
 import cover from './cover.jpg'
 import './styles.css'
 
 const repeatModes: RepeatMode[] = ['off', 'all', 'one']
+const repeatLabels: Record<RepeatMode, string> = {
+  off: 'Repeat',
+  all: 'Repeat all',
+  one: 'Repeat one',
+}
+
+/** Tag title, else the file name without its extension. */
+function trackTitle(track: { title?: string; name: string }) {
+  return track.title || track.name.replace(/\.[^.]+$/, '') || track.name
+}
+
+/** Tag artist, else the file format, e.g. "WAV file". */
+function trackDetail(track: { artist?: string; name: string }) {
+  const extension = /\.([^.]+)$/.exec(track.name)?.[1]
+  return track.artist || (extension ? `${extension.toUpperCase()} file` : 'Local audio')
+}
 
 export default function AudioPlayerShowcase() {
   const library = useAudioLibrary()
@@ -111,7 +128,7 @@ export default function AudioPlayerShowcase() {
   }
   const expandedContent = files.length > 0 && (
     <>
-      <div className="morph-audio-demo__options">
+      <div className="audio-player-demo__options">
         <button
           type="button"
           aria-pressed={shuffle}
@@ -120,6 +137,7 @@ export default function AudioPlayerShowcase() {
             setShuffle(!shuffle)
           }}
         >
+          <DemoIcon name="shuffle" />
           Shuffle
         </button>
         <button
@@ -129,9 +147,13 @@ export default function AudioPlayerShowcase() {
           title="Change repeat mode"
           onClick={() => setRepeat(repeatModes[(repeatModes.indexOf(repeat) + 1) % 3])}
         >
-          Repeat{repeat !== 'off' && <small>{repeat}</small>}
+          <span className="audio-player-demo__repeat-icon" data-mode={repeat}>
+            <DemoIcon name="repeat" />
+          </span>
+          {repeatLabels[repeat]}
         </button>
-        <label>
+        <label data-active={sleepUntil !== null}>
+          <DemoIcon name="sleep" />
           <span>Sleep</span>
           <select
             aria-label="Sleep timer"
@@ -162,7 +184,7 @@ export default function AudioPlayerShowcase() {
           </select>
         </label>
       </div>
-      <div className="morph-audio-demo__queue-heading">
+      <div className="audio-player-demo__queue-heading">
         <span>
           {files.length} {files.length === 1 ? 'track' : 'tracks'}
         </span>
@@ -180,50 +202,58 @@ export default function AudioPlayerShowcase() {
           Clear queue
         </button>
       </div>
-      <ol className="morph-audio-demo__queue" aria-label="Playlist">
+      <ol className="audio-player-demo__queue" aria-label="Playlist">
         {files.map((track, trackIndex) => (
           <li key={track.id}>
             <button
-              className="morph-audio-demo__track"
+              className="audio-player-demo__track"
               type="button"
               aria-current={file?.id === track.id ? 'true' : undefined}
               onClick={() => select(track.id, true)}
-              title={track.title || track.name}
+              title={trackTitle(track)}
             >
               <span aria-hidden="true">
-                {file?.id === track.id && playing ? '♫' : String(trackIndex + 1).padStart(2, '0')}
+                {file?.id === track.id && playing ? (
+                  <span className="audio-player-demo__playing">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                ) : (
+                  String(trackIndex + 1).padStart(2, '0')
+                )}
               </span>
               <span>
-                <strong>{track.title || track.name}</strong>
-                <small>{track.reading ? 'Reading tags…' : track.artist || 'Local audio'}</small>
+                <strong>{trackTitle(track)}</strong>
+                <small>{track.reading ? 'Reading tags…' : trackDetail(track)}</small>
               </span>
             </button>
-            <div className="morph-audio-demo__track-actions">
+            <div className="audio-player-demo__track-actions">
               <button
                 type="button"
-                aria-label={`Move up ${track.name}`}
+                aria-label={`Move up ${trackTitle(track)}`}
                 title="Move up"
                 disabled={trackIndex === 0}
                 onClick={() => library.move(track.id, -1)}
               >
-                ↑
+                <DemoIcon name="up" size={15} />
               </button>
               <button
                 type="button"
-                aria-label={`Move down ${track.name}`}
+                aria-label={`Move down ${trackTitle(track)}`}
                 title="Move down"
                 disabled={trackIndex === files.length - 1}
                 onClick={() => library.move(track.id, 1)}
               >
-                ↓
+                <DemoIcon name="down" size={15} />
               </button>
               <button
                 type="button"
-                aria-label={`Remove ${track.name}`}
+                aria-label={`Remove ${trackTitle(track)}`}
                 title="Remove"
                 onClick={() => remove(track.id)}
               >
-                ×
+                <DemoIcon name="remove" size={15} />
               </button>
             </div>
           </li>
@@ -233,7 +263,7 @@ export default function AudioPlayerShowcase() {
   )
   return (
     <div
-      className="morph-audio-demo"
+      className="audio-player-demo"
       data-dragging={dragging}
       onDragOver={(event) => {
         if (event.dataTransfer.types.includes('Files')) {
@@ -250,15 +280,17 @@ export default function AudioPlayerShowcase() {
         importFiles(Array.from(event.dataTransfer.files))
       }}
     >
-      {dragging && <div className="morph-audio-demo__drop">Drop audio to add to the queue</div>}
+      {dragging && <div className="audio-player-demo__drop">Drop audio to add to the queue</div>}
       {file || !imported ? (
         <AudioPlayer
           ref={player}
           expandedContent={expandedContent}
           src={file?.url}
-          title={file?.title || file?.name || 'Cabra Field'}
+          title={file ? trackTitle(file) : 'Cabra Field'}
           subtitle={
-            file ? [file.artist, file.album].filter(Boolean).join(' · ') || 'Local audio' : 'Side B'
+            file
+              ? [file.artist, file.album].filter(Boolean).join(' · ') || trackDetail(file)
+              : 'Side B'
           }
           artwork={file ? file.artwork : cover}
           artworkLoading={file?.reading}
@@ -294,23 +326,28 @@ export default function AudioPlayerShowcase() {
           onEnded={() => next(true)}
         />
       ) : (
-        <div className="morph-audio-demo__empty">
+        <div className="audio-player-demo__empty">
           <strong>Your queue is empty</strong>
           <span>Add audio files or drop them here.</span>
         </div>
       )}
-      <div className="morph-audio-demo__library">
-        <div className="morph-audio-demo__actions">
+      <div className="audio-player-demo__library">
+        <div className="audio-player-demo__actions">
           <AudioFilePicker
             label={files.length ? 'Add audio' : 'Open audio'}
+            icon="add"
             onFiles={importFiles}
           />
           {files.length > 0 && (
-            <AudioFilePicker label="Replace queue" onFiles={(input) => importFiles(input, true)} />
+            <AudioFilePicker
+              label="Replace queue"
+              icon="replace"
+              onFiles={(input) => importFiles(input, true)}
+            />
           )}
         </div>
         {(reading > 0 || library.message) && (
-          <p className="morph-audio-demo__status" role="status">
+          <p className="audio-player-demo__status" role="status">
             {reading
               ? `Reading tags for ${reading} ${reading === 1 ? 'track' : 'tracks'}…`
               : library.message}

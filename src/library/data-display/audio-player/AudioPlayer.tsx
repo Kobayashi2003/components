@@ -304,7 +304,7 @@ function AudioPlayerSession({
     if (event.altKey || event.ctrlKey || event.metaKey || event.defaultPrevented) return
     const target = event.target as HTMLElement
     if (
-      target.closest('input, select, textarea, [contenteditable], .morph-audio__expanded-content')
+      target.closest('input, select, textarea, [contenteditable], .audio-player__expanded-content')
     )
       return
     switch (event.key) {
@@ -346,6 +346,7 @@ function AudioPlayerSession({
   const bubbleTime = seeking ? elapsed : pointerTime
   const buffering = waiting && showWaiting
   const silenced = silent || level === 0
+  const shownLevel = silent ? 0 : level
   const state = error
     ? 'error'
     : seeking
@@ -360,7 +361,7 @@ function AudioPlayerSession({
 
   const playButton = (size: number) => (
     <button
-      className="morph-audio__play"
+      className="audio-player__play"
       type="button"
       aria-label={playing ? 'Pause' : 'Play'}
       title={playing ? 'Pause (K)' : 'Play (K)'}
@@ -394,7 +395,7 @@ function AudioPlayerSession({
 
   return (
     <div
-      className={['morph-audio', expanded && 'morph-audio--expanded', className]
+      className={['audio-player', expanded && 'audio-player--expanded', className]
         .filter(Boolean)
         .join(' ')}
       style={style}
@@ -451,20 +452,20 @@ function AudioPlayerSession({
       )}
       <AudioBackdrop key={artwork} src={artwork} />
       <button
-        className="morph-audio__surface-toggle"
+        className="audio-player__surface-toggle"
         type="button"
         aria-label={expanded ? 'Collapse the player' : 'Expand the player'}
         aria-expanded={expanded}
         aria-controls={panelId}
         onClick={toggleExpanded}
       />
-      <div className="morph-audio__content">
-        <div className="morph-audio__heading">
+      <div className="audio-player__content">
+        <div className="audio-player__heading">
           <AudioArtwork key={artwork} src={artwork} reading={artworkLoading} />
-          <div className="morph-audio__metadata">
+          <div className="audio-player__metadata">
             <strong title={title}>{title}</strong>
             <span title={subtitle}>
-              <span className="morph-audio__eq" aria-hidden="true">
+              <span className="audio-player__eq" aria-hidden="true">
                 <i />
                 <i />
                 <i />
@@ -474,10 +475,11 @@ function AudioPlayerSession({
           </div>
           {expanded ? (
             <button
-              className="morph-audio__like"
+              className="audio-player__like"
               type="button"
               aria-label={liked ? 'Remove from liked songs' : 'Add to liked songs'}
               aria-pressed={liked}
+              title={liked ? 'Liked' : 'Like'}
               onClick={() => {
                 setLocalLiked(!liked)
                 onLikedChange?.(!liked)
@@ -486,7 +488,7 @@ function AudioPlayerSession({
               <PlayerIcon name="heart" size={24} />
             </button>
           ) : (
-            <div className="morph-audio__transport morph-audio__transport--compact">
+            <div className="audio-player__transport audio-player__transport--compact">
               {previousButton(20)}
               {playButton(22)}
               {nextButton(20)}
@@ -494,23 +496,23 @@ function AudioPlayerSession({
           )}
         </div>
 
-        <div className="morph-audio__timeline" role="group" aria-label="Playback progress">
-          <div className="morph-audio__rail" data-seeking={seeking}>
+        <div className="audio-player__timeline" role="group" aria-label="Playback progress">
+          <div className="audio-player__rail" data-seeking={seeking}>
             {buffered.map(([from, to]) => (
               <span
                 key={from}
-                className="morph-audio__buffer"
+                className="audio-player__buffer"
                 style={{
                   left: `${(from / (total || 1)) * 100}%`,
                   width: `${((to - from) / (total || 1)) * 100}%`,
                 }}
               />
             ))}
-            <span className="morph-audio__run" style={{ width: `${progress}%` }} />
-            <span className="morph-audio__thumb" style={{ left: `${progress}%` }} />
+            <span className="audio-player__run" style={{ width: `${progress}%` }} />
+            <span className="audio-player__thumb" style={{ left: `${progress}%` }} />
             {bubbleTime !== null && total > 0 && (
               <span
-                className="morph-audio__bubble"
+                className="audio-player__bubble"
                 aria-hidden="true"
                 style={{ left: `${clamp((bubbleTime / total) * 100, 0, 100)}%` }}
               >
@@ -518,7 +520,7 @@ function AudioPlayerSession({
               </span>
             )}
             <input
-              className="morph-audio__seek"
+              className="audio-player__seek"
               type="range"
               min={0}
               max={total || 1}
@@ -541,16 +543,27 @@ function AudioPlayerSession({
           </div>
         </div>
 
-        <div className="morph-audio__panel" id={panelId} inert={!expanded}>
-          <div className="morph-audio__panel-inner">
-            <div className="morph-audio__time">
+        <div className="audio-player__panel" id={panelId} inert={!expanded}>
+          <div className="audio-player__panel-inner">
+            <div className="audio-player__time">
               <span>{formatTime(elapsed)}</span>
+              {rates.length > 1 && (
+                <button
+                  className="audio-player__rate"
+                  type="button"
+                  aria-label={`Playback speed ${rate}×`}
+                  title="Change playback speed"
+                  onClick={cycleRate}
+                >
+                  {rate}×
+                </button>
+              )}
               <span>−{formatTime(total - elapsed)}</span>
             </div>
-            <div className="morph-audio__transport morph-audio__transport--expanded">
+            <div className="audio-player__transport audio-player__transport--expanded">
               {step > 0 && (
                 <button
-                  className="morph-audio__skip"
+                  className="audio-player__skip"
                   type="button"
                   aria-label={`Back ${step} seconds`}
                   title={`Back ${step} seconds (←)`}
@@ -565,7 +578,7 @@ function AudioPlayerSession({
               {nextButton(26)}
               {step > 0 && (
                 <button
-                  className="morph-audio__skip"
+                  className="audio-player__skip"
                   type="button"
                   aria-label={`Forward ${step} seconds`}
                   title={`Forward ${step} seconds (→)`}
@@ -576,63 +589,49 @@ function AudioPlayerSession({
                 </button>
               )}
             </div>
-            <div className="morph-audio__options">
-              {src ? (
-                <div className="morph-audio__volume">
-                  <button
-                    type="button"
-                    aria-label="Mute"
-                    title={silenced ? 'Unmute (M)' : 'Mute (M)'}
-                    aria-pressed={silenced}
-                    onClick={toggleMute}
-                  >
-                    <PlayerIcon name={silenced ? 'muted' : 'volume'} size={20} />
-                  </button>
-                  <input
-                    type="range"
-                    aria-label="Volume"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={silent ? 0 : level}
-                    aria-valuetext={`${Math.round((silent ? 0 : level) * 100)}%`}
-                    style={{ '--fill': `${(silent ? 0 : level) * 100}%` } as CSSProperties}
-                    onChange={(event) => {
-                      const audio = audioRef.current
-                      if (!audio) return
-                      audio.volume = Number(event.currentTarget.value)
-                      audio.muted = false
-                    }}
-                  />
-                </div>
-              ) : (
-                <span />
-              )}
-              {rates.length > 1 && (
+            {src && (
+              <div className="audio-player__volume">
                 <button
-                  className="morph-audio__rate"
                   type="button"
-                  aria-label={`Playback speed ${rate}×`}
-                  title="Change playback speed"
-                  onClick={cycleRate}
+                  aria-label="Mute"
+                  title={silenced ? 'Unmute (M)' : 'Mute (M)'}
+                  aria-pressed={silenced}
+                  onClick={toggleMute}
                 >
-                  {rate}×
+                  <PlayerIcon name={silenced ? 'muted' : 'volume'} size={20} />
                 </button>
-              )}
-            </div>
+                <input
+                  type="range"
+                  aria-label="Volume"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={shownLevel}
+                  aria-valuetext={`${Math.round(shownLevel * 100)}%`}
+                  style={{ '--fill': `${shownLevel * 100}%` } as CSSProperties}
+                  onChange={(event) => {
+                    const audio = audioRef.current
+                    if (!audio) return
+                    audio.volume = Number(event.currentTarget.value)
+                    audio.muted = false
+                  }}
+                />
+                <output aria-hidden="true">{Math.round(shownLevel * 100)}</output>
+              </div>
+            )}
             {expandedContent && (
-              <div className="morph-audio__expanded-content">{expandedContent}</div>
+              <div className="audio-player__expanded-content">{expandedContent}</div>
             )}
           </div>
         </div>
 
         {buffering && (
-          <span className="morph-audio__sr-only" role="status">
+          <span className="audio-player__sr-only" role="status">
             Buffering…
           </span>
         )}
         {error && (
-          <p role="alert" className="morph-audio__error">
+          <p role="alert" className="audio-player__error">
             <span>{error}</span>
             <button
               type="button"

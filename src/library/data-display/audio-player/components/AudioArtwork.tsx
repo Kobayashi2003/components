@@ -6,7 +6,7 @@ export function AudioArtwork({ src, reading = false }: { src?: string; reading?:
   const shown = loaded && !failed
   return (
     <div
-      className="morph-audio__artwork"
+      className="audio-player__artwork"
       data-loaded={shown}
       data-reading={!shown && (reading || (!!src && !failed))}
       role="img"
@@ -43,7 +43,7 @@ export function AudioBackdrop({ src }: { src?: string }) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
   return (
-    <div className="morph-audio__backdrop" aria-hidden="true" data-loaded={loaded && !failed}>
+    <div className="audio-player__backdrop" aria-hidden="true" data-loaded={loaded && !failed}>
       {src && !failed && (
         <img src={src} alt="" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
       )}

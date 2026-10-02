@@ -1,13 +1,18 @@
+import { DemoIcon } from './icons'
+import type { DemoIconName } from './icons'
+
 export function AudioFilePicker({
   label,
+  icon,
   onFiles,
 }: {
   label: string
+  icon: DemoIconName
   onFiles: (files: File[]) => void
 }) {
   return (
-    <label className="morph-audio-demo__upload">
-      <span aria-hidden="true">＋</span>
+    <label className="audio-player-demo__upload">
+      <DemoIcon name={icon} />
       {label}
       <input
         type="file"

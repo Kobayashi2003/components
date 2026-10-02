@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { Fragment, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, ReactNode, RefObject } from 'react'
 import type { VideoChapter, VideoSubtitle } from '../VideoPlayer'
 import { formatMediaTime } from '../media/playback'
@@ -6,19 +6,41 @@ import { VideoIcon } from './icons'
 
 type View = 'main' | 'speed' | 'subtitles' | 'captions' | 'chapters' | 'shortcuts'
 
-const shortcuts: [string, string][] = [
-  ['Space / K', 'Play or pause'],
-  ['← / →', 'Seek 5 seconds'],
-  ['J / L', 'Seek 10 seconds'],
-  ['↑ / ↓', 'Volume'],
-  ['M', 'Mute'],
-  ['C', 'Subtitles'],
-  ['F', 'Fullscreen'],
-  ['I', 'Picture-in-picture'],
-  ['< / >', 'Speed'],
-  [', / .', 'Frame step while paused'],
-  ['0 – 9', 'Jump to 0–90%'],
-  ['Home / End', 'Start / end'],
+interface Shortcut {
+  action: string
+  keys: string[]
+  /** Keys are the ends of a range rather than alternatives. */
+  range?: boolean
+}
+
+const shortcutGroups: { title: string; items: Shortcut[] }[] = [
+  {
+    title: 'Playback',
+    items: [
+      { action: 'Play / pause', keys: ['Space', 'K'] },
+      { action: 'Slower / faster', keys: ['<', '>'] },
+      { action: 'Frame step (paused)', keys: [',', '.'] },
+    ],
+  },
+  {
+    title: 'Seeking',
+    items: [
+      { action: 'Back / forward 5s', keys: ['←', '→'] },
+      { action: 'Back / forward 10s', keys: ['J', 'L'] },
+      { action: 'Jump to 0–90%', keys: ['0', '9'], range: true },
+      { action: 'Start / end', keys: ['Home', 'End'] },
+    ],
+  },
+  {
+    title: 'Sound & view',
+    items: [
+      { action: 'Volume up / down', keys: ['↑', '↓'] },
+      { action: 'Mute', keys: ['M'] },
+      { action: 'Subtitles', keys: ['C'] },
+      { action: 'Fullscreen', keys: ['F'] },
+      { action: 'Picture-in-picture', keys: ['I'] },
+    ],
+  },
 ]
 
 export interface PlayerSettingsProps {
@@ -248,14 +270,28 @@ export function PlayerSettings({
   } else {
     content = (
       <div className="video-player__menu-list">
-        <dl className="video-player__shortcuts">
-          {shortcuts.map(([keys, action]) => (
-            <div key={keys}>
-              <dt>{keys}</dt>
-              <dd>{action}</dd>
-            </div>
+        <div className="video-player__shortcuts">
+          {shortcutGroups.map((group) => (
+            <section key={group.title} aria-label={group.title}>
+              <h3>{group.title}</h3>
+              <dl>
+                {group.items.map(({ action, keys, range }) => (
+                  <div key={action}>
+                    <dt>{action}</dt>
+                    <dd>
+                      {keys.map((key, index) => (
+                        <Fragment key={key}>
+                          {index > 0 && <span aria-hidden="true">{range ? '–' : '/'}</span>}
+                          <kbd>{key}</kbd>
+                        </Fragment>
+                      ))}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
           ))}
-        </dl>
+        </div>
         <p className="video-player__menu-note">Focus the video area to use shortcuts.</p>
       </div>
     )
