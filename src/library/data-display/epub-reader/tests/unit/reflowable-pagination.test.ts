@@ -14,6 +14,7 @@ import {
 } from '../../core/presentation/renderer/reflowable/geometry';
 import { DEFAULT_REFLOWABLE_RENDERER_POLICY } from '../../core/presentation/renderer/reflowable/model';
 import { reflowableScrollAxis } from '../../core/presentation/renderer/reflowable/dom';
+import { measureDocument } from '../../core/presentation/renderer/reflowable/dom/layout';
 import {
   buildReaderPreferenceCss,
   buildReflowableLayoutCss,
@@ -686,6 +687,121 @@ const item = publication.spine[0]!;
       );
     }
   }
+}
+
+// 11. The last page's offset is always scrollable. The margin after the last
+// column is not scrollable overflow, so without padding the final page lands
+// shifted by that margin — and a two-up spread with an odd page count cannot
+// reach its last page at all. The padding follows the body's writing mode,
+// which publishers often set without touching the root.
+{
+  const pad = (options: {
+    readonly writingMode: string;
+    readonly columnWidth: string;
+    readonly columnGap: string;
+    readonly client: number;
+    readonly extent: number;
+    readonly offset?: number;
+  }) => {
+    const elements = new Map<string, FakeElement>();
+    const root: FakeElement & Record<string, unknown> = {
+      style: {},
+      clientWidth: options.client,
+      clientHeight: options.client,
+      scrollWidth: options.client,
+      scrollHeight: options.client,
+      scrollTop: options.offset ?? 0,
+      scrollLeft: options.offset ?? 0,
+      append: (child: FakeElement) => {
+        elements.set(child.id ?? '', child);
+      },
+    };
+    const body = {
+      style: {},
+      scrollWidth: options.extent,
+      scrollHeight: options.extent,
+    };
+    const document = {
+      documentElement: root,
+      body,
+      defaultView: {
+        getComputedStyle: (element: unknown) =>
+          element === body
+            ? {
+                writingMode: options.writingMode,
+                columnWidth: options.columnWidth,
+                columnGap: options.columnGap,
+              }
+            : { writingMode: 'horizontal-tb', direction: 'ltr' },
+      },
+      getElementById: (id: string) => elements.get(id) ?? null,
+      createElement: (): FakeElement => ({
+        style: {},
+        setAttribute: () => {},
+        remove() {
+          elements.delete(this.id ?? '');
+        },
+      }),
+    };
+    measureDocument(document as unknown as Document);
+    return [...elements.values()][0]?.style ?? null;
+  };
+
+  // Vertical text on the body of a horizontal root: 22 pages of 746px whose
+  // extent ends one 44px page margin short.
+  const vertical = pad({
+    writingMode: 'vertical-rl',
+    columnWidth: '656.48px',
+    columnGap: '89.52px',
+    client: 746,
+    extent: 22 * 746 - 44,
+  });
+  assert(
+    vertical?.top === `${21 * 746 + 746 - 1}px`,
+    `vertical padding must reach the 22nd page, got ${vertical?.top}`,
+  );
+
+  // A fractional viewport rounds the client box up past the floored advance.
+  const fractional = pad({
+    writingMode: 'vertical-rl',
+    columnWidth: '539px',
+    columnGap: '60px',
+    client: 600,
+    extent: 32 * 599 - 30,
+  });
+  assert(
+    fractional?.top === `${31 * 599 + 600 - 1}px`,
+    `padding must follow the column advance, not the client box, got ${fractional?.top}`,
+  );
+
+  // Horizontal two-up: 15 columns of 585px advance in a 1138px viewport.
+  const spread = {
+    writingMode: 'horizontal-tb',
+    columnWidth: '486.64px',
+    columnGap: '98.36px',
+    client: 1138,
+    extent: 15 * 585 - 98.36,
+  };
+  const fromEvenPage = pad(spread);
+  assert(
+    fromEvenPage?.left === `${14 * 585 + 1138 - 1}px`,
+    `an odd chapter's last page must open a reachable spread, got ${fromEvenPage?.left}`,
+  );
+  const fromOddPage = pad({ ...spread, offset: 585 });
+  assert(
+    fromOddPage?.left === `${13 * 585 + 1138 - 1}px`,
+    `spreads read from an odd page must end on the odd parity, got ${fromOddPage?.left}`,
+  );
+
+  const scrolled = pad({ ...spread, columnWidth: 'auto' });
+  assert(scrolled === null, 'unpaginated documents must not be padded');
+}
+
+interface FakeElement {
+  id?: string;
+  readonly style: Record<string, string>;
+  setAttribute?(name: string, value: string): void;
+  remove?(): void;
 }
 
 console.log('Reflowable pagination unit test: PASS');
