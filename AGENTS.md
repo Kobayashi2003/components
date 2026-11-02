@@ -9,4 +9,4 @@ Storage for reusable components, shown by Component Atlas
 - EPUB Reader (`data-display/epub-reader/`) is its own package: follow its README
   and run its `pnpm check` after changing it.
 - Never import from Component Atlas or from another entry.
-- This file is the only agent instruction file; `CLAUDE.md` imports it.
+- Entries have no `AGENTS.md` of their own; this file covers them all.

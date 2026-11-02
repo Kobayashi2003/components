@@ -3,6 +3,10 @@
   "version": "0.15.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.10.1",
+  "engines": {
+    "node": ">=24"
+  },
   "description": "Browser EPUB reading system with CSS-fragmentation pagination for horizontal and vertical writing, image-page handling, fixed-layout support and a React adapter.",
   "scripts": {
     "typecheck": "pnpm typecheck:core && pnpm typecheck:react",
